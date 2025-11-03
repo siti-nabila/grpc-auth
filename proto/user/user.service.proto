@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "github.com/siti-nabila/grpc-auth/pb/user"; 
+
+import "user/user.payload.proto";
+
+service UserService {
+    rpc Register (CreateUserRequest) returns (CreateUserResponse);
+}
