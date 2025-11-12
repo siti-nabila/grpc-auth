@@ -24,19 +24,22 @@ var File_user_user_service_proto protoreflect.FileDescriptor
 
 const file_user_user_service_proto_rawDesc = "" +
 	"\n" +
-	"\x17user/user.service.proto\x12\x04user\x1a\x17user/user.payload.proto2L\n" +
-	"\vUserService\x12=\n" +
-	"\bRegister\x12\x17.user.CreateUserRequest\x1a\x18.user.CreateUserResponseB*Z(github.com/siti-nabila/grpc-auth/pb/userb\x06proto3"
+	"\x17user/user.service.proto\x12\x04user\x1a\x17user/user.payload.proto2z\n" +
+	"\vUserService\x126\n" +
+	"\bRegister\x12\x11.user.AuthRequest\x1a\x17.user.UserTokenResponse\x123\n" +
+	"\x05Login\x12\x11.user.AuthRequest\x1a\x17.user.UserTokenResponseB*Z(github.com/siti-nabila/grpc-auth/pb/userb\x06proto3"
 
 var file_user_user_service_proto_goTypes = []any{
-	(*CreateUserRequest)(nil),  // 0: user.CreateUserRequest
-	(*CreateUserResponse)(nil), // 1: user.CreateUserResponse
+	(*AuthRequest)(nil),       // 0: user.AuthRequest
+	(*UserTokenResponse)(nil), // 1: user.UserTokenResponse
 }
 var file_user_user_service_proto_depIdxs = []int32{
-	0, // 0: user.UserService.Register:input_type -> user.CreateUserRequest
-	1, // 1: user.UserService.Register:output_type -> user.CreateUserResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	0, // 0: user.UserService.Register:input_type -> user.AuthRequest
+	0, // 1: user.UserService.Login:input_type -> user.AuthRequest
+	1, // 2: user.UserService.Register:output_type -> user.UserTokenResponse
+	1, // 3: user.UserService.Login:output_type -> user.UserTokenResponse
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name

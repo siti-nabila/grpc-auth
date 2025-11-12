@@ -8,7 +8,17 @@ message User {
   string name = 2;
   string email = 3;
   string password = 4;
-  string created_at = 5;
+  string dob = 5;
+  string phone_no = 6;
+}
+
+message AuthRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message UserTokenResponse {
+  string token = 1;
 }
 
 message CreateUserRequest {

@@ -7,5 +7,7 @@ option go_package = "github.com/siti-nabila/grpc-auth/pb/user";
 import "user/user.payload.proto";
 
 service UserService {
-    rpc Register (CreateUserRequest) returns (CreateUserResponse);
+    rpc Register(AuthRequest) returns (UserTokenResponse);
+
+    rpc Login(AuthRequest) returns (UserTokenResponse);
 }
