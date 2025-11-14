@@ -9,6 +9,7 @@ package user
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	unsafe "unsafe"
 )
@@ -24,22 +25,27 @@ var File_user_user_service_proto protoreflect.FileDescriptor
 
 const file_user_user_service_proto_rawDesc = "" +
 	"\n" +
-	"\x17user/user.service.proto\x12\x04user\x1a\x17user/user.payload.proto2z\n" +
+	"\x17user/user.service.proto\x12\x04user\x1a\x17user/user.payload.proto\x1a\x1bgoogle/protobuf/empty.proto2\xab\x01\n" +
 	"\vUserService\x126\n" +
 	"\bRegister\x12\x11.user.AuthRequest\x1a\x17.user.UserTokenResponse\x123\n" +
-	"\x05Login\x12\x11.user.AuthRequest\x1a\x17.user.UserTokenResponseB*Z(github.com/siti-nabila/grpc-auth/pb/userb\x06proto3"
+	"\x05Login\x12\x11.user.AuthRequest\x1a\x17.user.UserTokenResponse\x12/\n" +
+	"\x06TesRPC\x12\x16.google.protobuf.Empty\x1a\r.user.TestRPCB*Z(github.com/siti-nabila/grpc-auth/pb/userb\x06proto3"
 
 var file_user_user_service_proto_goTypes = []any{
 	(*AuthRequest)(nil),       // 0: user.AuthRequest
-	(*UserTokenResponse)(nil), // 1: user.UserTokenResponse
+	(*emptypb.Empty)(nil),     // 1: google.protobuf.Empty
+	(*UserTokenResponse)(nil), // 2: user.UserTokenResponse
+	(*TestRPC)(nil),           // 3: user.TestRPC
 }
 var file_user_user_service_proto_depIdxs = []int32{
 	0, // 0: user.UserService.Register:input_type -> user.AuthRequest
 	0, // 1: user.UserService.Login:input_type -> user.AuthRequest
-	1, // 2: user.UserService.Register:output_type -> user.UserTokenResponse
-	1, // 3: user.UserService.Login:output_type -> user.UserTokenResponse
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
+	1, // 2: user.UserService.TesRPC:input_type -> google.protobuf.Empty
+	2, // 3: user.UserService.Register:output_type -> user.UserTokenResponse
+	2, // 4: user.UserService.Login:output_type -> user.UserTokenResponse
+	3, // 5: user.UserService.TesRPC:output_type -> user.TestRPC
+	3, // [3:6] is the sub-list for method output_type
+	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name

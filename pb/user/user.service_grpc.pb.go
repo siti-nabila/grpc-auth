@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -21,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	UserService_Register_FullMethodName = "/user.UserService/Register"
 	UserService_Login_FullMethodName    = "/user.UserService/Login"
+	UserService_TesRPC_FullMethodName   = "/user.UserService/TesRPC"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -29,6 +31,7 @@ const (
 type UserServiceClient interface {
 	Register(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*UserTokenResponse, error)
 	Login(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*UserTokenResponse, error)
+	TesRPC(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*TestRPC, error)
 }
 
 type userServiceClient struct {
@@ -59,12 +62,23 @@ func (c *userServiceClient) Login(ctx context.Context, in *AuthRequest, opts ...
 	return out, nil
 }
 
+func (c *userServiceClient) TesRPC(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*TestRPC, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TestRPC)
+	err := c.cc.Invoke(ctx, UserService_TesRPC_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
 type UserServiceServer interface {
 	Register(context.Context, *AuthRequest) (*UserTokenResponse, error)
 	Login(context.Context, *AuthRequest) (*UserTokenResponse, error)
+	TesRPC(context.Context, *emptypb.Empty) (*TestRPC, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -80,6 +94,9 @@ func (UnimplementedUserServiceServer) Register(context.Context, *AuthRequest) (*
 }
 func (UnimplementedUserServiceServer) Login(context.Context, *AuthRequest) (*UserTokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedUserServiceServer) TesRPC(context.Context, *emptypb.Empty) (*TestRPC, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TesRPC not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -138,6 +155,24 @@ func _UserService_Login_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_TesRPC_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).TesRPC(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_TesRPC_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).TesRPC(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -152,6 +187,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _UserService_Login_Handler,
+		},
+		{
+			MethodName: "TesRPC",
+			Handler:    _UserService_TesRPC_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

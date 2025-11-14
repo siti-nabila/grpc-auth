@@ -5,9 +5,10 @@ package user;
 option go_package = "github.com/siti-nabila/grpc-auth/pb/user"; 
 
 import "user/user.payload.proto";
+import "google/protobuf/empty.proto";
 
 service UserService {
     rpc Register(AuthRequest) returns (UserTokenResponse);
-
     rpc Login(AuthRequest) returns (UserTokenResponse);
+    rpc TesRPC(google.protobuf.Empty) returns (TestRPC);
 }

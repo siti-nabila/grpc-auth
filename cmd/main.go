@@ -1,7 +1,16 @@
 package main
 
-import "fmt"
+import (
+	"time"
 
+	"github.com/siti-nabila/grpc-auth/pkg/configs"
+)
+
+func init() {
+	configs.InitAllConfigs()
+}
 func main() {
-	fmt.Println("main")
+	loc, _ := time.LoadLocation("Asia/Jakarta")
+	time.Local = loc
+
 }

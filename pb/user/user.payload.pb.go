@@ -393,6 +393,50 @@ func (x *GetUserResponse) GetUser() *User {
 	return nil
 }
 
+type TestRPC struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Res           string                 `protobuf:"bytes,1,opt,name=res,proto3" json:"res,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TestRPC) Reset() {
+	*x = TestRPC{}
+	mi := &file_user_user_payload_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TestRPC) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TestRPC) ProtoMessage() {}
+
+func (x *TestRPC) ProtoReflect() protoreflect.Message {
+	mi := &file_user_user_payload_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TestRPC.ProtoReflect.Descriptor instead.
+func (*TestRPC) Descriptor() ([]byte, []int) {
+	return file_user_user_payload_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *TestRPC) GetRes() string {
+	if x != nil {
+		return x.Res
+	}
+	return ""
+}
+
 var File_user_user_payload_proto protoreflect.FileDescriptor
 
 const file_user_user_payload_proto_rawDesc = "" +
@@ -421,7 +465,9 @@ const file_user_user_payload_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\"1\n" +
 	"\x0fGetUserResponse\x12\x1e\n" +
 	"\x04user\x18\x01 \x01(\v2\n" +
-	".user.UserR\x04userB*Z(github.com/siti-nabila/grpc-auth/pb/userb\x06proto3"
+	".user.UserR\x04user\"\x1b\n" +
+	"\aTestRPC\x12\x10\n" +
+	"\x03res\x18\x01 \x01(\tR\x03resB*Z(github.com/siti-nabila/grpc-auth/pb/userb\x06proto3"
 
 var (
 	file_user_user_payload_proto_rawDescOnce sync.Once
@@ -435,7 +481,7 @@ func file_user_user_payload_proto_rawDescGZIP() []byte {
 	return file_user_user_payload_proto_rawDescData
 }
 
-var file_user_user_payload_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_user_user_payload_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_user_user_payload_proto_goTypes = []any{
 	(*User)(nil),               // 0: user.User
 	(*AuthRequest)(nil),        // 1: user.AuthRequest
@@ -444,6 +490,7 @@ var file_user_user_payload_proto_goTypes = []any{
 	(*CreateUserResponse)(nil), // 4: user.CreateUserResponse
 	(*GetUserRequest)(nil),     // 5: user.GetUserRequest
 	(*GetUserResponse)(nil),    // 6: user.GetUserResponse
+	(*TestRPC)(nil),            // 7: user.TestRPC
 }
 var file_user_user_payload_proto_depIdxs = []int32{
 	0, // 0: user.CreateUserResponse.user:type_name -> user.User
@@ -466,7 +513,7 @@ func file_user_user_payload_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_user_payload_proto_rawDesc), len(file_user_user_payload_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

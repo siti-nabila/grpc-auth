@@ -3,21 +3,22 @@ BIN_DIR=bin
 PROTO_SRC := $(shell find proto -name '*.proto')
 PROTO_OUT := pb
 
-all: build run
+all: clean build run
 
 build:
-	@echo "Building $(APP_NAME)..."
-	go build -o $(BIN_DIR)/$(APP_NAME) cmd/api/main.go
+	@echo "🚧 Building $(APP_NAME)..."
+	go build -o $(BIN_DIR)/$(APP_NAME) cmd/main.go
 
 run:
-	@echo "Running $(APP_NAME)..."
+	@echo "🚀 Running $(APP_NAME)..."
 	./$(BIN_DIR)/$(APP_NAME)
 
 clean:
-	@echo "Cleaning up..."
+	@echo "🧹 Cleaning build..."
 	rm -f $(BIN_DIR)/$(APP_NAME)
 
 .PHONY: proto clean-proto
+
 proto:
 	@echo "🔧 Generating protobuf files..."
 	@mkdir -p $(PROTO_OUT)
@@ -33,4 +34,4 @@ proto:
 
 clean-proto:
 	@echo "🧹 Cleaning generated protobuf files..."
-	@rm -rf $(PROTO_OUT)
+	@find $(PROTO_OUT) -type f -name "*.pb.go" -delete

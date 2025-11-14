@@ -38,3 +38,6 @@ message GetUserRequest {
 message GetUserResponse {
   User user = 1;
 }
+message TestRPC {
+  string res = 1;
+}
