@@ -3,7 +3,7 @@ package main
 import (
 	"time"
 
-	"github.com/siti-nabila/grpc-auth/pkg/configs"
+	"github.com/siti-nabila/grpc-auth/internal/configs"
 )
 
 func init() {

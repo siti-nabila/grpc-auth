@@ -1,23 +1,34 @@
 package jwt
 
 import (
-	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/siti-nabila/grpc-auth/pkg/configs"
 )
 
-func GenerateJWTToken(userId int, secretKey string) (string, error) {
-
-	claims := jwt.MapClaims{
-		"user_id": strconv.Itoa(userId),
-		"exp":     time.Now().Add(time.Hour * 72).Unix(),
-		"iat":     time.Now().Unix(),
-		"iss":     configs.AppCfg.ApplicationName,
+type (
+	JwtClaims struct {
+		UserId uint64 `json:"user_id"`
+		jwt.RegisteredClaims
 	}
+	JwtRequest struct {
+		UserId uint64 `json:"user_id"`
+		Issuer string `json:"iss"`
+		Secret string `json:"secret_key"`
+	}
+)
 
+func GenerateJWTToken(req JwtRequest) (string, error) {
+
+	claims := JwtClaims{
+		UserId: req.UserId,
+		RegisteredClaims: jwt.RegisteredClaims{
+			Issuer:    req.Issuer,
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)),
+		},
+	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(secretKey))
+	return token.SignedString([]byte(req.Secret))
 
 }

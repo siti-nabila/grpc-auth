@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/siti-nabila/grpc-auth/pkg/database"
 	"github.com/spf13/viper"
 )
 
@@ -20,8 +21,10 @@ type (
 		KeepAliveTimeout time.Duration
 		KeepAliveIdle    time.Duration
 
-		Database map[string]DBConfig
+		Database map[string]database.DBConfig
 		Services map[string]ServiceConfig
+		JWT      JWTConfig
+		Logger   LoggerConfig
 	}
 
 	ServiceConfig struct {
@@ -29,6 +32,13 @@ type (
 		Port             int
 		KeepAlive        time.Duration
 		KeepAliveTimeout time.Duration
+	}
+	JWTConfig struct {
+		SecretKey string
+	}
+	LoggerConfig struct {
+		HTTPMode string
+		DBMode   string
 	}
 )
 

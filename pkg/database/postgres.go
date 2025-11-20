@@ -1,8 +1,9 @@
-package configs
+package database
 
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"strings"
 	"sync"
 	"time"
@@ -11,11 +12,11 @@ import (
 )
 
 const (
-	UserDbSource dbSource = "user"
+	UserDbSource DbSource = "user"
 )
 
 type (
-	dbSource string
+	DbSource string
 	DBConfig struct {
 		User     string
 		Password string
@@ -27,12 +28,12 @@ type (
 )
 
 var (
-	dbNatConnections = make(map[dbSource]*sql.DB, 0)
-	dbConfigs        = make(map[dbSource]DBConfig, 0)
+	dbNatConnections = make(map[DbSource]*sql.DB, 0)
+	dbConfigs        = make(map[DbSource]DBConfig, 0)
 	mu               sync.RWMutex
 )
 
-func DBConnect(src dbSource) {
+func DBConnect(src DbSource) {
 
 	mu.Lock()
 	defer mu.Unlock()
@@ -69,7 +70,7 @@ func DBConnect(src dbSource) {
 
 }
 
-func DBClose(src dbSource) {
+func DBClose(src DbSource) {
 	sqlDB, exists := dbNatConnections[src]
 	if !exists {
 		return
@@ -80,8 +81,21 @@ func DBClose(src dbSource) {
 	}
 }
 
-func DBAddConnection(src dbSource, cfg DBConfig) {
+func DBAddConnection(src DbSource, cfg DBConfig) {
 	mu.Lock()
 	defer mu.Unlock()
 	dbConfigs[src] = cfg
+}
+
+func DBGetNativePool(src DbSource) *sql.DB {
+	mu.Lock()
+	defer mu.Unlock()
+
+	if db, exists := dbNatConnections[src]; !exists {
+		log.Println("error get db: ", src)
+		return nil
+	} else {
+		return db
+	}
+
 }
