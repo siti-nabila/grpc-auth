@@ -1,0 +1,20 @@
+errors:
+  err_duplicate_key:
+    code: 100001
+    en: already exists
+    id: sudah ada
+  err_no_rows:
+    code: 100002
+    en: data not found
+    id: data tidak ditemukan
+  err_not_found:
+    code: 110001
+    en: data not found
+    id: data tidak ditemukan
+  err_required:
+    en: is required
+    id: harus diisi
+  err_alpha_only:
+    en: must be alphabetical
+    id: harus huruf alfabet
+      

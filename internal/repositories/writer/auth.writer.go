@@ -6,6 +6,7 @@ import (
 
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/pkg/database"
+	"github.com/siti-nabila/grpc-auth/pkg/helpers"
 )
 
 type (
@@ -55,11 +56,6 @@ func (a *AuthWriter) Register(request *domain.AuthRequest) (err error) {
 
 func (a *AuthWriter) RegisterTx(request *domain.AuthRequest) (err error) {
 	query := `INSERT INTO auth(email, password) VALUES ($1, $2) RETURNING id`
-
 	err = a.Db.QueryRowTxContext(a.ctx, query, request.Email, request.Password).Scan(&request.Id)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return helpers.HandleErrorDB(err)
 }
