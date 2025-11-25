@@ -263,4 +263,4 @@ This project is for practice purposes.
 
 ---
 
-**Last Updated:** 2024
+**Last Updated:** 2025
