@@ -24,8 +24,8 @@ profile.cov
 go.work
 go.work.sum
 
-/bin/
 logs/
+bin
 
 # Editor/IDE
 # .idea/

@@ -52,3 +52,7 @@ func (a *AuthRequest) GetJSONTags() map[string]string {
 	}
 	return tags
 }
+
+func (a *AuthRequest) GetTableName() string {
+	return "auth"
+}

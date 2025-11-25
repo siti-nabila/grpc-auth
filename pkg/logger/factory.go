@@ -47,7 +47,7 @@ func NewLogger(format string, writer io.Writer, enableColor bool) *logrus.Logger
 	l.AddHook(NewWriterHook(os.Stdout, formatterTerminal, logrus.AllLevels...))
 
 	// OUTPUT ke file (writer external)
-	l.AddHook(NewWriterHook(writer, formatterFile, logrus.AllLevels...))
+	l.AddHook(NewFileHook(writer, formatterFile, logrus.AllLevels...))
 
 	return l
 }

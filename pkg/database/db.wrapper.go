@@ -8,6 +8,16 @@ import (
 	"github.com/siti-nabila/grpc-auth/pkg/logger"
 )
 
+const (
+	ColorReset  = "\033[0m"
+	ColorRed    = "\033[31m"
+	ColorGreen  = "\033[32m"
+	ColorYellow = "\033[33m"
+	ColorBlue   = "\033[34m"
+	ColorCyan   = "\033[36m"
+	Bold        = "\033[1m"
+)
+
 type (
 	DBLogger struct {
 		Db *sql.DB
@@ -36,11 +46,10 @@ func (d *DBLogger) UseTransaction(tx *sql.Tx) {
 }
 
 func deferLog(query string, err *error, start time.Time) {
-
 	if *err != nil {
-		logger.Logs.DB.Errorf("[SQL-ERROR] %v | err: %v | time: %v", query, *err, time.Since(start))
+		logger.Logs.DB.Errorf("%s%s[SQL-ERROR] %v | err: %v %s| %s%s time: %v%s", Bold, ColorRed, query, *err, ColorReset, Bold, ColorCyan, time.Since(start), ColorReset)
 	} else {
-		logger.Logs.DB.Infof("[SQL] %v | time: %v", query, time.Since(start))
+		logger.Logs.DB.Infof("%s%s[SQL]%s %v | time: %v", Bold, ColorGreen, ColorReset, query, time.Since(start))
 	}
 }
 

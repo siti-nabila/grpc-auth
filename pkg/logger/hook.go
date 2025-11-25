@@ -1,7 +1,9 @@
 package logger
 
 import (
+	"fmt"
 	"io"
+	"regexp"
 
 	"github.com/sirupsen/logrus"
 )
@@ -19,6 +21,8 @@ type (
 	}
 )
 
+var ansi = regexp.MustCompile(`(?:\\x1b|\x1b)\[[0-9;?]*[ -/]*[@-~]`)
+
 func NewWriterHook(w io.Writer, f logrus.Formatter, levels ...logrus.Level) *WriterHook {
 	if len(levels) == 0 {
 		levels = logrus.AllLevels
@@ -31,6 +35,19 @@ func NewWriterHook(w io.Writer, f logrus.Formatter, levels ...logrus.Level) *Wri
 	}
 }
 
+func NewFileHook(w io.Writer, f logrus.Formatter, levels ...logrus.Level) *FileHook {
+	if len(levels) == 0 {
+		levels = logrus.AllLevels
+	}
+
+	fmt.Println("---  file hook")
+
+	return &FileHook{
+		Writer:    w,
+		Formatter: f,
+		LevelsArr: levels,
+	}
+}
 func (h *WriterHook) Levels() []logrus.Level {
 	return h.LevelsArr
 }
@@ -41,7 +58,6 @@ func (h *WriterHook) Fire(entry *logrus.Entry) error {
 	if err != nil {
 		return err
 	}
-
 	_, err = h.Writer.Write(msg)
 	return err
 }
@@ -51,10 +67,21 @@ func (h *FileHook) Levels() []logrus.Level {
 }
 
 func (h *FileHook) Fire(e *logrus.Entry) error {
-	line, err := h.Formatter.Format(e)
+	// remove ANSI color before writing to file
+	clean := ansi.ReplaceAllString(e.Message, "")
+
+	newEntry := &logrus.Entry{
+		Logger:  e.Logger,
+		Time:    e.Time,
+		Level:   e.Level,
+		Message: clean,
+		Data:    e.Data,
+	}
+
+	msg, err := h.Formatter.Format(newEntry)
 	if err != nil {
 		return err
 	}
-	_, err = h.Writer.Write(line)
+	_, err = h.Writer.Write(msg)
 	return err
 }
