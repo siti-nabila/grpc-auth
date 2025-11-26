@@ -32,13 +32,13 @@ func (u *UserHandler) Register(ctx context.Context, in *user.AuthRequest) (*user
 		return nil, status.Errorf(codes.InvalidArgument, string(errJson))
 	}
 
-	err := feat.Register(request)
+	token, err := feat.Register(request)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
-	reqJson, _ := json.Marshal(request)
+
 	return &user.UserTokenResponse{
-		Token: string(reqJson),
+		Token: token,
 	}, nil
 }
 func (u *UserHandler) Login(context.Context, *user.AuthRequest) (*user.UserTokenResponse, error) {

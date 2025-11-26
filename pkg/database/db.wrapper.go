@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/siti-nabila/grpc-auth/pkg/logger"
@@ -46,11 +47,20 @@ func (d *DBLogger) UseTransaction(tx *sql.Tx) {
 }
 
 func deferLog(query string, err *error, start time.Time) {
-	if *err != nil {
-		logger.Logs.DB.Errorf("%s%s[SQL-ERROR] %v | err: %v %s| %s%s time: %v%s", Bold, ColorRed, query, *err, ColorReset, Bold, ColorCyan, time.Since(start), ColorReset)
+	var timeColor string
+	timeFormat := "%s%s time: %v%s"
+	duration := time.Since(start)
+	if duration > 300*time.Millisecond {
+		timeColor = fmt.Sprintf(timeFormat, Bold, ColorRed, duration, ColorReset)
 	} else {
-		logger.Logs.DB.Infof("%s%s[SQL]%s %v | time: %v", Bold, ColorGreen, ColorReset, query, time.Since(start))
+		timeColor = fmt.Sprintf(timeFormat, Bold, ColorCyan, duration, ColorReset)
 	}
+	if *err != nil {
+		logger.Logs.DB.Errorf("%s%s[SQL-ERROR]%s %v | %s%s err: %v %s | %v", Bold, ColorRed, ColorReset, query, Bold, ColorRed, *err, ColorReset, timeColor)
+	} else {
+		logger.Logs.DB.Infof("%s%s[SQL]%s %v | %v", Bold, ColorGreen, ColorReset, query, timeColor)
+	}
+
 }
 
 func (d *DBLogger) ExecContext(ctx context.Context, query string, args ...any) (res sql.Result, err error) {

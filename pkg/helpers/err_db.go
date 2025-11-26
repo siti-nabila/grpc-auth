@@ -8,9 +8,13 @@ import (
 func HandleErrorDB(err error) error {
 	if err != nil {
 		if err, ok := err.(*pq.Error); ok {
-			if err.Code == "23505" {
+			switch err.Code {
+			case "23505":
 				return dictionary.ErrDuplicateKey
+			default:
+				return err
 			}
+
 		}
 		return err
 	}

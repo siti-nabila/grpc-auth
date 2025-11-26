@@ -1,32 +1,14 @@
 package authfeature
 
 import (
-	"context"
-
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
-	"github.com/siti-nabila/grpc-auth/internal/repositories/writer"
+	"github.com/siti-nabila/grpc-auth/pkg/jwt"
 )
 
-type (
-	AuthService interface {
-		Register(req domain.AuthRequest) (err error)
-	}
-
-	authService struct {
-		authRepo domain.AuthWriter
-	}
-)
-
-func NewAuthService(ctx context.Context) AuthService {
-	return &authService{
-		authRepo: writer.NewAuthWriter(ctx),
-	}
-}
-
-func (a *authService) Register(request domain.AuthRequest) (err error) {
+func (a *authService) Register(request domain.AuthRequest) (token string, err error) {
 	tx, err := a.authRepo.Begin()
 	if err != nil {
-		return err
+		return "", err
 	}
 	a.authRepo.UseTransaction(tx)
 
@@ -37,10 +19,29 @@ func (a *authService) Register(request domain.AuthRequest) (err error) {
 			tx.Commit()
 		}
 	}()
+	passCfg := DefaultArgon2Config()
+	hashedPassword, err := passCfg.HashPassword(request.Password)
+	if err != nil {
+		return "", err
+	}
 
 	req := &domain.AuthRequest{
 		Email:    request.Email,
-		Password: request.Password,
+		Password: hashedPassword,
 	}
-	return a.authRepo.RegisterTx(req)
+	err = a.authRepo.RegisterTx(req)
+	if err != nil {
+		return "", err
+	}
+	jwtReq := jwt.JwtRequest{
+		UserId: req.Id,
+		Issuer: a.appCfg.ApplicationName,
+		Secret: a.appCfg.JWT.SecretKey,
+	}
+	token, err = jwt.GenerateJWTToken(jwtReq)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }
