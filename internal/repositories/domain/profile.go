@@ -11,8 +11,8 @@ type (
 		UseTransaction(tx *sql.Tx)
 		Begin() (*sql.Tx, error)
 
-		CreateProfile(*AuthRequest) error
-		CreateProfileTx(request *AuthRequest) (err error)
+		// CreateProfile(*AuthRequest) error
+		CreateProfileTx(request *ProfileRequest) (err error)
 	}
 
 	ProfileRequest struct {

@@ -2,27 +2,25 @@ package reader
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/siti-nabila/grpc-auth/internal/repositories"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/pkg/database"
 )
 
 type (
-	DbSource   string
 	authReader struct {
 		Db  *database.DBLogger
 		ctx context.Context
 	}
 )
 
-const (
-	UserDbSource DbSource = "user"
-)
-
 func NewAuthReader(ctx context.Context) domain.AuthReader {
 	dbLogger := database.NewDBLogger()
 	conn := database.DBGetNativePool(database.UserDbSource)
 	dbLogger.Adapter(conn)
+
 	return &authReader{
 		Db:  dbLogger,
 		ctx: ctx,
@@ -31,7 +29,7 @@ func NewAuthReader(ctx context.Context) domain.AuthReader {
 }
 
 func (a *authReader) GetByEmail(email string) (result domain.AuthResponse, err error) {
-	query := `SELECT id, email, password, created_at, updated_at, deleted_at FROM auth WHERE email = $1 LIMIT 1`
+	query := fmt.Sprintf(`SELECT id, email, password, created_at, updated_at, deleted_at FROM %s WHERE email = $1 LIMIT 1`, repositories.AuthTable)
 	err = a.Db.QueryRowContext(a.ctx, query, email).Scan(
 		&result.Id,
 		&result.Email,
@@ -48,7 +46,7 @@ func (a *authReader) GetByEmail(email string) (result domain.AuthResponse, err e
 }
 
 func (a *authReader) GetById(id uint64) (result domain.AuthResponse, err error) {
-	query := `SELECT id, email, password, created_at, updated_at,  deleted_at FROM auth WHERE id = $1 LIMIT 1`
+	query := fmt.Sprintf(`SELECT id, email, password, created_at, updated_at, deleted_at FROM %s WHERE id = $1 LIMIT 1`, repositories.AuthTable)
 	err = a.Db.QueryRowContext(a.ctx, query, id).Scan(
 		&result.Id,
 		&result.Email,

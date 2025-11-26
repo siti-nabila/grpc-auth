@@ -11,6 +11,7 @@ func (a *authService) Register(request domain.AuthRequest) (*string, error) {
 		return nil, err
 	}
 	a.authWriter.UseTransaction(tx)
+	a.profileWriter.UseTransaction(tx)
 
 	defer deferTransaction(tx, &err)
 
@@ -29,6 +30,14 @@ func (a *authService) Register(request domain.AuthRequest) (*string, error) {
 		return nil, err
 	}
 	token, err := a.GenerateAuthToken(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	profileRequest := &domain.ProfileRequest{
+		UserId: req.Id,
+	}
+	err = a.profileWriter.CreateProfileTx(profileRequest)
 	if err != nil {
 		return nil, err
 	}

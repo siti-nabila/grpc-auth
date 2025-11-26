@@ -18,17 +18,19 @@ type (
 	}
 
 	authService struct {
-		authWriter domain.AuthWriter
-		authReader domain.AuthReader
-		appCfg     *config.AppConfig
+		authWriter    domain.AuthWriter
+		authReader    domain.AuthReader
+		profileWriter domain.ProfileWriter
+		appCfg        *config.AppConfig
 	}
 )
 
 func NewAuthService(ctx context.Context) AuthService {
 	return &authService{
-		authWriter: writer.NewAuthWriter(ctx),
-		authReader: reader.NewAuthReader(ctx),
-		appCfg:     config.GetAppConfig(),
+		authWriter:    writer.NewAuthWriter(ctx),
+		authReader:    reader.NewAuthReader(ctx),
+		profileWriter: writer.NewProfileWriter(ctx),
+		appCfg:        config.GetAppConfig(),
 	}
 }
 
