@@ -7,8 +7,9 @@ import (
 )
 
 var (
-	errPack         errorpackage.DictionaryPack
-	ErrDuplicateKey error
+	errPack             errorpackage.DictionaryPack
+	ErrDuplicateKey     error
+	ErrPasswordMismatch error
 
 	//go:embed err_list.yaml
 	errorList []byte
@@ -18,4 +19,5 @@ func init() {
 	errPack = errorpackage.NewErrYamlPackage()
 	errPack.LoadBytes(errorList)
 	ErrDuplicateKey = errPack.New("err_duplicate_key")
+	ErrPasswordMismatch = errPack.New("err_password_mismatch")
 }

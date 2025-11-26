@@ -15,10 +15,24 @@ type (
 		RegisterTx(request *AuthRequest) (err error)
 	}
 
+	AuthReader interface {
+		GetById(id uint64) (AuthResponse, error)
+		GetByEmail(email string) (AuthResponse, error)
+	}
+
 	AuthRequest struct {
 		Id       uint64 `sql:"id" json:"id"`
 		Email    string `sql:"email" json:"email"`
 		Password string `sql:"password" json:"password"`
+	}
+
+	AuthResponse struct {
+		Id        uint64       `sql:"id" json:"id"`
+		Email     string       `sql:"email" json:"email"`
+		Password  string       `sql:"password" json:"password"`
+		CreatedAt sql.NullTime `sql:"created_at" json:"created_at"`
+		UpdatedAt sql.NullTime `sql:"updated_at" json:"updated_at"`
+		DeletedAt sql.NullTime `sql:"deleted_at" json:"deleted_at"`
 	}
 )
 

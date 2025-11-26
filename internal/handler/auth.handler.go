@@ -38,11 +38,29 @@ func (u *UserHandler) Register(ctx context.Context, in *user.AuthRequest) (*user
 	}
 
 	return &user.UserTokenResponse{
-		Token: token,
+		Token: *token,
 	}, nil
 }
-func (u *UserHandler) Login(context.Context, *user.AuthRequest) (*user.UserTokenResponse, error) {
-	return nil, nil
+func (u *UserHandler) Login(ctx context.Context, in *user.AuthRequest) (*user.UserTokenResponse, error) {
+	request := domain.AuthRequest{
+		Email:    in.Email,
+		Password: in.Password,
+	}
+	if errs := request.Validate(); errs != nil || len(errs) != 0 {
+		errJson, _ := json.Marshal(errs)
+		return nil, status.Errorf(codes.InvalidArgument, string(errJson))
+	}
+
+	feat := authfeature.NewAuthService(ctx)
+	token, err := feat.Login(request)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
+	return &user.UserTokenResponse{
+		Token: *token,
+	}, nil
+
 }
 func (u *UserHandler) TesRPC(context.Context, *emptypb.Empty) (*user.TestRPC, error) {
 	return &user.TestRPC{

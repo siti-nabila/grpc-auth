@@ -42,7 +42,6 @@ func (d *DBLogger) Adapter(dbConn *sql.DB) {
 }
 
 func (d *DBLogger) UseTransaction(tx *sql.Tx) {
-
 	d.Tx = tx
 }
 

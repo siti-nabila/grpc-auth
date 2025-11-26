@@ -8,9 +8,15 @@ errors:
     en: data not found
     id: data tidak ditemukan
   err_not_found:
-    code: 110001
+    code: 110003
     en: data not found
     id: data tidak ditemukan
+  err_password_mismatch:
+    code: 110004
+    en: wrong password
+    id: password salah
+
+
   err_required:
     en: is required
     id: harus diisi
