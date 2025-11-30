@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 
+	errorpackage "github.com/siti-nabila/error-package"
 	authfeature "github.com/siti-nabila/grpc-auth/internal/features/auth_feature"
+	"github.com/siti-nabila/grpc-auth/internal/inteceptors"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/pb/user"
 
@@ -23,6 +25,9 @@ func (u *UserHandler) Register(ctx context.Context, in *user.AuthRequest) (*user
 	var (
 		feat = authfeature.NewAuthService(ctx)
 	)
+	lang := ctx.Value(inteceptors.ContextKeyLanguage).(string)
+	errorpackage.SetLanguage(lang)
+
 	request := domain.AuthRequest{
 		Email:    in.Email,
 		Password: in.Password,

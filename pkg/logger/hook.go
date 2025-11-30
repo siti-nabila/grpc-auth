@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"fmt"
 	"io"
 	"regexp"
 
@@ -39,8 +38,6 @@ func NewFileHook(w io.Writer, f logrus.Formatter, levels ...logrus.Level) *FileH
 	if len(levels) == 0 {
 		levels = logrus.AllLevels
 	}
-
-	fmt.Println("---  file hook")
 
 	return &FileHook{
 		Writer:    w,
