@@ -3,6 +3,7 @@ package inteceptors
 import (
 	"context"
 
+	errorpackage "github.com/siti-nabila/error-package"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -26,6 +27,8 @@ func LanguageInterceptor(
 		langs := md.Get(string(ContextKeyLanguage))
 		if len(langs) > 0 {
 			ctx = context.WithValue(ctx, ContextKeyLanguage, langs[0])
+			errorpackage.SetLanguage(langs[0])
+
 		}
 	}
 	return handler(ctx, req)
