@@ -2,11 +2,12 @@ package handler
 
 import (
 	"context"
-	"encoding/json"
 
+	errorpackage "github.com/siti-nabila/error-package"
 	authfeature "github.com/siti-nabila/grpc-auth/internal/features/auth_feature"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/pb/user"
+	"github.com/siti-nabila/grpc-auth/pkg/helpers"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -27,9 +28,10 @@ func (u *UserHandler) Register(ctx context.Context, in *user.AuthRequest) (*user
 		Email:    in.Email,
 		Password: in.Password,
 	}
-	if errs := request.Validate(); errs != nil || len(errs) != 0 {
-		errJson, _ := json.Marshal(errs)
-		return nil, status.Errorf(codes.InvalidArgument, string(errJson))
+	if err := request.Validate(); err != nil {
+		if er, ok := err.(errorpackage.Errors); ok {
+			return nil, helpers.GrpcBadRequest(er)
+		}
 	}
 
 	token, err := feat.Register(request)
@@ -46,9 +48,10 @@ func (u *UserHandler) Login(ctx context.Context, in *user.AuthRequest) (*user.Us
 		Email:    in.Email,
 		Password: in.Password,
 	}
-	if errs := request.Validate(); errs != nil || len(errs) != 0 {
-		errJson, _ := json.Marshal(errs)
-		return nil, status.Errorf(codes.InvalidArgument, string(errJson))
+	if err := request.Validate(); err != nil {
+		if er, ok := err.(errorpackage.Errors); ok {
+			return nil, helpers.GrpcBadRequest(er)
+		}
 	}
 
 	feat := authfeature.NewAuthService(ctx)

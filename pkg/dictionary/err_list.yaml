@@ -15,11 +15,22 @@ errors:
     code: 110004
     en: wrong password
     id: password salah
+  err_bad_request:
+    code: 1400
+    en: "Bad request."
+    id: "Permintaan tidak valid."
 
 
   err_required:
     en: is required
     id: harus diisi
+  err_min_length:
+    en: minimum length is 6
+    id: minimal panjang huruf adalah 6
+  err_max_length:
+    en: minimum length is 50
+    id: minimal panjang huruf adalah 6
+
   err_alpha_only:
     en: must be alphabetical
     id: harus huruf alfabet

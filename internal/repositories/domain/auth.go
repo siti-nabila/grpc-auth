@@ -2,8 +2,11 @@ package domain
 
 import (
 	"database/sql"
-	"errors"
 	"reflect"
+
+	errorpackage "github.com/siti-nabila/error-package"
+	"github.com/siti-nabila/grpc-auth/pkg/dictionary"
+	"github.com/siti-nabila/grpc-auth/pkg/helpers"
 )
 
 type (
@@ -36,19 +39,66 @@ type (
 	}
 )
 
-func (a *AuthRequest) Validate() (errs map[string]error) {
-	errs = make(map[string]error, 0)
-	jsonTags := a.GetJSONTags()
+func (a *AuthRequest) Validate() error {
+	// errs = make(map[string]error, 0)
+	// jsonTags := a.GetJSONTags()
 	// tag := jsonTags[a.Email]
-	if a.Email == "" {
-		errs[jsonTags[a.Email]] = errors.New("email is required")
+	errs := errorpackage.Errors{}
+	if er := a.validateEmail(); er != nil {
+		if sub, ok := er.(errorpackage.Errors); ok {
+			errs.Merge(sub)
+		} else {
+			errs.Add(helpers.EmailJsonTag, er)
+		}
 	}
-	if a.Password == "" {
-		errs[jsonTags[a.Password]] = errors.New("password is required")
+	if er := a.validatePassword(); er != nil {
+		if sub, ok := er.(errorpackage.Errors); ok {
+			errs.Merge(sub)
+		} else {
+			errs.Add(helpers.PasswordJsonTag, er)
+		}
+	}
+	if errs.Empty() {
+		return nil
+	}
+
+	return errs
+}
+
+func (a *AuthRequest) validateEmail() error {
+	errs := errorpackage.Errors{}
+
+	if a.Email == "" {
+		errs.Add(helpers.EmailJsonTag, dictionary.ErrRequired)
+	}
+	if len(a.Email) < 6 {
+		errs.Add(helpers.EmailJsonTag, dictionary.ErrMinLength)
+	}
+	if len(a.Email) > 50 {
+		errs.Add(helpers.EmailJsonTag, dictionary.ErrMaxLength)
 	}
 	if len(errs) != 0 {
 		return errs
 	}
+
+	return nil
+}
+func (a *AuthRequest) validatePassword() error {
+	errs := errorpackage.Errors{}
+
+	if a.Password == "" {
+		errs.Add(helpers.PasswordJsonTag, dictionary.ErrRequired)
+	}
+	if len(a.Password) < 6 {
+		errs.Add(helpers.PasswordJsonTag, dictionary.ErrMinLength)
+	}
+	if len(a.Password) > 50 {
+		errs.Add(helpers.PasswordJsonTag, dictionary.ErrMaxLength)
+	}
+	if len(errs) != 0 {
+		return errs
+	}
+
 	return nil
 }
 
