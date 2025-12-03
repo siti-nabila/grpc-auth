@@ -37,6 +37,71 @@ func GrpcBadRequest(err error) error {
 	return stWithDetails.Err()
 }
 
+func GrpcBadGateway(err error) error {
+	if err == nil {
+		return nil
+	}
+	return status.Error(codes.Internal, err.Error())
+}
+
+func GrpcConflict(err error) error {
+	if err == nil {
+		return nil
+	}
+	return status.Error(codes.AlreadyExists, err.Error())
+}
+
+func GrpcUnauthorized(err error) error {
+	if err == nil {
+		return nil
+	}
+	return status.Error(codes.Unauthenticated, err.Error())
+}
+
+func GrpcNotAllowed(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	return status.Error(codes.PermissionDenied, err.Error())
+}
+
+func GrpcFailedPrecondition(err error) error {
+	if err == nil {
+		return nil
+	}
+	return status.Error(codes.FailedPrecondition, err.Error())
+}
+
+var (
+	errorRoutes = map[string]func(error) error{
+		getCode(dictionary.ErrDuplicateKey):     GrpcFailedPrecondition,
+		getCode(dictionary.ErrPasswordMismatch): GrpcFailedPrecondition,
+	}
+)
+
+func HandleError(err error) error {
+	if er, ok := err.(errorpackage.Errors); ok {
+		return GrpcBadRequest(er)
+	}
+	if e, ok := err.(errorpackage.Error); ok {
+		if route, exists := errorRoutes[getCode(e)]; exists {
+			return route(e)
+		}
+	}
+	return GrpcBadGateway(err)
+
+}
+
+func getCode(err error) string {
+	if er, ok := err.(errorpackage.Error); ok {
+		if er.Code() == nil {
+			return ""
+		}
+		return *er.Code()
+	}
+	return ""
+}
 func convertErrorsToViolations(field string, list []error) []*errdetails.BadRequest_FieldViolation {
 	var result []*errdetails.BadRequest_FieldViolation
 

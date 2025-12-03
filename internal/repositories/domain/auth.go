@@ -3,6 +3,7 @@ package domain
 import (
 	"database/sql"
 	"reflect"
+	"regexp"
 
 	errorpackage "github.com/siti-nabila/error-package"
 	"github.com/siti-nabila/grpc-auth/pkg/dictionary"
@@ -39,10 +40,12 @@ type (
 	}
 )
 
+var emailRegex = regexp.MustCompile(
+	`^[A-Za-z0-9](?:[A-Za-z0-9._~\-]*[A-Za-z0-9])?@` +
+		`[A-Za-z0-9](?:[A-Za-z0-9._~\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9._~\-]*[A-Za-z0-9])?)+$`,
+)
+
 func (a *AuthRequest) Validate() error {
-	// errs = make(map[string]error, 0)
-	// jsonTags := a.GetJSONTags()
-	// tag := jsonTags[a.Email]
 	errs := errorpackage.Errors{}
 	if er := a.validateEmail(); er != nil {
 		if sub, ok := er.(errorpackage.Errors); ok {
@@ -72,10 +75,13 @@ func (a *AuthRequest) validateEmail() error {
 		errs.Add(helpers.EmailJsonTag, dictionary.ErrRequired)
 	}
 	if len(a.Email) < 6 {
-		errs.Add(helpers.EmailJsonTag, dictionary.ErrMinLength)
+		errs.Add(helpers.EmailJsonTag, dictionary.ErrMinLength(6))
 	}
 	if len(a.Email) > 50 {
-		errs.Add(helpers.EmailJsonTag, dictionary.ErrMaxLength)
+		errs.Add(helpers.EmailJsonTag, dictionary.ErrMaxLength(50))
+	}
+	if !isValidEmail(a.Email) && a.Email != "" {
+		errs.Add(helpers.EmailJsonTag, dictionary.ErrInvalidEmail)
 	}
 	if len(errs) != 0 {
 		return errs
@@ -90,10 +96,10 @@ func (a *AuthRequest) validatePassword() error {
 		errs.Add(helpers.PasswordJsonTag, dictionary.ErrRequired)
 	}
 	if len(a.Password) < 6 {
-		errs.Add(helpers.PasswordJsonTag, dictionary.ErrMinLength)
+		errs.Add(helpers.PasswordJsonTag, dictionary.ErrMinLength(6))
 	}
 	if len(a.Password) > 50 {
-		errs.Add(helpers.PasswordJsonTag, dictionary.ErrMaxLength)
+		errs.Add(helpers.PasswordJsonTag, dictionary.ErrMaxLength(50))
 	}
 	if len(errs) != 0 {
 		return errs
@@ -119,4 +125,8 @@ func (a *AuthRequest) GetJSONTags() map[string]string {
 
 func (a *AuthRequest) GetTableName() string {
 	return "auth"
+}
+
+func isValidEmail(email string) bool {
+	return emailRegex.MatchString(email)
 }

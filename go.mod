@@ -7,7 +7,7 @@ require (
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/lib/pq v1.10.9
 	github.com/sirupsen/logrus v1.9.3
-	github.com/siti-nabila/error-package v0.0.7
+	github.com/siti-nabila/error-package v0.0.8
 	github.com/spf13/viper v1.21.0
 	golang.org/x/crypto v0.45.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251022142026-3a174f9686a8

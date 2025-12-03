@@ -30,8 +30,10 @@ errors:
   err_max_length:
     en: minimum length is 50
     id: minimal panjang huruf adalah 6
-
   err_alpha_only:
     en: must be alphabetical
     id: harus huruf alfabet
+  err_invalid_email:
+    en: email is invalid
+    id: email tidak valid
       

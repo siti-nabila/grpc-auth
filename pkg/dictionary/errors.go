@@ -11,9 +11,8 @@ var (
 	ErrDuplicateKey     error
 	ErrPasswordMismatch error
 	ErrRequired         error
-	ErrMinLength        error
-	ErrMaxLength        error
 	ErrBadRequest       error
+	ErrInvalidEmail     error
 
 	//go:embed err_list.yaml
 	errorList []byte
@@ -25,8 +24,7 @@ func init() {
 	ErrDuplicateKey = errPack.New("err_duplicate_key")
 	ErrPasswordMismatch = errPack.New("err_password_mismatch")
 	ErrRequired = errPack.New("err_required")
-	ErrMinLength = errPack.New("err_min_length")
-	ErrMaxLength = errPack.New("err_max_length")
 	ErrBadRequest = errPack.New("err_bad_request")
+	ErrInvalidEmail = errPack.New("err_invalid_email")
 
 }
