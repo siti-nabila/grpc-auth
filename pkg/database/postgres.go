@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	_ "github.com/godror/godror"
 	_ "github.com/lib/pq"
 )
 
@@ -18,12 +19,13 @@ const (
 type (
 	DbSource string
 	DBConfig struct {
-		User     string
-		Password string
-		Host     string
-		Port     string
-		Name     string
-		Driver   string
+		User        string
+		Password    string
+		Host        string
+		Port        string
+		Name        string
+		Driver      string
+		ServiceName string
 	}
 )
 
@@ -37,9 +39,6 @@ func DBConnect(src DbSource) {
 
 	mu.Lock()
 	defer mu.Unlock()
-	var (
-		dsn string
-	)
 
 	config, exists := dbConfigs[src]
 	if !exists {
@@ -48,26 +47,57 @@ func DBConnect(src DbSource) {
 
 	switch strings.ToLower(config.Driver) {
 	case "postgres":
-		dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable timezone=Asia/Jakarta",
-			config.Host,
-			config.Port,
-			config.User,
-			config.Password,
-			config.Name,
-		)
-		db, err := sql.Open("postgres", dsn)
-		if err != nil {
-			panic(err)
-		}
-		db.SetMaxOpenConns(25)
-		db.SetMaxIdleConns(25)
-		db.SetConnMaxLifetime(1 * time.Hour)
-		dbNatConnections[src] = db
-		fmt.Println("Connected to Postgres database:", src)
+		openPostgresConnection(config, src)
+	case "oracle":
+		openOracleConnection(config, src)
 	default:
 		panic("Unsupported database driver")
 	}
 
+}
+
+func openPostgresConnection(config DBConfig, src DbSource) {
+	var (
+		dsn string
+	)
+	dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable timezone=Asia/Jakarta",
+		config.Host,
+		config.Port,
+		config.User,
+		config.Password,
+		config.Name,
+	)
+	db, err := sql.Open("postgres", dsn)
+	if err != nil {
+		panic(err)
+	}
+	db.SetMaxOpenConns(25)
+	db.SetMaxIdleConns(25)
+	db.SetConnMaxLifetime(1 * time.Hour)
+	dbNatConnections[src] = db
+	fmt.Println("Connected to Postgres database:", src)
+}
+
+func openOracleConnection(config DBConfig, src DbSource) {
+	var (
+		dsn string
+	)
+	dsn = fmt.Sprintf(`user="%s" password="%s" connectString="%s:%s/%s"`,
+		config.User,
+		config.Password,
+		config.Host,
+		config.Port,
+		config.ServiceName,
+	)
+	db, err := sql.Open("godror", dsn)
+	if err != nil {
+		panic(err)
+	}
+	db.SetMaxOpenConns(25)
+	db.SetMaxIdleConns(25)
+	db.SetConnMaxLifetime(1 * time.Hour)
+	dbNatConnections[src] = db
+	fmt.Println("Connected to Oracle database:", src)
 }
 
 func DBClose(src DbSource) {
@@ -98,4 +128,16 @@ func DBGetNativePool(src DbSource) *sql.DB {
 		return db
 	}
 
+}
+
+func DBGetConfig(src DbSource) DBConfig {
+	mu.RLock()
+	defer mu.RUnlock()
+
+	cfg, ok := dbConfigs[src]
+	if !ok {
+		log.Fatalf("no DB config found with source: %s", src)
+	}
+
+	return cfg
 }

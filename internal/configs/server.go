@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/siti-nabila/grpc-auth/internal/interceptors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/keepalive"
@@ -30,6 +31,11 @@ func NewGRPCServer(cfg *AppConfig, register func(*grpc.Server)) *GRPCServerClien
 			Time:              cfg.KeepAlive,
 			Timeout:           cfg.KeepAliveTimeout,
 		}),
+
+		grpc.ChainUnaryInterceptor(
+			interceptors.LanguageInterceptor,
+			interceptors.TokenInterceptor(cfg.JWT.SecretKey),
+		),
 	}
 
 	server := grpc.NewServer(opts...)

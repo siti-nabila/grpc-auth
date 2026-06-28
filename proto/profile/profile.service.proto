@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package profile;
+
+option go_package = "github.com/siti-nabila/grpc-auth/pb/profile"; 
+
+import "profile/profile.payload.proto";
+
+service ProfileService {
+    rpc UpdateProfile (ProfileRequest) returns (ProfileResponse);
+}

@@ -1,0 +1,19 @@
+errors:
+  err_generate_token:
+    code: 120001
+    en: failed generating token = %s
+    id: gagal membuat token = %s
+
+  err_min_length:
+    en: minimum length is %d
+    id: minimal panjang huruf adalah %d
+  err_max_length:
+    en: minimum length is %d
+    id: minimal panjang huruf adalah %d
+  err_alpha_only:
+    en: must be alphabetical
+    id: harus huruf alfabet
+  err_invalid_email:
+    en: email is invalid
+    id: email tidak valid
+      

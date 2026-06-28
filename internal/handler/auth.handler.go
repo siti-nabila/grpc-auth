@@ -2,14 +2,12 @@ package handler
 
 import (
 	"context"
-	"encoding/json"
 
 	authfeature "github.com/siti-nabila/grpc-auth/internal/features/auth_feature"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/pb/user"
+	"github.com/siti-nabila/grpc-auth/pkg/helpers"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -27,23 +25,49 @@ func (u *UserHandler) Register(ctx context.Context, in *user.AuthRequest) (*user
 		Email:    in.Email,
 		Password: in.Password,
 	}
-	if errs := request.Validate(); errs != nil || len(errs) != 0 {
-		errJson, _ := json.Marshal(errs)
-		return nil, status.Errorf(codes.InvalidArgument, string(errJson))
+	if err := request.Validate(); err != nil {
+		return nil, helpers.HandleError(err)
 	}
 
-	err := feat.Register(request)
+	token, err := feat.Register(request)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, err.Error())
+		return nil, helpers.HandleError(err)
 	}
-	reqJson, _ := json.Marshal(request)
+
 	return &user.UserTokenResponse{
-		Token: string(reqJson),
+		Token: *token,
 	}, nil
 }
-func (u *UserHandler) Login(context.Context, *user.AuthRequest) (*user.UserTokenResponse, error) {
-	return nil, nil
+func (u *UserHandler) Login(ctx context.Context, in *user.AuthRequest) (*user.UserTokenResponse, error) {
+	request := domain.AuthRequest{
+		Email:    in.Email,
+		Password: in.Password,
+	}
+	if err := request.Validate(); err != nil {
+		return nil, helpers.HandleError(err)
+	}
+
+	feat := authfeature.NewAuthService(ctx)
+	token, err := feat.Login(request)
+	if err != nil {
+		return nil, helpers.HandleError(err)
+	}
+
+	return &user.UserTokenResponse{
+		Token: *token,
+	}, nil
+
 }
+
+func (u *UserHandler) Me(ctx context.Context, in *emptypb.Empty) (*user.UserData, error) {
+	feat := authfeature.NewAuthService(ctx)
+	data, err := feat.GetUserData()
+	if err != nil {
+		return nil, helpers.HandleError(err)
+	}
+	return &data, nil
+}
+
 func (u *UserHandler) TesRPC(context.Context, *emptypb.Empty) (*user.TestRPC, error) {
 	return &user.TestRPC{
 		Res: "WELCOME ANJING !!!!!!!",

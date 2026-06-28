@@ -10,5 +10,7 @@ import "google/protobuf/empty.proto";
 service UserService {
     rpc Register(AuthRequest) returns (UserTokenResponse);
     rpc Login(AuthRequest) returns (UserTokenResponse);
+    rpc Me(google.protobuf.Empty) returns (UserData);
+    rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
     rpc TesRPC(google.protobuf.Empty) returns (TestRPC);
 }

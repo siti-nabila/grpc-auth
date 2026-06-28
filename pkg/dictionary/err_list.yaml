@@ -1,20 +1,39 @@
 errors:
-  err_duplicate_key:
-    code: 100001
+  err_already_exists:
+    code: EX
     en: already exists
     id: sudah ada
-  err_no_rows:
-    code: 100002
-    en: data not found
-    id: data tidak ditemukan
   err_not_found:
-    code: 110001
+    code: NF
     en: data not found
     id: data tidak ditemukan
+  err_password_mismatch:
+    code: PM
+    en: wrong password
+    id: password salah
+  err_bad_request:
+    code: BR
+    en: "Bad request."
+    id: "Permintaan tidak valid."
+  err_internal_server_error:
+    code: IS
+    en: "Internal server error."
+    id: "Terjadi kesalahan pada server."
+
+
   err_required:
     en: is required
     id: harus diisi
+  err_min_length:
+    en: minimum length is 6
+    id: minimal panjang huruf adalah 6
+  err_max_length:
+    en: minimum length is 50
+    id: minimal panjang huruf adalah 6
   err_alpha_only:
     en: must be alphabetical
     id: harus huruf alfabet
+  err_invalid_email:
+    en: email is invalid
+    id: email tidak valid
       

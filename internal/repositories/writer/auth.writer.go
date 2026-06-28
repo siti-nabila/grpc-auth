@@ -3,59 +3,60 @@ package writer
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/pkg/database"
-	"github.com/siti-nabila/grpc-auth/pkg/helpers"
+	"github.com/siti-nabila/grpc-auth/pkg/dictionary"
+	"github.com/siti-nabila/orm/orm"
+	ormLog "github.com/siti-nabila/orm/pkg/logger"
 )
 
 type (
-	DbSource string
-
 	AuthWriter struct {
-		Db  *database.DBLogger
-		Tx  *sql.Tx
+		Db  *sql.DB
+		Tx  *orm.SqlTransactionAdapter
 		ctx context.Context
 	}
 )
 
-const (
-	UserDbSource DbSource = "user"
-)
-
 func NewAuthWriter(ctx context.Context) domain.AuthWriter {
-	dbLogger := database.NewDBLogger()
+	// dbLogger := database.NewDBLogger()
+	fmt.Println("---------- auth writer new ----------")
+
 	conn := database.DBGetNativePool(database.UserDbSource)
-	dbLogger.Adapter(conn)
+	// dbLogger.Adapter(conn)
 	return &AuthWriter{
-		Db:  dbLogger,
+		Db:  conn,
 		ctx: ctx,
 	}
 }
 
-func (a *AuthWriter) UseTransaction(tx *sql.Tx) {
-	a.Db.UseTransaction(tx)
-}
-
-func (a *AuthWriter) Begin() (*sql.Tx, error) {
-	return a.Db.Db.Begin()
-}
-
-func (a *AuthWriter) Register(request *domain.AuthRequest) (err error) {
-	query := `
-		INSERT INTO users(email, password) VALUES (?, ?) RETURNING id
-	`
-
-	err = a.Db.QueryRowContext(a.ctx, query, request.Email, request.Password).Scan(&request.Id)
+func (a *AuthWriter) Begin() (*orm.SqlTransactionAdapter, error) {
+	if a.Tx != nil {
+		return a.Tx, nil
+	}
+	tx, err := a.Db.Begin()
 	if err != nil {
-		return err
+		return nil, err
+	}
+	ormCfg := database.GetORMConfig()
+	oTx := orm.NewSqlTransactionAdapter(a.ctx, tx, database.GetDialect(database.UserDbSource), ormCfg)
+	oTx.SetLogger(ormLog.DefaultLogger{}, ormCfg.EnableDebug)
+	a.Tx = oTx
+
+	return a.Tx, nil
+}
+
+func (a *AuthWriter) UseTransaction(tx *orm.SqlTransactionAdapter) {
+	a.Tx = tx
+}
+
+func (a *AuthWriter) Create(req *domain.AuthRequest) error {
+	err := a.Tx.Create(req)
+	if er := dictionary.HandleDBError(err); er != nil {
+		return er
 	}
 
 	return nil
-}
-
-func (a *AuthWriter) RegisterTx(request *domain.AuthRequest) (err error) {
-	query := `INSERT INTO auth(email, password) VALUES ($1, $2) RETURNING id`
-	err = a.Db.QueryRowTxContext(a.ctx, query, request.Email, request.Password).Scan(&request.Id)
-	return helpers.HandleErrorDB(err)
 }
