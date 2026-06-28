@@ -1,15 +1,18 @@
 module github.com/siti-nabila/grpc-auth
 
-go 1.24.4
+go 1.26.2
 
 require (
+	github.com/godror/godror v0.50.0
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
-	github.com/lib/pq v1.10.9
+	github.com/lib/pq v1.12.3
 	github.com/sirupsen/logrus v1.9.3
-	github.com/siti-nabila/error-package v0.0.8
+	github.com/siti-nabila/error-package v0.0.9
+	github.com/siti-nabila/orm v1.6.7
 	github.com/spf13/viper v1.21.0
 	golang.org/x/crypto v0.45.0
+	golang.org/x/sync v0.20.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251022142026-3a174f9686a8
 	google.golang.org/grpc v1.77.0
 	google.golang.org/protobuf v1.36.10
@@ -17,8 +20,13 @@ require (
 )
 
 require (
+	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/VictoriaMetrics/easyproto v0.1.4 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
+	github.com/go-logfmt/logfmt v0.6.0 // indirect
+	github.com/go-sql-driver/mysql v1.9.3 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
+	github.com/godror/knownpb v0.3.0 // indirect
 	github.com/jonboulle/clockwork v0.5.0 // indirect
 	github.com/lestrrat-go/strftime v1.1.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
@@ -30,6 +38,7 @@ require (
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
+	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6 // indirect
 	golang.org/x/net v0.47.0 // indirect
 	golang.org/x/sys v0.38.0 // indirect
 	golang.org/x/text v0.31.0 // indirect

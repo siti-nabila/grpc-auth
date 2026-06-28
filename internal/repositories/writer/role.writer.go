@@ -12,25 +12,25 @@ import (
 )
 
 type (
-	ProfileWriter struct {
+	RoleWriter struct {
 		Db  *sql.DB
 		Tx  *orm.SqlTransactionAdapter
 		ctx context.Context
 	}
 )
 
-func NewProfileWriter(ctx context.Context) *ProfileWriter {
+func NewRoleWriter(ctx context.Context) *RoleWriter {
 	conn := database.DBGetNativePool(database.UserDbSource)
-	return &ProfileWriter{
+	return &RoleWriter{
 		Db:  conn,
 		ctx: ctx,
 	}
 }
 
-func (p *ProfileWriter) Model() domain.ProfileRequest {
-	return domain.ProfileRequest{}
+func (p *RoleWriter) Model() domain.RoleRequest {
+	return domain.RoleRequest{}
 }
-func (p *ProfileWriter) Begin() (*orm.SqlTransactionAdapter, error) {
+func (p *RoleWriter) Begin() (*orm.SqlTransactionAdapter, error) {
 	if p.Tx != nil {
 		return p.Tx, nil
 	}
@@ -47,30 +47,12 @@ func (p *ProfileWriter) Begin() (*orm.SqlTransactionAdapter, error) {
 	return p.Tx, nil
 }
 
-func (p *ProfileWriter) UseTransaction(tx *orm.SqlTransactionAdapter) {
+func (p *RoleWriter) UseTransaction(tx *orm.SqlTransactionAdapter) {
 	p.Tx = tx
 }
 
-func (p *ProfileWriter) Create(req *domain.ProfileRequest) error {
+func (p *RoleWriter) Create(req *domain.RoleRequest) error {
 	err := p.Tx.Create(req)
-	if er := dictionary.HandleDBError(err); er != nil {
-		return er
-	}
-
-	return nil
-}
-
-func (p *ProfileWriter) Update(req *domain.UpdateProfileRequest) error {
-	err := p.Tx.Update(req)
-	if er := dictionary.HandleDBError(err); er != nil {
-		return er
-	}
-
-	return nil
-}
-
-func (p *ProfileWriter) Patch(req map[string]any) error {
-	err := p.Tx.Update(p.Model(), req)
 	if er := dictionary.HandleDBError(err); er != nil {
 		return er
 	}

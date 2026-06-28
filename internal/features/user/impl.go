@@ -1,4 +1,4 @@
-package authfeature
+package user
 
 import (
 	"context"
@@ -6,20 +6,18 @@ import (
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/reader"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/writer"
-	"github.com/siti-nabila/grpc-auth/pb/user"
 	"github.com/siti-nabila/grpc-auth/pkg/config"
-	"github.com/siti-nabila/grpc-auth/pkg/jwt"
+	"github.com/siti-nabila/orm/orm"
 )
 
 type (
-	AuthService interface {
-		Register(req domain.AuthRequest) (token *string, err error)
-		Login(req domain.AuthRequest) (token *string, err error)
-		GetUserData() (res user.UserData, err error)
+	UserService interface {
+		SearchUsers(req domain.UserListRequest) (orm.PageData[domain.UserSearchRow], error)
 	}
 
-	authService struct {
+	userService struct {
 		ctx            context.Context
+		userReader     domain.UserReader
 		authWriter     domain.AuthWriter
 		authReader     domain.AuthReader
 		profileWriter  domain.ProfileWriter
@@ -31,9 +29,10 @@ type (
 	}
 )
 
-func NewAuthService(ctx context.Context) AuthService {
-	return &authService{
+func NewUserService(ctx context.Context) *userService {
+	return &userService{
 		ctx:            ctx,
+		userReader:     reader.NewUserReader(ctx),
 		authWriter:     writer.NewAuthWriter(ctx),
 		authReader:     reader.NewAuthReader(ctx),
 		profileWriter:  writer.NewProfileWriter(ctx),
@@ -43,18 +42,4 @@ func NewAuthService(ctx context.Context) AuthService {
 		userRoleReader: reader.NewUserRoleReader(ctx),
 		appCfg:         config.GetAppConfig(),
 	}
-}
-
-func (a *authService) GenerateAuthToken(userId uint64) (*string, error) {
-	jwtReq := jwt.JwtRequest{
-		UserId: userId,
-		Issuer: a.appCfg.ApplicationName,
-		Secret: a.appCfg.JWT.SecretKey,
-	}
-	token, err := jwt.GenerateJWTToken(jwtReq)
-	if err != nil {
-		return nil, err
-	}
-	return &token, nil
-
 }

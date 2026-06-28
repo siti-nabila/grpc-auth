@@ -6,37 +6,55 @@ import (
 	"regexp"
 
 	errorpackage "github.com/siti-nabila/error-package"
+	"github.com/siti-nabila/grpc-auth/pb/user"
 	"github.com/siti-nabila/grpc-auth/pkg/dictionary"
 	"github.com/siti-nabila/grpc-auth/pkg/helpers"
+	"github.com/siti-nabila/orm/orm"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type (
-	AuthWriter interface {
+	AuthWriterOld interface {
 		UseTransaction(tx *sql.Tx)
 		Begin() (*sql.Tx, error)
 
 		Register(*AuthRequest) error
 		RegisterTx(request *AuthRequest) (err error)
 	}
+	AuthWriter interface {
+		UseTransaction(tx *orm.SqlTransactionAdapter)
+		Begin() (*orm.SqlTransactionAdapter, error)
+
+		Create(*AuthRequest) error
+		// RegisterTx(request *AuthRequest) (err error)
+	}
 
 	AuthReader interface {
-		GetById(id uint64) (AuthResponse, error)
-		GetByEmail(email string) (AuthResponse, error)
+		GetById(id uint64) (Auth, error)
+		GetByEmail(email string) (Auth, error)
 	}
 
 	AuthRequest struct {
-		Id       uint64 `sql:"id" json:"id"`
-		Email    string `sql:"email" json:"email"`
-		Password string `sql:"password" json:"password"`
+		Id       uint64 `sql:"column:id;primaryKey" json:"id"`
+		Email    string `sql:"column:email" json:"email"`
+		Password string `sql:"column:password" json:"password"`
+	}
+	Auth struct {
+		Id        uint64       `sql:"column:id;primaryKey" json:"id"`
+		Email     string       `sql:"column:email" json:"email"`
+		Password  string       `sql:"column:password" json:"password"`
+		CreatedAt sql.NullTime `sql:"column:created_at" json:"created_at"`
+		UpdatedAt sql.NullTime `sql:"column:updated_at" json:"updated_at"`
+		DeletedAt sql.NullTime `sql:"column:deleted_at" json:"deleted_at"`
 	}
 
 	AuthResponse struct {
-		Id        uint64       `sql:"id" json:"id"`
-		Email     string       `sql:"email" json:"email"`
-		Password  string       `sql:"password" json:"password"`
-		CreatedAt sql.NullTime `sql:"created_at" json:"created_at"`
-		UpdatedAt sql.NullTime `sql:"updated_at" json:"updated_at"`
-		DeletedAt sql.NullTime `sql:"deleted_at" json:"deleted_at"`
+		Id        uint64       `sql:"column:id;primaryKey" json:"id"`
+		Email     string       `sql:"column:email" json:"email"`
+		Password  string       `sql:"column:password" json:"password"`
+		CreatedAt sql.NullTime `sql:"column:created_at" json:"created_at"`
+		UpdatedAt sql.NullTime `sql:"column:updated_at" json:"updated_at"`
+		DeletedAt sql.NullTime `sql:"column:deleted_at" json:"deleted_at"`
 	}
 )
 
@@ -44,6 +62,15 @@ var emailRegex = regexp.MustCompile(
 	`^[A-Za-z0-9](?:[A-Za-z0-9._~\-]*[A-Za-z0-9])?@` +
 		`[A-Za-z0-9](?:[A-Za-z0-9._~\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9._~\-]*[A-Za-z0-9])?)+$`,
 )
+
+func (a Auth) ToUserDataResponse() *user.UserResponse {
+	return &user.UserResponse{
+		Id:        a.Id,
+		Email:     a.Email,
+		CreatedAt: timestamppb.New(a.CreatedAt.Time),
+	}
+
+}
 
 func (a *AuthRequest) Validate() error {
 	errs := errorpackage.Errors{}
@@ -123,10 +150,13 @@ func (a *AuthRequest) GetJSONTags() map[string]string {
 	return tags
 }
 
-func (a *AuthRequest) GetTableName() string {
+func (a *AuthRequest) TableName() string {
 	return "auth"
 }
 
+func (a *Auth) TableName() string {
+	return "auth"
+}
 func isValidEmail(email string) bool {
 	return emailRegex.MatchString(email)
 }

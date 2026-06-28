@@ -1,24 +1,24 @@
 errors:
-  err_duplicate_key:
-    code: 100001
+  err_already_exists:
+    code: EX
     en: already exists
     id: sudah ada
-  err_no_rows:
-    code: 100002
-    en: data not found
-    id: data tidak ditemukan
   err_not_found:
-    code: 110003
+    code: NF
     en: data not found
     id: data tidak ditemukan
   err_password_mismatch:
-    code: 110004
+    code: PM
     en: wrong password
     id: password salah
   err_bad_request:
-    code: 1400
+    code: BR
     en: "Bad request."
     id: "Permintaan tidak valid."
+  err_internal_server_error:
+    code: IS
+    en: "Internal server error."
+    id: "Terjadi kesalahan pada server."
 
 
   err_required:

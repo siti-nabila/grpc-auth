@@ -75,7 +75,7 @@ func GrpcFailedPrecondition(err error) error {
 
 var (
 	errorRoutes = map[string]func(error) error{
-		getCode(dictionary.ErrDuplicateKey):     GrpcFailedPrecondition,
+		getCode(dictionary.ErrDataExists):       GrpcConflict,
 		getCode(dictionary.ErrPasswordMismatch): GrpcFailedPrecondition,
 	}
 )
@@ -84,7 +84,7 @@ func HandleError(err error) error {
 	if er, ok := err.(errorpackage.Errors); ok {
 		return GrpcBadRequest(er)
 	}
-	if e, ok := err.(errorpackage.Error); ok {
+	if e, ok := err.(*errorpackage.Error); ok {
 		if route, exists := errorRoutes[getCode(e)]; exists {
 			return route(e)
 		}
@@ -94,7 +94,7 @@ func HandleError(err error) error {
 }
 
 func getCode(err error) string {
-	if er, ok := err.(errorpackage.Error); ok {
+	if er, ok := err.(*errorpackage.Error); ok {
 		if er.Code() == nil {
 			return ""
 		}
@@ -116,7 +116,7 @@ func convertErrorsToViolations(field string, list []error) []*errdetails.BadRequ
 				result = append(result, convertErrorsToViolations(nestedKey, subList)...)
 			}
 
-		case errorpackage.Error:
+		case *errorpackage.Error:
 			// localized per current Language variable
 			msg := e.Error()
 			result = append(result, &errdetails.BadRequest_FieldViolation{

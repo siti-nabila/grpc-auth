@@ -4,10 +4,13 @@ import (
 	"database/sql"
 	"errors"
 	"reflect"
+
+	"github.com/siti-nabila/grpc-auth/pb/profile"
+	"github.com/siti-nabila/orm/orm"
 )
 
 type (
-	ProfileWriter interface {
+	ProfileWriterOld interface {
 		UseTransaction(tx *sql.Tx)
 		Begin() (*sql.Tx, error)
 
@@ -15,14 +18,59 @@ type (
 		CreateProfileTx(request *ProfileRequest) (err error)
 	}
 
+	ProfileReader interface {
+		GetByUserId(userId uint64) (Profile, error)
+	}
+
+	ProfileWriter interface {
+		UseTransaction(tx *orm.SqlTransactionAdapter)
+		Begin() (*orm.SqlTransactionAdapter, error)
+
+		// CreateProfile(*AuthRequest) error
+		Create(request *ProfileRequest) (err error)
+		Update(request *UpdateProfileRequest) (err error)
+	}
+
+	Profile struct {
+		Id      uint64 `sql:"column:id;primaryKey" json:"id"`
+		UserId  uint64 `sql:"column:user_id" json:"user_id"`
+		Name    string `sql:"column:name" json:"name"`
+		Address string `sql:"column:address" json:"address"`
+		Phone   string `sql:"column:phone" json:"phone"`
+	}
+
 	ProfileRequest struct {
-		Id      uint64 `sql:"id" json:"id"`
-		UserId  uint64 `sql:"user_id" json:"user_id"`
-		Name    string `sql:"name" json:"name"`
-		Address string `sql:"address" json:"address"`
-		Phone   string `sql:"phone" json:"phone"`
+		Id      uint64 `sql:"column:id;primaryKey" json:"id"`
+		UserId  uint64 `sql:"column:user_id" json:"user_id"`
+		Name    string `sql:"column:name" json:"name"`
+		Address string `sql:"column:address" json:"address"`
+		Phone   string `sql:"column:phone" json:"phone"`
+	}
+
+	UpdateProfileRequest struct {
+		Id      uint64 `sql:"column:id;primaryKey" json:"id"`
+		Name    string `sql:"column:name" json:"name"`
+		Address string `sql:"column:address" json:"address"`
+		Phone   string `sql:"column:phone" json:"phone"`
 	}
 )
+
+func (UpdateProfileRequest) TableName() string {
+	return "profile"
+}
+func (Profile) TableName() string {
+	return "profile"
+}
+
+func (p Profile) ToProfileResponse() *profile.Profile {
+	return &profile.Profile{
+		Id:      p.Id,
+		UserId:  p.UserId,
+		Name:    p.Name,
+		Address: p.Address,
+		Phone:   p.Phone,
+	}
+}
 
 func (p *ProfileRequest) Validate() (errs map[string]error) {
 	errs = make(map[string]error, 0)
@@ -58,6 +106,6 @@ func (p *ProfileRequest) GetJSONTags() map[string]string {
 	return tags
 }
 
-func (p *ProfileRequest) GetTableName() string {
+func (p *ProfileRequest) TableName() string {
 	return "profile"
 }

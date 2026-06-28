@@ -1,0 +1,44 @@
+
+syntax = "proto3";
+package paginator;
+
+option go_package = "github.com/siti-nabila/grpc-auth/pb/paginator";
+
+message PageQuery {
+  int32 page = 1;
+  int32 limit = 2;
+
+  repeated string fields = 3;
+  repeated Sort sort = 4;
+  Search search = 5;
+  string last_id = 6;
+}
+
+message PageMeta {
+  int32 page = 1;
+  int32 limit = 2;
+  int64 total = 3;
+  int32 total_pages = 4;
+  bool has_next = 5;
+  bool has_prev = 6;
+}
+
+message Sort {
+  string field = 1;
+  bool desc = 2;
+}
+
+message Search {
+  repeated string fields = 1;
+  string keyword = 2;
+  SearchMode mode = 3;
+}
+
+enum SearchMode {
+  SEARCH_MODE_UNSPECIFIED = 0;
+  SEARCH_MODE_CONTAINS = 1;
+  SEARCH_MODE_PREFIX = 2;
+  SEARCH_MODE_FULL_TEXT = 3;
+  SEARCH_MODE_TRIGRAM = 4;
+  SEARCH_MODE_FULL_TEXT_TRIGRAM = 5;
+}

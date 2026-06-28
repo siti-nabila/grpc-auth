@@ -58,6 +58,16 @@ func (u *UserHandler) Login(ctx context.Context, in *user.AuthRequest) (*user.Us
 	}, nil
 
 }
+
+func (u *UserHandler) Me(ctx context.Context, in *emptypb.Empty) (*user.UserData, error) {
+	feat := authfeature.NewAuthService(ctx)
+	data, err := feat.GetUserData()
+	if err != nil {
+		return nil, helpers.HandleError(err)
+	}
+	return &data, nil
+}
+
 func (u *UserHandler) TesRPC(context.Context, *emptypb.Empty) (*user.TestRPC, error) {
 	return &user.TestRPC{
 		Res: "WELCOME ANJING !!!!!!!",
