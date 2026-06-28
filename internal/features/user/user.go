@@ -9,7 +9,6 @@ import (
 const (
 	userListMaxLimit     = pagination.MaxLimit
 	userListDefaultLimit = pagination.DefaultLimit
-	userListMaxAuthID    = "2147483647"
 )
 
 func (u *userService) SearchUsers(req domain.UserListRequest) (orm.PageData[domain.UserSearchRow], error) {
@@ -102,11 +101,8 @@ func (u *userService) resolveUserListBatchStartCursor(opts orm.QueryOptions, tar
 	return cursorValue, true, nil
 }
 
-func initialUserListCursor(sortDesc bool) string {
-	if sortDesc {
-		return userListMaxAuthID
-	}
-	return "0"
+func initialUserListCursor(_ bool) string {
+	return ""
 }
 
 func userListCursorQueryOptions(opts orm.QueryOptions, page, limit int, cursorValue string, sortDesc bool) orm.QueryOptions {

@@ -78,7 +78,7 @@ func TestSearchUsersReplaysPreviousBatchAndUsesAuthIDCursor(t *testing.T) {
 	}
 	if captured[0].InMemoryOffset == nil ||
 		captured[0].InMemoryOffset.Cursor.Field != domain.UserListCursorField ||
-		captured[0].InMemoryOffset.Cursor.Value != "2147483647" {
+		captured[0].InMemoryOffset.Cursor.Value != "" {
 		t.Fatalf("unexpected replay cursor: %+v", captured[0].InMemoryOffset)
 	}
 	if captured[1].Page != 1 || captured[1].Limit != 500 {

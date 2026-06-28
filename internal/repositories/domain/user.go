@@ -70,11 +70,20 @@ func IsLastIDInsideUserListBatch(lastIDText, startCursorText, nextCursorText str
 	if err != nil {
 		return false
 	}
-	startCursor, err := strconv.ParseInt(strings.TrimSpace(startCursorText), 10, 64)
+	nextCursor, err := strconv.ParseInt(strings.TrimSpace(nextCursorText), 10, 64)
 	if err != nil {
 		return false
 	}
-	nextCursor, err := strconv.ParseInt(strings.TrimSpace(nextCursorText), 10, 64)
+
+	startCursorText = strings.TrimSpace(startCursorText)
+	if startCursorText == "" {
+		if sortDesc {
+			return lastID >= nextCursor
+		}
+		return lastID > 0 && lastID <= nextCursor
+	}
+
+	startCursor, err := strconv.ParseInt(startCursorText, 10, 64)
 	if err != nil {
 		return false
 	}
