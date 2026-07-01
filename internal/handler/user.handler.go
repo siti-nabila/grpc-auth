@@ -105,5 +105,6 @@ func listUsersResponseFromPage(page orm.PageData[domain.UserSearchRow]) *pbuser.
 		TotalPages: int32(page.TotalPages),
 		HasNext:    page.HasNext,
 		HasPrev:    page.HasPrev,
+		NextCursor: page.NextCursor,
 	}
 }

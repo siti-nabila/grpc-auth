@@ -1,6 +1,9 @@
 package user
 
 import (
+	"strconv"
+	"strings"
+
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/orm/orm"
 	"github.com/siti-nabila/orm/pagination"
@@ -18,37 +21,20 @@ func (u *userService) SearchUsers(req domain.UserListRequest) (orm.PageData[doma
 		return orm.PageData[domain.UserSearchRow]{}, err
 	}
 
-	batchIndex, pageInBatch, _, err := calculateUserListBatch(page, limit, userListMaxLimit)
-	if err != nil {
-		return orm.PageData[domain.UserSearchRow]{}, err
-	}
-
 	sortDesc, err := domain.ValidateUserListSortDesc(opts.Sort)
 	if err != nil {
 		return orm.PageData[domain.UserSearchRow]{}, err
 	}
 
-	startCursor, ok, err := u.resolveUserListBatchStartCursor(opts, batchIndex, limit, sortDesc)
-	if err != nil {
-		return orm.PageData[domain.UserSearchRow]{}, err
-	}
-	if !ok {
-		return emptyUserSearchPage(page, limit), nil
-	}
-
-	pageData, err := u.userReader.SearchUsers(userListCursorQueryOptions(opts, pageInBatch, limit, startCursor, sortDesc))
+	cursorText := strings.TrimSpace(req.LastID)
+	cursorValue, err := normalizeUserListCursorValue(cursorText)
 	if err != nil {
 		return orm.PageData[domain.UserSearchRow]{}, err
 	}
 
-	if page == 1 && domain.IsEmptyUserListLastID(req.LastID) {
-		pageData.Page = page
-		pageData.Limit = limit
-		pageData.HasPrev = false
-		return pageData, nil
-	}
-	if pageData.NextCursor != "" && !domain.IsLastIDInsideUserListBatch(req.LastID, startCursor, pageData.NextCursor, sortDesc) {
-		return emptyUserSearchPage(page, limit), nil
+	pageData, err := u.userReader.SearchUsers(userListCursorQueryOptions(opts, page, limit, cursorValue, sortDesc))
+	if err != nil {
+		return orm.PageData[domain.UserSearchRow]{}, err
 	}
 
 	pageData.Page = page
@@ -70,42 +56,20 @@ func normalizeUserListPagination(page, limit int) (int, int, error) {
 	return page, limit, nil
 }
 
-func calculateUserListBatch(page, limit, maxLimit int) (int, int, int, error) {
-	batchSize := maxLimit / limit
-	if batchSize <= 0 {
-		return 0, 0, 0, domain.NewUserListValidationError("limit", "invalid pagination limit")
+func normalizeUserListCursorValue(lastIDText string) (any, error) {
+	lastIDText = strings.TrimSpace(lastIDText)
+	if domain.IsEmptyUserListLastID(lastIDText) {
+		return "", nil
 	}
 
-	batchIndex := (page - 1) / batchSize
-	pageInBatch := ((page - 1) % batchSize) + 1
-	return batchIndex, pageInBatch, batchSize, nil
-}
-
-func (u *userService) resolveUserListBatchStartCursor(opts orm.QueryOptions, targetBatchIndex, limit int, sortDesc bool) (string, bool, error) {
-	cursorValue := initialUserListCursor(sortDesc)
-	if targetBatchIndex == 0 {
-		return cursorValue, true, nil
+	lastID, err := strconv.ParseInt(lastIDText, 10, 64)
+	if err != nil || lastID < 1 {
+		return nil, domain.NewUserListValidationError("last_id", "list users cursor must be a positive auth_id")
 	}
-
-	for batchIndex := 0; batchIndex < targetBatchIndex; batchIndex++ {
-		pageData, err := u.userReader.SearchUsers(userListCursorQueryOptions(opts, 1, limit, cursorValue, sortDesc))
-		if err != nil {
-			return "", false, err
-		}
-		if pageData.NextCursor == "" {
-			return "", false, nil
-		}
-		cursorValue = pageData.NextCursor
-	}
-
-	return cursorValue, true, nil
+	return lastID, nil
 }
 
-func initialUserListCursor(_ bool) string {
-	return ""
-}
-
-func userListCursorQueryOptions(opts orm.QueryOptions, page, limit int, cursorValue string, sortDesc bool) orm.QueryOptions {
+func userListCursorQueryOptions(opts orm.QueryOptions, page, limit int, cursorValue any, sortDesc bool) orm.QueryOptions {
 	opts.Page = page
 	opts.Limit = limit
 	opts.InMemoryOffset = &orm.InMemoryOffsetOptions{
