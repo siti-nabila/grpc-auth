@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	errorpackage "github.com/siti-nabila/error-package"
+	"github.com/siti-nabila/api-contracts/pkg/dictionary"
 	"github.com/siti-nabila/orm/orm"
 )
 
@@ -60,7 +60,7 @@ func ValidateUserListSortDesc(sorts []orm.SortField) (bool, error) {
 }
 
 func NewUserListValidationError(field, message string) error {
-	errs := errorpackage.Errors{}
+	errs := dictionary.FieldErrors{}
 	errs.Add(field, errors.New(message))
 	return errs
 }
@@ -70,11 +70,20 @@ func IsLastIDInsideUserListBatch(lastIDText, startCursorText, nextCursorText str
 	if err != nil {
 		return false
 	}
-	startCursor, err := strconv.ParseInt(strings.TrimSpace(startCursorText), 10, 64)
+	nextCursor, err := strconv.ParseInt(strings.TrimSpace(nextCursorText), 10, 64)
 	if err != nil {
 		return false
 	}
-	nextCursor, err := strconv.ParseInt(strings.TrimSpace(nextCursorText), 10, 64)
+
+	startCursorText = strings.TrimSpace(startCursorText)
+	if startCursorText == "" {
+		if sortDesc {
+			return lastID >= nextCursor
+		}
+		return lastID > 0 && lastID <= nextCursor
+	}
+
+	startCursor, err := strconv.ParseInt(startCursorText, 10, 64)
 	if err != nil {
 		return false
 	}

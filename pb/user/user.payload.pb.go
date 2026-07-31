@@ -789,6 +789,7 @@ type ListUsersResponse struct {
 	TotalPages    int32                  `protobuf:"varint,5,opt,name=total_pages,json=totalPages,proto3" json:"total_pages,omitempty"`
 	HasNext       bool                   `protobuf:"varint,6,opt,name=has_next,json=hasNext,proto3" json:"has_next,omitempty"`
 	HasPrev       bool                   `protobuf:"varint,7,opt,name=has_prev,json=hasPrev,proto3" json:"has_prev,omitempty"`
+	NextCursor    string                 `protobuf:"bytes,8,opt,name=next_cursor,json=nextCursor,proto3" json:"next_cursor,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -870,6 +871,13 @@ func (x *ListUsersResponse) GetHasPrev() bool {
 		return x.HasPrev
 	}
 	return false
+}
+
+func (x *ListUsersResponse) GetNextCursor() string {
+	if x != nil {
+		return x.NextCursor
+	}
+	return ""
 }
 
 type UserFilter struct {
@@ -998,7 +1006,7 @@ const file_user_user_payload_proto_rawDesc = "" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12\x12\n" +
 	"\x04name\x18\x03 \x01(\tR\x04name\x12\x18\n" +
 	"\aaddress\x18\x04 \x01(\tR\aaddress\x12\x14\n" +
-	"\x05phone\x18\x05 \x01(\tR\x05phone\"\xd4\x01\n" +
+	"\x05phone\x18\x05 \x01(\tR\x05phone\"\xf5\x01\n" +
 	"\x11ListUsersResponse\x12(\n" +
 	"\x05items\x18\x01 \x03(\v2\x12.user.UserListItemR\x05items\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\x12\x12\n" +
@@ -1007,7 +1015,9 @@ const file_user_user_payload_proto_rawDesc = "" +
 	"\vtotal_pages\x18\x05 \x01(\x05R\n" +
 	"totalPages\x12\x19\n" +
 	"\bhas_next\x18\x06 \x01(\bR\ahasNext\x12\x19\n" +
-	"\bhas_prev\x18\a \x01(\bR\ahasPrev\"\xc1\x01\n" +
+	"\bhas_prev\x18\a \x01(\bR\ahasPrev\x12\x1f\n" +
+	"\vnext_cursor\x18\b \x01(\tR\n" +
+	"nextCursor\"\xc1\x01\n" +
 	"\n" +
 	"UserFilter\x12=\n" +
 	"\fcreated_from\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\vcreatedFrom\x129\n" +

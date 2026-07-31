@@ -90,6 +90,7 @@ message ListUsersResponse {
   int32 total_pages = 5;
   bool has_next = 6;
   bool has_prev = 7;
+  string next_cursor = 8;
 }
 
 message UserFilter {

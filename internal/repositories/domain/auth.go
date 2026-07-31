@@ -5,9 +5,9 @@ import (
 	"reflect"
 	"regexp"
 
-	errorpackage "github.com/siti-nabila/error-package"
+	"github.com/siti-nabila/api-contracts/pkg/dictionary"
 	"github.com/siti-nabila/grpc-auth/pb/user"
-	"github.com/siti-nabila/grpc-auth/pkg/dictionary"
+	appdictionary "github.com/siti-nabila/grpc-auth/pkg/dictionary"
 	"github.com/siti-nabila/grpc-auth/pkg/helpers"
 	"github.com/siti-nabila/orm/orm"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -73,16 +73,16 @@ func (a Auth) ToUserDataResponse() *user.UserResponse {
 }
 
 func (a *AuthRequest) Validate() error {
-	errs := errorpackage.Errors{}
+	errs := dictionary.FieldErrors{}
 	if er := a.validateEmail(); er != nil {
-		if sub, ok := er.(errorpackage.Errors); ok {
+		if sub, ok := er.(dictionary.FieldErrors); ok {
 			errs.Merge(sub)
 		} else {
 			errs.Add(helpers.EmailJsonTag, er)
 		}
 	}
 	if er := a.validatePassword(); er != nil {
-		if sub, ok := er.(errorpackage.Errors); ok {
+		if sub, ok := er.(dictionary.FieldErrors); ok {
 			errs.Merge(sub)
 		} else {
 			errs.Add(helpers.PasswordJsonTag, er)
@@ -96,19 +96,19 @@ func (a *AuthRequest) Validate() error {
 }
 
 func (a *AuthRequest) validateEmail() error {
-	errs := errorpackage.Errors{}
+	errs := dictionary.FieldErrors{}
 
 	if a.Email == "" {
-		errs.Add(helpers.EmailJsonTag, dictionary.ErrRequired)
+		errs.Add(helpers.EmailJsonTag, appdictionary.ErrRequired)
 	}
 	if len(a.Email) < 6 {
-		errs.Add(helpers.EmailJsonTag, dictionary.ErrMinLength(6))
+		errs.Add(helpers.EmailJsonTag, appdictionary.ErrMinLength(6))
 	}
 	if len(a.Email) > 50 {
-		errs.Add(helpers.EmailJsonTag, dictionary.ErrMaxLength(50))
+		errs.Add(helpers.EmailJsonTag, appdictionary.ErrMaxLength(50))
 	}
 	if !isValidEmail(a.Email) && a.Email != "" {
-		errs.Add(helpers.EmailJsonTag, dictionary.ErrInvalidEmail)
+		errs.Add(helpers.EmailJsonTag, appdictionary.ErrInvalidEmail)
 	}
 	if len(errs) != 0 {
 		return errs
@@ -117,16 +117,16 @@ func (a *AuthRequest) validateEmail() error {
 	return nil
 }
 func (a *AuthRequest) validatePassword() error {
-	errs := errorpackage.Errors{}
+	errs := dictionary.FieldErrors{}
 
 	if a.Password == "" {
-		errs.Add(helpers.PasswordJsonTag, dictionary.ErrRequired)
+		errs.Add(helpers.PasswordJsonTag, appdictionary.ErrRequired)
 	}
 	if len(a.Password) < 6 {
-		errs.Add(helpers.PasswordJsonTag, dictionary.ErrMinLength(6))
+		errs.Add(helpers.PasswordJsonTag, appdictionary.ErrMinLength(6))
 	}
 	if len(a.Password) > 50 {
-		errs.Add(helpers.PasswordJsonTag, dictionary.ErrMaxLength(50))
+		errs.Add(helpers.PasswordJsonTag, appdictionary.ErrMaxLength(50))
 	}
 	if len(errs) != 0 {
 		return errs

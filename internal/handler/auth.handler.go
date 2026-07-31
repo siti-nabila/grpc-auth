@@ -6,7 +6,6 @@ import (
 	authfeature "github.com/siti-nabila/grpc-auth/internal/features/auth_feature"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/pb/user"
-	"github.com/siti-nabila/grpc-auth/pkg/helpers"
 
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -26,12 +25,12 @@ func (u *UserHandler) Register(ctx context.Context, in *user.AuthRequest) (*user
 		Password: in.Password,
 	}
 	if err := request.Validate(); err != nil {
-		return nil, helpers.HandleError(err)
+		return nil, err
 	}
 
 	token, err := feat.Register(request)
 	if err != nil {
-		return nil, helpers.HandleError(err)
+		return nil, err
 	}
 
 	return &user.UserTokenResponse{
@@ -44,13 +43,13 @@ func (u *UserHandler) Login(ctx context.Context, in *user.AuthRequest) (*user.Us
 		Password: in.Password,
 	}
 	if err := request.Validate(); err != nil {
-		return nil, helpers.HandleError(err)
+		return nil, err
 	}
 
 	feat := authfeature.NewAuthService(ctx)
 	token, err := feat.Login(request)
 	if err != nil {
-		return nil, helpers.HandleError(err)
+		return nil, err
 	}
 
 	return &user.UserTokenResponse{
@@ -63,7 +62,7 @@ func (u *UserHandler) Me(ctx context.Context, in *emptypb.Empty) (*user.UserData
 	feat := authfeature.NewAuthService(ctx)
 	data, err := feat.GetUserData()
 	if err != nil {
-		return nil, helpers.HandleError(err)
+		return nil, err
 	}
 	return &data, nil
 }
