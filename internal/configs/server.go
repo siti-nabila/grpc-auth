@@ -34,6 +34,7 @@ func NewGRPCServer(cfg *AppConfig, register func(*grpc.Server)) *GRPCServerClien
 
 		grpc.ChainUnaryInterceptor(
 			interceptors.LanguageInterceptor,
+			interceptors.ErrorInterceptor,
 			interceptors.TokenInterceptor(cfg.JWT.SecretKey),
 		),
 	}

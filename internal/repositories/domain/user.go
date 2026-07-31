@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	errorpackage "github.com/siti-nabila/error-package"
+	"github.com/siti-nabila/api-contracts/pkg/dictionary"
 	"github.com/siti-nabila/orm/orm"
 )
 
@@ -60,7 +60,7 @@ func ValidateUserListSortDesc(sorts []orm.SortField) (bool, error) {
 }
 
 func NewUserListValidationError(field, message string) error {
-	errs := errorpackage.Errors{}
+	errs := dictionary.FieldErrors{}
 	errs.Add(field, errors.New(message))
 	return errs
 }

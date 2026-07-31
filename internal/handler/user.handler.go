@@ -7,7 +7,6 @@ import (
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/pb/paginator"
 	pbuser "github.com/siti-nabila/grpc-auth/pb/user"
-	"github.com/siti-nabila/grpc-auth/pkg/helpers"
 	"github.com/siti-nabila/orm/orm"
 	ormdictionary "github.com/siti-nabila/orm/pkg/dictionary"
 )
@@ -15,7 +14,7 @@ import (
 func (u *UserHandler) ListUsers(ctx context.Context, in *pbuser.ListUsersRequest) (*pbuser.ListUsersResponse, error) {
 	opts, err := queryOptionsFromProto(in.GetQuery())
 	if err != nil {
-		return nil, helpers.HandleError(err)
+		return nil, err
 	}
 
 	feat := userfeature.NewUserService(ctx)
@@ -24,7 +23,7 @@ func (u *UserHandler) ListUsers(ctx context.Context, in *pbuser.ListUsersRequest
 		LastID: in.GetQuery().GetLastId(),
 	})
 	if err != nil {
-		return nil, helpers.HandleError(err)
+		return nil, err
 	}
 
 	return listUsersResponseFromPage(page), nil
