@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"regexp"
 
+	userv1 "github.com/siti-nabila/api-contracts/pb/user/v1"
 	"github.com/siti-nabila/api-contracts/pkg/dictionary"
-	"github.com/siti-nabila/grpc-auth/pb/user"
 	appdictionary "github.com/siti-nabila/grpc-auth/pkg/dictionary"
 	"github.com/siti-nabila/grpc-auth/pkg/helpers"
 	"github.com/siti-nabila/orm/orm"
@@ -63,8 +63,8 @@ var emailRegex = regexp.MustCompile(
 		`[A-Za-z0-9](?:[A-Za-z0-9._~\-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9._~\-]*[A-Za-z0-9])?)+$`,
 )
 
-func (a Auth) ToUserDataResponse() *user.UserResponse {
-	return &user.UserResponse{
+func (a Auth) ToUserDataResponse() *userv1.UserResponse {
+	return &userv1.UserResponse{
 		Id:        a.Id,
 		Email:     a.Email,
 		CreatedAt: timestamppb.New(a.CreatedAt.Time),

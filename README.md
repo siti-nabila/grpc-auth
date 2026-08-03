@@ -24,7 +24,7 @@ grpc-auth/
 │   ├── features/               # Business logic features
 │   ├── handler/                # gRPC request handlers
 │   └── repositories/           # Data access layer
-├── pb/                         # Generated protobuf files
+├── pb/                         # Generated local profile protobuf files
 ├── pkg/
 │   ├── database/               # Database wrapper & utilities
 │   ├── dictionary/             # Error definitions
@@ -32,7 +32,7 @@ grpc-auth/
 │   ├── jwt/                    # JWT token utilities
 │   ├── logger/                 # Logging configuration
 │   └── utils/                  # Utility functions
-├── proto/                      # Protocol buffer definitions
+├── proto/                      # Local profile protocol definitions
 ├── logs/                       # Application logs (auto-generated)
 ├── env.yaml                    # Environment configuration
 ├── Makefile                    # Build & development commands
@@ -107,6 +107,10 @@ make clean
 
 ### Protocol Buffers
 
+The versioned `UserService` contract is consumed from
+`github.com/siti-nabila/api-contracts/pb/user/v1`. The commands below only
+regenerate protobuf contracts that are still local to this repository.
+
 ```bash
 # Generate protobuf files
 make proto
@@ -122,7 +126,7 @@ make clean-proto
 ```bash
 grpcurl -plaintext \
   -d '{"email": "user@example.com", "password": "password123"}' \
-  localhost:50051 user.UserService/Register
+  localhost:50051 user.v1.UserService/Register
 ```
 
 ### Login
@@ -130,14 +134,14 @@ grpcurl -plaintext \
 ```bash
 grpcurl -plaintext \
   -d '{"email": "user@example.com", "password": "password123"}' \
-  localhost:50051 user.UserService/Login
+  localhost:50051 user.v1.UserService/Login
 ```
 
 ### Test RPC
 
 ```bash
 grpcurl -plaintext \
-  localhost:50051 user.UserService/TesRPC
+  localhost:50051 user.v1.UserService/TesRPC
 ```
 
 ## 🗄️ Database Setup
@@ -241,17 +245,19 @@ errors:
 
 ## 📚 Proto Definitions
 
-See `proto/user/` for service definitions:
-- `user.payload.proto` - Message definitions
-- `user.service.proto` - Service RPC definitions
+The versioned user and paginator contracts live in the shared
+[`api-contracts`](https://github.com/siti-nabila/api-contracts) module. Local
+`proto/profile/` files currently define `ProfileService`.
 
 ## 🚦 Development Workflow
 
-1. Modify `.proto` files in `proto/` directory
-2. Generate code: `make proto`
-3. Implement handlers in `internal/handler/`
-4. Implement business logic in `internal/features/`
-5. Build and test: `make build && make run`
+1. Modify shared user contracts in `api-contracts`, or local profile contracts
+   in `proto/profile/`
+2. Publish/update `api-contracts` when needed, then run `go get` in this service
+3. Generate local profile code with `make proto`
+4. Implement handlers in `internal/handler/`
+5. Implement business logic in `internal/features/`
+6. Build and test: `make build && make run`
 
 ## 📄 License
 

@@ -3,15 +3,15 @@ package handler
 import (
 	"context"
 
+	paginatorv1 "github.com/siti-nabila/api-contracts/pb/paginator/v1"
+	userv1 "github.com/siti-nabila/api-contracts/pb/user/v1"
 	userfeature "github.com/siti-nabila/grpc-auth/internal/features/user"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
-	"github.com/siti-nabila/grpc-auth/pb/paginator"
-	pbuser "github.com/siti-nabila/grpc-auth/pb/user"
 	"github.com/siti-nabila/orm/orm"
 	ormdictionary "github.com/siti-nabila/orm/pkg/dictionary"
 )
 
-func (u *UserHandler) ListUsers(ctx context.Context, in *pbuser.ListUsersRequest) (*pbuser.ListUsersResponse, error) {
+func (u *UserHandler) ListUsers(ctx context.Context, in *userv1.ListUsersRequest) (*userv1.ListUsersResponse, error) {
 	opts, err := queryOptionsFromProto(in.GetQuery())
 	if err != nil {
 		return nil, err
@@ -26,10 +26,10 @@ func (u *UserHandler) ListUsers(ctx context.Context, in *pbuser.ListUsersRequest
 		return nil, err
 	}
 
-	return listUsersResponseFromPage(page), nil
+	return ListUsersResponseFromPage(page), nil
 }
 
-func queryOptionsFromProto(in *paginator.PageQuery) (orm.QueryOptions, error) {
+func queryOptionsFromProto(in *paginatorv1.PageQuery) (orm.QueryOptions, error) {
 	if in == nil {
 		return orm.QueryOptions{}, nil
 	}
@@ -65,29 +65,29 @@ func queryOptionsFromProto(in *paginator.PageQuery) (orm.QueryOptions, error) {
 	return opts, nil
 }
 
-func searchModeFromProto(mode paginator.SearchMode) (orm.SearchMode, error) {
+func searchModeFromProto(mode paginatorv1.SearchMode) (orm.SearchMode, error) {
 	switch mode {
-	case paginator.SearchMode_SEARCH_MODE_UNSPECIFIED:
+	case paginatorv1.SearchMode_SEARCH_MODE_UNSPECIFIED:
 		return "", nil
-	case paginator.SearchMode_SEARCH_MODE_CONTAINS:
+	case paginatorv1.SearchMode_SEARCH_MODE_CONTAINS:
 		return orm.SearchModeContains, nil
-	case paginator.SearchMode_SEARCH_MODE_PREFIX:
+	case paginatorv1.SearchMode_SEARCH_MODE_PREFIX:
 		return orm.SearchModePrefix, nil
-	case paginator.SearchMode_SEARCH_MODE_FULL_TEXT:
+	case paginatorv1.SearchMode_SEARCH_MODE_FULL_TEXT:
 		return orm.SearchModeFullText, nil
-	case paginator.SearchMode_SEARCH_MODE_TRIGRAM:
+	case paginatorv1.SearchMode_SEARCH_MODE_TRIGRAM:
 		return orm.SearchModeTrigram, nil
-	case paginator.SearchMode_SEARCH_MODE_FULL_TEXT_TRIGRAM:
+	case paginatorv1.SearchMode_SEARCH_MODE_FULL_TEXT_TRIGRAM:
 		return orm.SearchModeFullTextTrigram, nil
 	default:
 		return "", ormdictionary.ErrInvalidSearchMode
 	}
 }
 
-func listUsersResponseFromPage(page orm.PageData[domain.UserSearchRow]) *pbuser.ListUsersResponse {
-	items := make([]*pbuser.UserListItem, 0, len(page.Items))
+func ListUsersResponseFromPage(page orm.PageData[domain.UserSearchRow]) *userv1.ListUsersResponse {
+	items := make([]*userv1.UserListItem, 0, len(page.Items))
 	for _, row := range page.Items {
-		items = append(items, &pbuser.UserListItem{
+		items = append(items, &userv1.UserListItem{
 			Email:   row.Email,
 			Name:    row.Name,
 			Address: row.Address,
@@ -96,7 +96,7 @@ func listUsersResponseFromPage(page orm.PageData[domain.UserSearchRow]) *pbuser.
 		})
 	}
 
-	return &pbuser.ListUsersResponse{
+	return &userv1.ListUsersResponse{
 		Items:      items,
 		Total:      int32(page.Total),
 		Page:       int32(page.Page),

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
+	userv1 "github.com/siti-nabila/api-contracts/pb/user/v1"
 	"github.com/siti-nabila/grpc-auth/internal/sessions"
 	jwtPackage "github.com/siti-nabila/grpc-auth/pkg/jwt"
 	"google.golang.org/grpc"
@@ -89,9 +90,9 @@ func extractTokenFromContext(ctx context.Context) (string, error) {
 
 func isPublicMethod(fullMethod string) bool {
 	publicMethods := map[string]bool{
-		"/user.UserService/Login":    true,
-		"/user.UserService/Register": true,
-		"/user.UserService/TesRPC":   true,
+		userv1.UserService_Login_FullMethodName:    true,
+		userv1.UserService_Register_FullMethodName: true,
+		userv1.UserService_TesRPC_FullMethodName:   true,
 	}
 	return publicMethods[fullMethod]
 }

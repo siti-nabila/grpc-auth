@@ -23,8 +23,7 @@ func HandleDBError(err error) error {
 		return nil
 	}
 
-	var databaseError *normalizeerr.DBError
-	if errors.As(err, &databaseError) {
+	if databaseError, ok := errors.AsType[*normalizeerr.DBError](err); ok {
 		switch databaseError.Kind {
 		case normalizeerr.KindDuplicateRow:
 			return ErrDataExists

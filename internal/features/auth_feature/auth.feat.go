@@ -1,10 +1,10 @@
 package authfeature
 
 import (
+	userv1 "github.com/siti-nabila/api-contracts/pb/user/v1"
 	"github.com/siti-nabila/grpc-auth/internal/features/common"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/internal/sessions"
-	"github.com/siti-nabila/grpc-auth/pb/user"
 	"github.com/siti-nabila/grpc-auth/pkg/dictionary"
 	"github.com/siti-nabila/orm/orm"
 	"golang.org/x/sync/errgroup"
@@ -114,7 +114,7 @@ func (a *authService) Login(request domain.AuthRequest) (*string, error) {
 	return token, nil
 }
 
-func (a *authService) GetUserData() (res user.UserData, err error) {
+func (a *authService) GetUserData() (res userv1.UserData, err error) {
 	var (
 		authData    domain.Auth
 		profileData domain.Profile
@@ -124,7 +124,7 @@ func (a *authService) GetUserData() (res user.UserData, err error) {
 	roleNames := make([]string, 0)
 	userSession, err := sessions.GetUserSession(a.ctx)
 	if err != nil {
-		return user.UserData{}, err
+		return userv1.UserData{}, err
 	}
 
 	g, _ := errgroup.WithContext(a.ctx)
@@ -155,12 +155,12 @@ func (a *authService) GetUserData() (res user.UserData, err error) {
 	})
 
 	if err = g.Wait(); err != nil {
-		return user.UserData{}, err
+		return userv1.UserData{}, err
 	}
 	// protoProfile := profileData.ToProfileResponse()
 	// protoAuth := authData.ToUserDataResponse()
 
-	return user.UserData{
+	return userv1.UserData{
 		Id:        authData.Id,
 		Email:     authData.Email,
 		Fullname:  profileData.Name,
