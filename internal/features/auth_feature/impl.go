@@ -3,10 +3,10 @@ package authfeature
 import (
 	"context"
 
+	userv1 "github.com/siti-nabila/api-contracts/pb/user/v1"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/reader"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/writer"
-	"github.com/siti-nabila/grpc-auth/pb/user"
 	"github.com/siti-nabila/grpc-auth/pkg/config"
 	"github.com/siti-nabila/grpc-auth/pkg/jwt"
 )
@@ -15,7 +15,7 @@ type (
 	AuthService interface {
 		Register(req domain.AuthRequest) (token *string, err error)
 		Login(req domain.AuthRequest) (token *string, err error)
-		GetUserData() (res user.UserData, err error)
+		GetUserData() (res userv1.UserData, err error)
 	}
 
 	authService struct {
