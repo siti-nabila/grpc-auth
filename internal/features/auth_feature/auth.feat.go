@@ -1,11 +1,14 @@
 package authfeature
 
 import (
+	"errors"
+
 	userv1 "github.com/siti-nabila/api-contracts/pb/user/v1"
+	authdictionary "github.com/siti-nabila/api-contracts/pkg/dictionary/auth"
+	commondictionary "github.com/siti-nabila/api-contracts/pkg/dictionary/common"
 	"github.com/siti-nabila/grpc-auth/internal/features/common"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/internal/sessions"
-	"github.com/siti-nabila/grpc-auth/pkg/dictionary"
 	"github.com/siti-nabila/orm/orm"
 	"golang.org/x/sync/errgroup"
 )
@@ -14,6 +17,7 @@ func (a *authService) Register(request domain.AuthRequest) (token *string, err e
 	var (
 		tx *orm.SqlTransactionAdapter
 	)
+
 	defer func() {
 		if tx != nil {
 			common.DeferTransaction(tx, &err)
@@ -21,12 +25,12 @@ func (a *authService) Register(request domain.AuthRequest) (token *string, err e
 
 		if r := recover(); r != nil {
 			// Handle the panic and return an error
-			err = dictionary.ErrInternalServerError
+			err = commondictionary.ErrInternalServerError
 		}
 	}()
 	if _, err := a.authReader.GetByEmail(request.Email); err == nil {
-		return nil, dictionary.ErrDataExists
-	} else if err != dictionary.ErrNotFound {
+		return nil, authdictionary.ErrDataExists
+	} else if !errors.Is(err, authdictionary.ErrNotFound) {
 		return nil, err
 	}
 
@@ -103,7 +107,7 @@ func (a *authService) Login(request domain.AuthRequest) (*string, error) {
 		return nil, err
 	}
 	if !valid {
-		return nil, dictionary.ErrPasswordMismatch
+		return nil, authdictionary.ErrPasswordMismatch
 	}
 
 	token, err := a.GenerateAuthToken(userData.Id)
@@ -120,7 +124,7 @@ func (a *authService) GetUserData() (res userv1.UserData, err error) {
 		profileData domain.Profile
 		RolesData   []domain.Role
 	)
-	roleIds := make([]uint64, 0)
+	roleCodes := make([]int32, 0)
 	roleNames := make([]string, 0)
 	userSession, err := sessions.GetUserSession(a.ctx)
 	if err != nil {
@@ -148,7 +152,7 @@ func (a *authService) GetUserData() (res userv1.UserData, err error) {
 			return err
 		}
 		for _, role := range RolesData {
-			roleIds = append(roleIds, role.Id)
+			roleCodes = append(roleCodes, int32(role.Code))
 			roleNames = append(roleNames, role.Name)
 		}
 		return nil
@@ -166,7 +170,7 @@ func (a *authService) GetUserData() (res userv1.UserData, err error) {
 		Fullname:  profileData.Name,
 		Address:   profileData.Address,
 		Phone:     profileData.Phone,
-		RoleIds:   roleIds,
+		RoleCodes: roleCodes,
 		RoleNames: roleNames,
 	}, nil
 }

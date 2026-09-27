@@ -6,7 +6,7 @@ import (
 
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/pkg/database"
-	"github.com/siti-nabila/grpc-auth/pkg/dictionary"
+	"github.com/siti-nabila/grpc-auth/pkg/helpers"
 	"github.com/siti-nabila/orm/orm"
 	ormLog "github.com/siti-nabila/orm/pkg/logger"
 )
@@ -53,7 +53,7 @@ func (p *RoleWriter) UseTransaction(tx *orm.SqlTransactionAdapter) {
 
 func (p *RoleWriter) Create(req *domain.RoleRequest) error {
 	err := p.Tx.Create(req)
-	if er := dictionary.HandleDBError(err); er != nil {
+	if er := helpers.HandleDBError(err); er != nil {
 		return er
 	}
 

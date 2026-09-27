@@ -61,20 +61,13 @@ func (u *userReader) SearchFields() map[string]orm.SearchFieldConfig {
 	}
 }
 
-func (u *userReader) SearchUsers(opts orm.QueryOptions) (orm.PageData[domain.UserSearchRow], error) {
+func (u *userReader) SearchUsers(
+	opts orm.QueryOptions,
+	filter domain.UserListFilter,
+) (orm.PageData[domain.UserSearchRow], error) {
 	db := u.Adapter()
 	rows := make([]domain.UserSearchRow, 0)
-
-	query := db.UseModel(u.Model()).
-		Select(
-			"a.id AS auth_id",
-			"a.email",
-			`p."name"`,
-			"p.address",
-			"p.phone",
-		).
-		Join("auth a", "a.id = p.user_id").
-		Join("user_profile_search ups", "ups.profile_id = p.id")
+	query := BuildUserListQuery(db, filter)
 
 	return orm.QueryPageWithConfig(
 		u.ctx,
@@ -86,4 +79,40 @@ func (u *userReader) SearchUsers(opts orm.QueryOptions) (orm.PageData[domain.Use
 		},
 		opts,
 	)
+}
+
+func BuildUserListQuery(
+	db *orm.SqlQueryAdapter,
+	filter domain.UserListFilter,
+) *orm.QueryBuilder {
+	if db == nil {
+		return nil
+	}
+
+	query := db.UseModel(domain.UserSearchRow{}).
+		Select(
+			"a.id AS auth_id",
+			"a.email",
+			`p."name"`,
+			"p.address",
+			"p.phone",
+		).
+		Join("auth a", "a.id = p.user_id").
+		Join("user_profile_search ups", "ups.profile_id = p.id")
+
+	if filter.CreatedFrom != nil {
+		query = query.Where("a.created_at >= ?", *filter.CreatedFrom)
+	}
+	if filter.CreatedTo != nil {
+		query = query.Where("a.created_at < ?", *filter.CreatedTo)
+	}
+	if len(filter.RoleCodes) > 0 {
+		query = query.
+			Join("user_role ur", "ur.user_id = a.id").
+			Join("role r", "r.id = ur.role_id").
+			WhereIn("r.role_code", filter.RoleCodes).
+			Distinct()
+	}
+
+	return query
 }

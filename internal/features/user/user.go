@@ -42,7 +42,7 @@ func (u *userService) SearchUsers(req domain.UserListRequest) (orm.PageData[doma
 		return orm.PageData[domain.UserSearchRow]{}, err
 	}
 
-	pageData, err := u.userReader.SearchUsers(pager.Options)
+	pageData, err := u.userReader.SearchUsers(pager.Options, req.Filter)
 	if err != nil {
 		return orm.PageData[domain.UserSearchRow]{}, err
 	}

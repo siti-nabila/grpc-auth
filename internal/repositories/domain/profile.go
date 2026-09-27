@@ -5,7 +5,7 @@ import (
 	"errors"
 	"reflect"
 
-	"github.com/siti-nabila/grpc-auth/pb/profile"
+	profilev1 "github.com/siti-nabila/api-contracts/pb/profile/v1"
 	"github.com/siti-nabila/orm/orm"
 )
 
@@ -62,8 +62,8 @@ func (Profile) TableName() string {
 	return "profile"
 }
 
-func (p Profile) ToProfileResponse() *profile.Profile {
-	return &profile.Profile{
+func (p Profile) ToProfileResponse() *profilev1.Profile {
+	return &profilev1.Profile{
 		Id:      p.Id,
 		UserId:  p.UserId,
 		Name:    p.Name,

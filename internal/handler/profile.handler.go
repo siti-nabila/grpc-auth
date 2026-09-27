@@ -3,18 +3,18 @@ package handler
 import (
 	"context"
 
+	profilev1 "github.com/siti-nabila/api-contracts/pb/profile/v1"
 	profilefeat "github.com/siti-nabila/grpc-auth/internal/features/profile"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
-	"github.com/siti-nabila/grpc-auth/pb/profile"
 )
 
 type (
 	ProfileHandler struct {
-		profile.UnimplementedProfileServiceServer
+		profilev1.UnimplementedProfileServiceServer
 	}
 )
 
-func (p *ProfileHandler) UpdateProfile(ctx context.Context, in *profile.ProfileRequest) (*profile.ProfileResponse, error) {
+func (p *ProfileHandler) UpdateProfile(ctx context.Context, in *profilev1.ProfileRequest) (*profilev1.ProfileResponse, error) {
 	var (
 		feat = profilefeat.NewProfileService(ctx)
 	)
@@ -29,8 +29,8 @@ func (p *ProfileHandler) UpdateProfile(ctx context.Context, in *profile.ProfileR
 		return nil, err
 	}
 
-	return &profile.ProfileResponse{
-		Profile: &profile.Profile{
+	return &profilev1.ProfileResponse{
+		Profile: &profilev1.Profile{
 			Id:      request.Id,
 			UserId:  0,
 			Name:    request.Name,
