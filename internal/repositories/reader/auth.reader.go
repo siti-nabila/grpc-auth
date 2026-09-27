@@ -6,7 +6,7 @@ import (
 
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/pkg/database"
-	"github.com/siti-nabila/grpc-auth/pkg/dictionary"
+	"github.com/siti-nabila/grpc-auth/pkg/helpers"
 	"github.com/siti-nabila/orm/orm"
 )
 
@@ -47,13 +47,12 @@ func (a *authReader) Model() domain.Auth {
 
 func (a *authReader) GetByEmail(email string) (result domain.Auth, err error) {
 	db := a.Adapter()
-
 	err = db.
 		UseModel(a.Model()).
 		Where("email = ?", email).
 		Limit(1).
 		Scan(&result)
-	if er := dictionary.HandleDBError(err); er != nil {
+	if er := helpers.HandleDBError(err); er != nil {
 		return result, er
 	}
 
@@ -69,7 +68,7 @@ func (a *authReader) GetById(id uint64) (result domain.Auth, err error) {
 		Where("id = ?", id).
 		Limit(1).
 		Scan(&result)
-	if er := dictionary.HandleDBError(err); er != nil {
+	if er := helpers.HandleDBError(err); er != nil {
 		return result, er
 	}
 

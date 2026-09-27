@@ -8,6 +8,9 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/siti-nabila/api-contracts/pkg/grpcerror"
+	"github.com/siti-nabila/api-contracts/pkg/grpcerror/mapping"
+
 	"github.com/siti-nabila/grpc-auth/internal/interceptors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -24,6 +27,9 @@ type (
 
 func NewGRPCServer(cfg *AppConfig, register func(*grpc.Server)) *GRPCServerClient {
 	// Implementation for creating a new gRPC server using the provided AppConfig{
+	var mappings []grpcerror.CodeMapping
+	mappings = append(mapping.CommonCodeMappings(), mapping.AuthCodeMappings()...)
+	errorEncoder := grpcerror.NewEncoder(mappings...)
 	opts := []grpc.ServerOption{
 		grpc.ConnectionTimeout(cfg.Timeout),
 		grpc.KeepaliveParams(keepalive.ServerParameters{
@@ -34,7 +40,7 @@ func NewGRPCServer(cfg *AppConfig, register func(*grpc.Server)) *GRPCServerClien
 
 		grpc.ChainUnaryInterceptor(
 			interceptors.LanguageInterceptor,
-			interceptors.ErrorInterceptor,
+			interceptors.NewErrorInterceptor(errorEncoder),
 			interceptors.TokenInterceptor(cfg.JWT.SecretKey),
 		),
 	}

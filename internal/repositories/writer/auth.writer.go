@@ -3,11 +3,10 @@ package writer
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/pkg/database"
-	"github.com/siti-nabila/grpc-auth/pkg/dictionary"
+	"github.com/siti-nabila/grpc-auth/pkg/helpers"
 	"github.com/siti-nabila/orm/orm"
 	ormLog "github.com/siti-nabila/orm/pkg/logger"
 )
@@ -22,7 +21,6 @@ type (
 
 func NewAuthWriter(ctx context.Context) domain.AuthWriter {
 	// dbLogger := database.NewDBLogger()
-	fmt.Println("---------- auth writer new ----------")
 
 	conn := database.DBGetNativePool(database.UserDbSource)
 	// dbLogger.Adapter(conn)
@@ -54,7 +52,7 @@ func (a *AuthWriter) UseTransaction(tx *orm.SqlTransactionAdapter) {
 
 func (a *AuthWriter) Create(req *domain.AuthRequest) error {
 	err := a.Tx.Create(req)
-	if er := dictionary.HandleDBError(err); er != nil {
+	if er := helpers.HandleDBError(err); er != nil {
 		return er
 	}
 

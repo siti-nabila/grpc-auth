@@ -6,7 +6,7 @@ import (
 
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/pkg/database"
-	"github.com/siti-nabila/grpc-auth/pkg/dictionary"
+	"github.com/siti-nabila/grpc-auth/pkg/helpers"
 	"github.com/siti-nabila/orm/orm"
 	ormLog "github.com/siti-nabila/orm/pkg/logger"
 )
@@ -53,7 +53,7 @@ func (p *ProfileWriter) UseTransaction(tx *orm.SqlTransactionAdapter) {
 
 func (p *ProfileWriter) Create(req *domain.ProfileRequest) error {
 	err := p.Tx.Create(req)
-	if er := dictionary.HandleDBError(err); er != nil {
+	if er := helpers.HandleDBError(err); er != nil {
 		return er
 	}
 
@@ -62,7 +62,7 @@ func (p *ProfileWriter) Create(req *domain.ProfileRequest) error {
 
 func (p *ProfileWriter) Update(req *domain.UpdateProfileRequest) error {
 	err := p.Tx.Update(req)
-	if er := dictionary.HandleDBError(err); er != nil {
+	if er := helpers.HandleDBError(err); er != nil {
 		return er
 	}
 
@@ -71,7 +71,7 @@ func (p *ProfileWriter) Update(req *domain.UpdateProfileRequest) error {
 
 func (p *ProfileWriter) Patch(req map[string]any) error {
 	err := p.Tx.Update(p.Model(), req)
-	if er := dictionary.HandleDBError(err); er != nil {
+	if er := helpers.HandleDBError(err); er != nil {
 		return er
 	}
 

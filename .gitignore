@@ -30,3 +30,8 @@ bin
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# Local AI agent instructions
+AGENTS.md
+
+.DS_Store

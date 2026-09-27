@@ -4,21 +4,35 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/siti-nabila/api-contracts/pkg/dictionary"
 	"github.com/siti-nabila/orm/orm"
 )
 
-const UserListCursorField = "auth_id"
+const (
+	UserListCursorField = "auth_id"
+	UserListSearchField = "keyword"
+)
 
 type (
 	UserReader interface {
-		SearchUsers(opts orm.QueryOptions) (orm.PageData[UserSearchRow], error)
+		SearchUsers(
+			opts orm.QueryOptions,
+			filter UserListFilter,
+		) (orm.PageData[UserSearchRow], error)
 	}
 
 	UserListRequest struct {
 		Query  orm.QueryOptions
 		LastID string
+		Filter UserListFilter
+	}
+
+	UserListFilter struct {
+		CreatedFrom *time.Time
+		CreatedTo   *time.Time
+		RoleCodes   []uint64
 	}
 
 	UserSearchRow struct {

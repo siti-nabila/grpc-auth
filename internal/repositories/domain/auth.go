@@ -6,8 +6,8 @@ import (
 	"regexp"
 
 	userv1 "github.com/siti-nabila/api-contracts/pb/user/v1"
-	"github.com/siti-nabila/api-contracts/pkg/dictionary"
-	appdictionary "github.com/siti-nabila/grpc-auth/pkg/dictionary"
+	contractdictionary "github.com/siti-nabila/api-contracts/pkg/dictionary"
+	authdictionary "github.com/siti-nabila/api-contracts/pkg/dictionary/auth"
 	"github.com/siti-nabila/grpc-auth/pkg/helpers"
 	"github.com/siti-nabila/orm/orm"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -73,16 +73,16 @@ func (a Auth) ToUserDataResponse() *userv1.UserResponse {
 }
 
 func (a *AuthRequest) Validate() error {
-	errs := dictionary.FieldErrors{}
+	errs := contractdictionary.FieldErrors{}
 	if er := a.validateEmail(); er != nil {
-		if sub, ok := er.(dictionary.FieldErrors); ok {
+		if sub, ok := er.(contractdictionary.FieldErrors); ok {
 			errs.Merge(sub)
 		} else {
 			errs.Add(helpers.EmailJsonTag, er)
 		}
 	}
 	if er := a.validatePassword(); er != nil {
-		if sub, ok := er.(dictionary.FieldErrors); ok {
+		if sub, ok := er.(contractdictionary.FieldErrors); ok {
 			errs.Merge(sub)
 		} else {
 			errs.Add(helpers.PasswordJsonTag, er)
@@ -96,19 +96,19 @@ func (a *AuthRequest) Validate() error {
 }
 
 func (a *AuthRequest) validateEmail() error {
-	errs := dictionary.FieldErrors{}
+	errs := contractdictionary.FieldErrors{}
 
 	if a.Email == "" {
-		errs.Add(helpers.EmailJsonTag, appdictionary.ErrRequired)
+		errs.Add(helpers.EmailJsonTag, authdictionary.ErrRequired)
 	}
 	if len(a.Email) < 6 {
-		errs.Add(helpers.EmailJsonTag, appdictionary.ErrMinLength(6))
+		errs.Add(helpers.EmailJsonTag, authdictionary.ErrMinLength(6))
 	}
 	if len(a.Email) > 50 {
-		errs.Add(helpers.EmailJsonTag, appdictionary.ErrMaxLength(50))
+		errs.Add(helpers.EmailJsonTag, authdictionary.ErrMaxLength(50))
 	}
 	if !isValidEmail(a.Email) && a.Email != "" {
-		errs.Add(helpers.EmailJsonTag, appdictionary.ErrInvalidEmail)
+		errs.Add(helpers.EmailJsonTag, authdictionary.ErrInvalidEmail)
 	}
 	if len(errs) != 0 {
 		return errs
@@ -117,16 +117,16 @@ func (a *AuthRequest) validateEmail() error {
 	return nil
 }
 func (a *AuthRequest) validatePassword() error {
-	errs := dictionary.FieldErrors{}
+	errs := contractdictionary.FieldErrors{}
 
 	if a.Password == "" {
-		errs.Add(helpers.PasswordJsonTag, appdictionary.ErrRequired)
+		errs.Add(helpers.PasswordJsonTag, authdictionary.ErrRequired)
 	}
 	if len(a.Password) < 6 {
-		errs.Add(helpers.PasswordJsonTag, appdictionary.ErrMinLength(6))
+		errs.Add(helpers.PasswordJsonTag, authdictionary.ErrMinLength(6))
 	}
 	if len(a.Password) > 50 {
-		errs.Add(helpers.PasswordJsonTag, appdictionary.ErrMaxLength(50))
+		errs.Add(helpers.PasswordJsonTag, authdictionary.ErrMaxLength(50))
 	}
 	if len(errs) != 0 {
 		return errs

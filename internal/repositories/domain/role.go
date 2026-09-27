@@ -27,10 +27,10 @@ type (
 		Name string `sql:"column:role_name" json:"role_name"`
 	}
 	Role struct {
-		Id          uint64 `sql:"column:id;primaryKey" json:"id"`
-		Name        string `sql:"column:role_name" json:"role_name"`
-		Code        uint64 `sql:"column:role_code" json:"role_code"`
-		Description string `sql:"column:role_description" json:"role_description"`
+		Id          uint64  `sql:"column:id;primaryKey" json:"id"`
+		Name        string  `sql:"column:role_name" json:"role_name"`
+		Code        uint64  `sql:"column:role_code" json:"role_code"`
+		Description *string `sql:"column:role_description" json:"role_description"`
 	}
 
 	RoleResponse struct {

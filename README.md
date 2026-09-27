@@ -24,15 +24,12 @@ grpc-auth/
 │   ├── features/               # Business logic features
 │   ├── handler/                # gRPC request handlers
 │   └── repositories/           # Data access layer
-├── pb/                         # Generated local profile protobuf files
 ├── pkg/
 │   ├── database/               # Database wrapper & utilities
-│   ├── dictionary/             # Error definitions
-│   ├── helpers/                # Helper functions
+│   ├── helpers/                # gRPC and database error adapters
 │   ├── jwt/                    # JWT token utilities
 │   ├── logger/                 # Logging configuration
 │   └── utils/                  # Utility functions
-├── proto/                      # Local profile protocol definitions
 ├── logs/                       # Application logs (auto-generated)
 ├── env.yaml                    # Environment configuration
 ├── Makefile                    # Build & development commands
@@ -45,8 +42,6 @@ grpc-auth/
 
 - **Go** 1.24.4 or higher
 - **PostgreSQL** 12 or higher
-- **Protocol Buffers** compiler (`protoc`)
-- **protoc-gen-go** and **protoc-gen-go-grpc** plugins
 
 ### Installation
 
@@ -107,17 +102,9 @@ make clean
 
 ### Protocol Buffers
 
-The versioned `UserService` contract is consumed from
-`github.com/siti-nabila/api-contracts/pb/user/v1`. The commands below only
-regenerate protobuf contracts that are still local to this repository.
-
-```bash
-# Generate protobuf files
-make proto
-
-# Clean generated protobuf files
-make clean-proto
-```
+The versioned `UserService` and `ProfileService` contracts are consumed from
+`github.com/siti-nabila/api-contracts`. Protobuf definitions and generated Go
+packages are maintained in the separate `api-contracts` repository.
 
 ## 📡 API Usage
 
@@ -199,9 +186,9 @@ Logger:
 - **postgres.go** - PostgreSQL connection management
 - **helper.go** - Query interpolation and formatting
 
-### `pkg/dictionary`
-- Centralized error definitions with multi-language support
-- YAML-based error configuration
+### `api-contracts/pkg/dictionary`
+- Shared error registry and multi-language definitions
+- Namespaced auth/common errors consumed directly by this service
 
 ### `pkg/jwt`
 - JWT token generation and validation
@@ -229,35 +216,30 @@ Logs rotate daily and are compressed after 30 days.
 
 ## 🐛 Error Handling
 
-Errors are managed through `pkg/dictionary/err_list.yaml`:
+The error registry in `github.com/siti-nabila/api-contracts/pkg/dictionary` is
+the source of truth for error keys, codes, protocol status, and localized
+messages. This service consumes the `dictionary/auth` and `dictionary/common`
+namespaces directly. Database-specific errors are normalized locally and then
+mapped to the corresponding shared registry error.
 
-```yaml
-errors:
-  err_duplicate_key:
-    code: 100001
-    en: already exists
-    id: sudah ada
-  err_not_found:
-    code: 110001
-    en: data not found
-    id: data tidak ditemukan
-```
+Clients select an arbitrary catalog language through gRPC metadata
+`x-language`. Locale tags use BCP-47, and regional values such as `zh-CN`
+fall back to their base catalog entry (`zh`). Validation errors added through
+`dictionary.FieldErrors.Add` preserve every message for the same field.
 
 ## 📚 Proto Definitions
 
-The versioned user and paginator contracts live in the shared
-[`api-contracts`](https://github.com/siti-nabila/api-contracts) module. Local
-`proto/profile/` files currently define `ProfileService`.
+All versioned user, profile, and paginator contracts live in the shared
+[`api-contracts`](https://github.com/siti-nabila/api-contracts) module.
 
 ## 🚦 Development Workflow
 
-1. Modify shared user contracts in `api-contracts`, or local profile contracts
-   in `proto/profile/`
-2. Publish/update `api-contracts` when needed, then run `go get` in this service
-3. Generate local profile code with `make proto`
-4. Implement handlers in `internal/handler/`
-5. Implement business logic in `internal/features/`
-6. Build and test: `make build && make run`
+1. Modify shared contracts and generate code in `api-contracts`
+2. Use the parent `go.work` to test local contract changes without publishing
+3. Implement handlers in `internal/handler/`
+4. Implement business logic in `internal/features/`
+5. Build and test with `make build` and `go test ./...`
+6. Publish `api-contracts`, update `go.mod`, then test with `GOWORK=off`
 
 ## 📄 License
 

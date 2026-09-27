@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/orm/orm"
@@ -11,22 +12,40 @@ import (
 type fakeUserReader struct {
 	t     *testing.T
 	calls int
-	fn    func(orm.QueryOptions) (orm.PageData[domain.UserSearchRow], error)
+	fn    func(
+		orm.QueryOptions,
+		domain.UserListFilter,
+	) (orm.PageData[domain.UserSearchRow], error)
 }
 
-func (f *fakeUserReader) SearchUsers(opts orm.QueryOptions) (orm.PageData[domain.UserSearchRow], error) {
+func (f *fakeUserReader) SearchUsers(
+	opts orm.QueryOptions,
+	filter domain.UserListFilter,
+) (orm.PageData[domain.UserSearchRow], error) {
 	f.calls++
 	if f.fn == nil {
 		f.t.Fatalf("unexpected SearchUsers call")
 	}
-	return f.fn(opts)
+	return f.fn(opts, filter)
 }
 
 func TestSearchUsersUsesLastIDAsMovingAuthIDCursor(t *testing.T) {
 	var captured []orm.QueryOptions
+	createdFrom := time.Date(2026, time.July, 31, 17, 0, 0, 0, time.UTC)
+	expectedFilter := domain.UserListFilter{
+		CreatedFrom: &createdFrom,
+		RoleCodes:   []uint64{1, 2},
+	}
 	reader := &fakeUserReader{
 		t: t,
-		fn: func(opts orm.QueryOptions) (orm.PageData[domain.UserSearchRow], error) {
+		fn: func(
+			opts orm.QueryOptions,
+			filter domain.UserListFilter,
+		) (orm.PageData[domain.UserSearchRow], error) {
+			if filter.CreatedFrom == nil || !filter.CreatedFrom.Equal(createdFrom) ||
+				len(filter.RoleCodes) != 2 || filter.RoleCodes[0] != 1 || filter.RoleCodes[1] != 2 {
+				t.Fatalf("unexpected reader filter: %#v", filter)
+			}
 			captured = append(captured, opts)
 			return orm.PageData[domain.UserSearchRow]{
 				Items:      []domain.UserSearchRow{},
@@ -47,6 +66,7 @@ func TestSearchUsersUsesLastIDAsMovingAuthIDCursor(t *testing.T) {
 
 	page, err := svc.SearchUsers(domain.UserListRequest{
 		LastID: "400",
+		Filter: expectedFilter,
 		Query: orm.QueryOptions{
 			Page:  3,
 			Limit: 500,
@@ -85,7 +105,10 @@ func TestSearchUsersUsesEmptyLastIDForFirstBatchInMemoryPagination(t *testing.T)
 	var captured []orm.QueryOptions
 	reader := &fakeUserReader{
 		t: t,
-		fn: func(opts orm.QueryOptions) (orm.PageData[domain.UserSearchRow], error) {
+		fn: func(
+			opts orm.QueryOptions,
+			_ domain.UserListFilter,
+		) (orm.PageData[domain.UserSearchRow], error) {
 			captured = append(captured, opts)
 			return orm.PageData[domain.UserSearchRow]{
 				Items: []domain.UserSearchRow{
