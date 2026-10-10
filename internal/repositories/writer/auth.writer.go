@@ -1,57 +1,20 @@
 package writer
 
 import (
-	"context"
-	"database/sql"
-
+	"github.com/siti-nabila/api-contracts/pkg/dictionary/common"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
-	"github.com/siti-nabila/grpc-auth/pkg/database"
 	"github.com/siti-nabila/grpc-auth/pkg/helpers"
-	"github.com/siti-nabila/orm/orm"
-	ormLog "github.com/siti-nabila/orm/pkg/logger"
 )
 
-type (
-	AuthWriter struct {
-		Db  *sql.DB
-		Tx  *orm.SqlTransactionAdapter
-		ctx context.Context
-	}
-)
+type AuthWriter struct{ tx domain.Transaction }
 
-func NewAuthWriter(ctx context.Context) domain.AuthWriter {
-	// dbLogger := database.NewDBLogger()
-
-	conn := database.DBGetNativePool(database.UserDbSource)
-	// dbLogger.Adapter(conn)
-	return &AuthWriter{
-		Db:  conn,
-		ctx: ctx,
-	}
-}
-
-func (a *AuthWriter) Begin() (*orm.SqlTransactionAdapter, error) {
-	if a.Tx != nil {
-		return a.Tx, nil
-	}
-	tx, err := a.Db.Begin()
-	if err != nil {
-		return nil, err
-	}
-	ormCfg := database.GetORMConfig()
-	oTx := orm.NewSqlTransactionAdapter(a.ctx, tx, database.GetDialect(database.UserDbSource), ormCfg)
-	oTx.SetLogger(ormLog.DefaultLogger{}, ormCfg.EnableDebug)
-	a.Tx = oTx
-
-	return a.Tx, nil
-}
-
-func (a *AuthWriter) UseTransaction(tx *orm.SqlTransactionAdapter) {
-	a.Tx = tx
-}
+func NewAuthWriterInTransaction(tx domain.Transaction) domain.AuthWriter { return &AuthWriter{tx: tx} }
 
 func (a *AuthWriter) Create(req *domain.AuthRequest) error {
-	err := a.Tx.Create(req)
+	if a.tx == nil {
+		return common.ErrInternalServerError
+	}
+	err := a.tx.Create(req)
 	if er := helpers.HandleDBError(err); er != nil {
 		return er
 	}

@@ -23,6 +23,7 @@ import (
 
 func All() []testutils.Scenario {
 	return []testutils.Scenario{
+		{Name: "transaction errors preserve locale identity cause and legacy mappings", Run: encodeTransactionErrors},
 		{
 			Name: "encodes error with request-scoped language",
 			Run:  encodeRequestLanguage,
@@ -208,6 +209,7 @@ func invokeChain(language string, handlerError error) error {
 		grpcmapping.CommonCodeMappings(),
 		grpcmapping.AuthCodeMappings()...,
 	)
+	mappings = append(mappings, grpcmapping.UserCodeMappings()...)
 	errorEncoder := grpcerror.NewEncoder(mappings...)
 	ctx := metadata.NewIncomingContext(
 		context.Background(),

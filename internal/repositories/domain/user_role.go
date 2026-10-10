@@ -1,14 +1,9 @@
 package domain
 
-import (
-	"github.com/siti-nabila/orm/orm"
-)
+import ()
 
 type (
 	UserRoleWriter interface {
-		UseTransaction(tx *orm.SqlTransactionAdapter)
-		Begin() (*orm.SqlTransactionAdapter, error)
-
 		Create(*UserRoleRequest) error
 	}
 

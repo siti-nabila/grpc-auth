@@ -29,6 +29,7 @@ func NewGRPCServer(cfg *AppConfig, register func(*grpc.Server)) *GRPCServerClien
 	// Implementation for creating a new gRPC server using the provided AppConfig{
 	var mappings []grpcerror.CodeMapping
 	mappings = append(mapping.CommonCodeMappings(), mapping.AuthCodeMappings()...)
+	mappings = append(mappings, mapping.UserCodeMappings()...)
 	errorEncoder := grpcerror.NewEncoder(mappings...)
 	opts := []grpc.ServerOption{
 		grpc.ConnectionTimeout(cfg.Timeout),

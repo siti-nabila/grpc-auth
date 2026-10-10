@@ -1,0 +1,158 @@
+{
+  "executed_at_utc": "2026-10-10T05:08:02.840344+00:00",
+  "source_head": "46dc4debb87281d8357a1c671365407ac8c374ca",
+  "working_tree_implementation": true,
+  "go_version": "go version go1.26.2 darwin/arm64",
+  "results": [
+    {
+      "command": "go test -json ./...",
+      "exit_code": 0,
+      "elapsed_seconds": 4.542,
+      "result": "PASS",
+      "passed_test_events": 146,
+      "failed_test_events": 0
+    },
+    {
+      "command": "GOWORK=off go test -json ./...",
+      "exit_code": 0,
+      "elapsed_seconds": 5.789,
+      "result": "PASS",
+      "passed_test_events": 146,
+      "failed_test_events": 0
+    },
+    {
+      "command": "go vet ./...",
+      "exit_code": 0,
+      "elapsed_seconds": 0.366,
+      "result": "PASS"
+    },
+    {
+      "command": "GOWORK=off go vet ./...",
+      "exit_code": 0,
+      "elapsed_seconds": 0.331,
+      "result": "PASS"
+    },
+    {
+      "command": "GOWORK=off go test -race ./tests/features/... ./tests/repositories/transaction ./tests/handler ./tests/interceptors",
+      "exit_code": 0,
+      "elapsed_seconds": 5.212,
+      "result": "PASS"
+    },
+    {
+      "command": "make build",
+      "exit_code": 0,
+      "elapsed_seconds": 1.544,
+      "result": "PASS"
+    },
+    {
+      "command": "GOWORK=off make build",
+      "exit_code": 0,
+      "elapsed_seconds": 1.49,
+      "result": "PASS"
+    },
+    {
+      "command": "go vet -tags=postgres ./tests/integration/postgres/...",
+      "exit_code": 0,
+      "elapsed_seconds": 0.272,
+      "result": "PASS"
+    },
+    {
+      "command": "GOWORK=off go test -race -json -tags=postgres ./tests/integration/postgres -count=1",
+      "database": "grpc_auth_test",
+      "exit_code": 0,
+      "elapsed_seconds": 6.089,
+      "result": "PASS",
+      "passed_test_events": 43,
+      "failed_test_events": 0
+    }
+  ],
+  "post_run": {
+    "database": "grpc_auth_test",
+    "postgresql": "PostgreSQL 16.13 on x86_64-apple-darwin24.6.0, compiled by Apple clang version 17.0.0 (clang-1700.6.3.2), 64-bit",
+    "remaining_fixture_schemas": 0,
+    "public_tables": 0
+  },
+  "modules": [
+    {
+      "Path": "github.com/siti-nabila/api-contracts",
+      "Version": "v0.0.0-20261010044649-bfbbeb282ec7",
+      "Sum": "h1:rdvYTBkMiYOXPbL0lTc4/6ednORNqUQOmDQgIsc7u74="
+    },
+    {
+      "Path": "github.com/siti-nabila/error-package",
+      "Version": "v0.0.10-0.20260927130242-e06b69ef855d",
+      "Sum": "h1:woIeRxbNHQH9+8XKrTrjDeQVjZwllwW0N0Z6hjmb3pM="
+    },
+    {
+      "Path": "github.com/siti-nabila/orm",
+      "Version": "v1.7.0",
+      "Sum": "h1:boteRlc9wvz0wHcK1O9OFtL9mziJ2uvjR9LlMAhwjC0="
+    }
+  ],
+  "default_excludes_postgres": true,
+  "source_sha256": {
+    "internal/configs/server.go": "10ca5f43d96585cfb93d5274602b2a31384b8375f68b288ff03e4b1f17631de6",
+    "internal/features/auth_feature/auth.feat.go": "e60f9c46d76ce6e36b1c7bbd4498ae4371e83d2f6d338516985cffdf5054e03e",
+    "internal/features/auth_feature/impl.go": "b182e9d0edab767ff98fcac5cf2ea8dd5f954fa5c7d4980b573d67a955311813",
+    "internal/features/common/idempotency.go": "43111f13a934994d81fc1813b006f0d603f092279680eee8eeee7aed5bf4b993",
+    "internal/features/common/impl.go": "7e932ea7fcea892160eaf6e2f3dc4fcc56d01c0570bcbe36a5952af90005bf82",
+    "internal/features/common/locking.go": "c02f0929adf0d6c945bb4fe212da202333094362c15f47c66cf95a6158d6a021",
+    "internal/features/common/transaction.go": "64ba1b5d36d5bd17a17fcd27d34e178cb01959011b21f1868fed49c9cba76b45",
+    "internal/features/profile/impl.go": "02883621457d8df8e4365af01af53f354cc6fd8c14ca5374845cb6586cd51981",
+    "internal/features/profile/profile.feat.go": "20bf33923f00b16b28750748d245b2887bcfceb1b62eb3f7021221d6023ff1c7",
+    "internal/features/user/impl.go": "0be7b563219006fe8e02a9f26b8cce603cac263d17fd0b555cb59a7712aed669",
+    "internal/handler/auth.handler.go": "ca14ad7d457069d8e0c077efcd777692e8ae8095d165e2c9e462896a2743aefd",
+    "internal/handler/profile.handler.go": "5faefedddc5901e07384d118f0df1e96c250525b9225e595a8f87a6f1e2a22cb",
+    "internal/repositories/domain/audit.go": "f5263f1ebfe1e6a172c3b8844e065b93973cb7223ea9b73074c96da26c8f46ae",
+    "internal/repositories/domain/auth.go": "560a9d4a8c04634f477f4f4229dd8e217b85ad5231c8b9da8b958202a47d1d37",
+    "internal/repositories/domain/idempotency.go": "654ef6a6a69856081b70c3ef3aa6744340ab4552d96757b851c2ece280d96c3a",
+    "internal/repositories/domain/outbox.go": "fb6acabb0024479487a35bd84e8834a4b436d2099576ac447bcd2718bc697ecb",
+    "internal/repositories/domain/profile.go": "0e7857a3b9a12e083b2dbb27a1b25a04bf89078687863311e61102b13125a0d7",
+    "internal/repositories/domain/role.go": "506ea0a75bd349be28d261bf9572f2846b3d20ae65062221a31c3edb521abf06",
+    "internal/repositories/domain/snapshot.go": "2d09df8d3817cd82ba085afa32d4b153bc9eeb9e5990d01f6227bbefc26d1c41",
+    "internal/repositories/domain/transaction.go": "bfefe7de1b59cb09a5415c9321f66684770d796d4acd8ba2a73a4bd76c306b36",
+    "internal/repositories/domain/user_role.go": "aaa1bcccd3bc2578e5c9b3897c1f3fd881723aa138e0f64fc99cb056db4e19f7",
+    "internal/repositories/reader/transaction.go": "4193dc5cf16bfd4eb9b7bf40b840b9645b037fd3ea71e62078f196823425edfa",
+    "internal/repositories/writer/audit.writer.go": "0b3ec6b326f1a9e52355ce32e9d58f5674873827798b3cdfee96440ada16f416",
+    "internal/repositories/writer/auth.writer.go": "7acd242ef0f44085ffb715cdf369b89b8bd96a7076e330981a3d875809e6869c",
+    "internal/repositories/writer/idempotency.go": "93e0277f911189daa791dec6692a20335abe6973d57c3675b8e653ba3dbb1e34",
+    "internal/repositories/writer/outbox.writer.go": "712597ff5a4c1aecbc508f9cc45ce63e4e2c3e083a9c27baea9ba4e24358aee9",
+    "internal/repositories/writer/profile.writer.go": "468720e9bc51af443bcbf278c535afbae92e47352cf99857113e8e5ef1a9ea62",
+    "internal/repositories/writer/role.writer.go": "8479cd6d5e34cd0284c790ca437e904d3a5cf44d39f48827115fe9f746661942",
+    "internal/repositories/writer/user_role.writer.go": "e806f1015995fe986a36eb71ba83285ec618f9dd32a4a6bcadce095d3263f1f7",
+    "pkg/database/transaction.go": "2b84e7394ecfd36cdf5fe931aae6c8b2ef744dd88641ea0fa062ca0f0e8cb09c",
+    "pkg/helpers/grpc.go": "09958ce89a963420d106cf5223e4a6238af41b41678ba019443230687b2b11d7",
+    "tests/features/auth_feature/mocks/repositories.go": "411d5890caf18a182aeefbfc45f8f1201d6d7060810795e68c559ba3f9dd990d",
+    "tests/features/auth_feature/runner_test.go": "389362a697bd2930256bb1e0f2aaa0bf75848e4d0f09b3d5cde7f715fc6ea9df",
+    "tests/features/auth_feature/test_scenarios/login.go": "9b029a2d692cca16296307313e0a0b9722cd0ed1e772d550da83f374fa852f44",
+    "tests/features/auth_feature/test_scenarios/register.go": "afb212389934142001900e684c7f3d1c6c00b31be5172af84a9e4f769bdd302d",
+    "tests/features/common/runner_test.go": "30e16af9bfc9dc539de2c653bc2792a8b25fe3bf1ce97cd13f7d13981cccbf1a",
+    "tests/features/common/test_scenarios/idempotency.go": "10f8ca01d3de2d58c57fc5a0232e4e55dc2b43a0d4ecee97cc8914985b612dc2",
+    "tests/features/common/test_scenarios/transaction.go": "76a4e28697aff214fab87c9b4044dc5c12fd0fed9cb6309095672c49cac5d5a0",
+    "tests/features/profile/mocks/repositories.go": "69444342bda8712d8d5659ab9da54067b6716aec8b72994fa71c58113870d026",
+    "tests/features/profile/runner_test.go": "b5fd0f7d1dffed3b8e0fe53a61a58c0152fc84c0b8a7da26c4f72b51f9869960",
+    "tests/features/profile/test_scenarios/profile.go": "a54206306f9e4cee2a6937f893ec08e5234ce458c065f45074a91bde67c393e5",
+    "tests/handler/mocks/services.go": "01898ef02d3aa08471548b2d5d0294463fd077138da7a64931406793133f9f96",
+    "tests/handler/test_scenarios/auth_profile.go": "24e1a6756b86d9bbb964849af9a9d7502cb923e52bfba21671ae2df8a52ebe72",
+    "tests/handler/test_scenarios/user_handler_scenarios.go": "c9d8f7bd31925dc0fe95566158d63090e8dae2de26811a271cf24a01cbd4ca5d",
+    "tests/integration/postgres/fixtures/config.go": "ab9fb51800f72fc907d867f5024b121bbb90d03c1ea46f7171e5a8ebde480f88",
+    "tests/integration/postgres/fixtures/schema.go": "0c5eee38906f4af4b1c649b87e24a609e59d12f133127f4bd4db8011d958966e",
+    "tests/integration/postgres/runner_test.go": "758e3f345e3e726e58666a01906edaf17423cf346ee18fd884cfb68e82efe681",
+    "tests/integration/postgres/test_scenarios/commands.go": "06f0a1b3bca13507fe33904e89a1b1d1808196318a5a417e5febf88e1397a924",
+    "tests/integration/postgres/test_scenarios/config.go": "030495b637c9c61de533751e56dc775cb71bafb953bbb7b037fb8caf74d4d13d",
+    "tests/integration/postgres/test_scenarios/persistence.go": "995fb6c7119537857b43969ee9fa41bbd8181ea947597acca72c026e1b7680ae",
+    "tests/integration/postgres/test_scenarios/schema.go": "40505e9d65cb97e463333188ff0a98f371cbe672a0a79c3fe3c557c0e371e936",
+    "tests/integration/postgres/test_scenarios/transaction.go": "9c23856e3440a5223f14885143d1252a416b42962cd65e159edb1aac639c1883",
+    "tests/interceptors/test_scenarios/interceptor_scenarios.go": "9b4b0df52e6ee022705843dcbf5229840dbd3de3bb4e9e46e37aab5f82115c4a",
+    "tests/interceptors/test_scenarios/transaction_errors.go": "fdaef0ccec9534e57e3ade1f6a174b7b46c745ce88c28a499a89570492d1ae47",
+    "tests/repositories/transaction/mocks/role.go": "15cf04390b93eeeff5a7038d14f8a87c5954cfdf4008e295d8f1dee46fec8d5a",
+    "tests/repositories/transaction/runner_test.go": "adca6028d54311ed327e221d49d1263b8fc39ec517b76b7eee05133f071f958c",
+    "tests/repositories/transaction/test_scenarios/bound.go": "4c7d79ed98fa9c7a1dbe1e13d7374b254448dd520143f3ac259c3ad78da874ea",
+    "tests/repositories/transaction/test_scenarios/idempotency.go": "d633eefa5e3ebdbe4cb77b20c5668c1227e26566680148a60d9b600b25675e6c",
+    "tests/repositories/transaction/test_scenarios/persistence.go": "97f1ef2c7beb4d95d1ed8773d13d9eaf13a9a7ccc32ce5b4c9eac685593e6b82",
+    "tests/shared/fixtures/persistence.go": "f2f4aac949335502bb3a312d275318967bc88aff81cf05d26ef791d445bd55fb",
+    "tests/shared/mocks/sql.go": "08dc9ae16b880c59a2bbfabd55df388b2c7729ba4b15d5e1d22c7b7186ced152",
+    "tests/shared/mocks/transaction.go": "14f60a9a177407f0c5b299aa5ce767503fd7006478d978756e638ac129511556"
+  },
+  "credential_scan": "PASS: changed Go sources contain no supplied database password"
+}

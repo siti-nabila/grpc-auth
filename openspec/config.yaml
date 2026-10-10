@@ -1,0 +1,174 @@
+schema: spec-driven
+
+context: |
+  Repository: github.com/siti-nabila/grpc-auth. Ini satu microservice Go unary
+  gRPC dengan PostgreSQL, dipanggil rest-orc; auth/user/role/application/session
+  tetap satu deployment. REST dan UI berada di repository lain. rest-orc tidak
+  mengakses database auth.
+
+  Baca AGENTS.md terdekat, docs/grpc-auth-mvp-spec.md (scope, full RPC matrices,
+  mutation/audit/outbox, AC dan gates), serta docs/user-management-spec.md
+  (aturan bisnis sistem). docs/grpc-auth-mvp-spec-plan.md adalah asal rencana,
+  bukan bukti behavior. Keputusan user eksplisit berlaku di atas aturan lokal.
+  Konflik bisnis/contract yang belum diputuskan harus ditanyakan; jangan memilih
+  sendiri. Bedakan EXISTING, MVP_REQUIRED, EXTERNAL_REPOSITORY, dan POST_MVP.
+
+  Baseline inspeksi 9 Oktober 2026: Go 1.26.2, gRPC, api-contracts, ORM v1.7.0,
+  Argon2id, JWT/v5, logger dan loader env.yaml existing. Pertahankan alur
+  handler -> feature -> repository, feature sebagai owner transaksi, reader/
+  writer dan reusable database pool. Jangan mengadopsi aturan env-only atau
+  arsitektur Fiber rest-orc, mengganti stack, atau menambah framework/scaffold.
+  Gunakan graph-instruction.md bila tersedia dan graphify-out/graph.json untuk
+  routing AST, kemudian validasi source/freshness; inference bukan fakta source.
+
+  api-contracts merupakan source protobuf/generated contract, dictionary error,
+  locale, paginator dan gRPC error. Parent go.work memakai sibling api-contracts;
+  go.mod menunjuk versi published yang berbeda dari checkout lokal. Perubahan
+  sibling/dependency/generator harus menjadi pekerjaan eksplisit; jangan membuat
+  proto/pb atau catalog error lokal, mengedit generated code/module cache, atau
+  menganggap workspace build membuktikan release dependency tersedia. Verifikasi
+  GOWORK=off setelah versi dependency yang dibutuhkan dipublikasikan.
+
+  Existing RPC: user.v1.UserService/Register, Login, Me, ListUsers, TesRPC;
+  profile.v1.ProfileService/UpdateProfile. Nama RPC, field number/type/semantics,
+  error code, metadata, auth_id/last_id pagination dan numeric role_codes tetap
+  kompatibel kecuali perubahan eksplisit dalam spec MVP. Target full methods
+  baru pada matriks spec adalah contract yang belum tersedia. TesRPC tetap ada.
+  User/role ID INTEGER existing tetap; ID sesi/token/family/event UUID.
+
+  Service authentication MVP: opaque token per caller melalui TLS; metadata
+  x-service-token terpisah dari authorization: Bearer <user JWT>. Semua RPC
+  termasuk Register/Login/RefreshSession/TesRPC memerlukan service authentication;
+  empat RPC tersebut exempt user access JWT sesuai credential mode spec.
+  Server menetapkan service ID, credential digest/expiry, full-method/namespace
+  allowlist; identitas service/user_id dari browser/payload tidak dipercaya.
+  Secret/key/config tidak boleh disalin dari env.yaml ke artifact atau log.
+
+  Register membuat PENDING tanpa session/access/refresh; admin mengaktifkan.
+  UserTokenResponse.token field 1 dipertahankan dengan nilai kosong pada Register,
+  registration metadata additive; Login/Refresh saja mengembalikan credential.
+  Tidak ada user pertama otomatis admin. Admin-created user menggunakan password
+  awal dari request, tidak dikembalikan, must_change_password=true. Profil sendiri
+  hanya name/address/phone; email/password/status/role/owner bukan profile fields.
+  ChangePassword terpisah. Preserve full replacement UpdateProfile legacy;
+  field_mask additive untuk partial update, new update RPC memakai presence.
+
+  JWT HS256 existing hanya sebelum cutover Phase 3; setelah readiness gate gunakan
+  EdDSA/Ed25519, login ulang dan tolak HS256/token tanpa sid. Issuer tepat
+  ApplicationName dari env.yaml; audience sengaja tidak diwajibkan/divalidasi.
+  Access 15 menit dibatasi session expiry; refresh/session absolute 7 hari sejak
+  login; skew JWT 30 detik tidak memperpanjang absolute session expiry. Refresh
+  tidak memperpanjang batas sesi. Claims sub/sid/jti/iss/iat/exp/auth_version.
+  Validasi session-user/status/expiry/auth_version pada primary DB snapshot.
+  Restricted allowlist hanya Me response minimum, ChangePassword, Logout;
+  RefreshSession dan operasi lain ditolak ketika must_change_password=true.
+
+  Refresh tidak memerlukan access JWT valid; strict single-use rotation dengan
+  transaction + TryLock session. Client single-flight; busy bukan reuse. Reuse
+  token consumed mencabut session/family, audit/outbox committed dahulu kemudian
+  UNAUTHENTICATED. Response hilang setelah rotation commit memerlukan login ulang,
+  tanpa grace/replay credential. Logout tepat satu mode access atau refresh valid.
+  Role/permission/app changes mempertahankan sesi dan auth_version; permission
+  authoritative selalu di-resolve ulang. Password/global revoke/suspend/deactivate
+  menaikkan auth_version dan mencabut seluruh sesi; reactivate tidak memulihkannya.
+
+  Pemanggilan Begin, Commit, Rollback dan TryLock wajib di internal/features/,
+  termasuk helper features/common. Feature menentukan boundary, lock keys/order
+  dan outcome; repository hanya read/write pada handle tx yang diberikan, tanpa
+  lifecycle atau lock mandiri. Feature memanggil injected transaction provider
+  untuk Begin(requestCtx); implementasi provider Db.BeginTx dan lock tetap
+  infrastructure/ORM existing. Jangan menambah framework transaksi baru.
+  Gunakan ORM transaction adapter TryLock existing. v1.7.0 PostgreSQL memakai
+  pg_try_advisory_xact_lock, retained sampai commit/rollback; ini fakta source,
+  belum bukti real-DB correctness. acquired=false -> ABORTED/RESOURCE_BUSY,
+  bukan dependency failure. Protocol bersama: idem -> last-admin/policy guard ->
+  account/role-code -> user -> role -> application -> session; canonical sorted
+  IDs, actor/target recheck dalam tx yang sama. Include register/profile existing.
+  Minimal satu ACTIVE platform admin; system IAM roles protected. Tidak ada
+  external network atau concurrent writes pada shared transaction adapter.
+  Operation/commit errors, cancellation dan panic wajib cleanup yang benar;
+  commit-on-denial reuse exception tidak boleh di-rollback karena RPC error.
+
+  expected_user_version/expected_role_version memakai entity version, bukan
+  auth_version. Effective mutation menambah entity version sekali per command,
+  batch all-or-nothing max 20 role; no-op tidak menambah version/event, hanya audit
+  NO_OP baru sesuai policy; replay tidak menambah version/audit/event.
+  sessions tidak memiliki version column: terminal ACTIVE -> REVOKED memakai
+  lifecycle revision konseptual 1 -> 2, revoked event aggregate_version=2 sekali;
+  rotation memakai consumed_at/replaced_by. Global revocation memakai user version.
+  Idempotency actor + full method + canonical target + key, safe result 24 jam,
+  metadata idempotency-key, daftar mandatory admin methods mengikuti spec.
+  Same target/key berbeda payload -> ABORTED/IDEMPOTENCY_CONFLICT; berbeda target
+  scope berbeda. Replay tetap memerlukan valid actor/session/permission; jangan
+  menyimpan raw credential/hash authentication di result/fingerprint/audit/event.
+
+  Error benar-benar baru dibuat pada feature dictionary api-contracts
+  (auth/user/role/application/session/authorization/audit) dan mapping pada
+  api-contracts/pkg/grpcerror/mapping/. Reuse semantik existing; jangan remap
+  legacy secara global. LOGIN_FAILED generic -> UNAUTHENTICATED; unavailable
+  dependency -> UNAVAILABLE, bukan allow/permission denial. Preserve locale,
+  error wrapping/cause, redaction, request context/deadline/cancellation.
+
+  MVP mencakup IAM, authoritative authz, sessions, custom business roles,
+  permission mapping, app access, last-admin, versions, idempotency, security
+  audit, audit read, required outbox persistence dan numeric local token bucket.
+  Mutasi/audit/required outbox/idempotency result atomik sejak command pertama;
+  preserve event catalog/envelope dan compound policy. Relay RabbitMQ, consumer,
+  CLM resource policy/integration, UI, distributed limiter dan multi-replica/load
+  merupakan POST_MVP. DeleteRole/reset-password/permission-application CRUD,
+  MFA/SSO/multi-tenant/delegation/direct permission/hierarchy ditunda. Jangan
+  membuat placeholder RPC atau runtime dependency Redis/RabbitMQ untuk MVP.
+
+  Migration/seed dilaporkan user, SQL password VARCHAR(150), tetapi schema live,
+  index/constraint dan admin count belum diverifikasi. Script/table keberadaan
+  bukan evidence aplikasi. Jangan rerun migration/reset DB otomatis. Perubahan
+  Go/protobuf/SQL/migration memerlukan scope implementation change eksplisit.
+
+  Semua test baru di root tests/, runner _test.go tipis memakai testutils.Scenario
+  dan testutils.Run; scenario .go biasa di test_scenarios, mocks/fixtures sesuai
+  module. Legacy collocated tests tidak menjadi precedent. Default unit dan
+  integration deterministic memakai mock/fake, tanpa external service/DB.
+  Pengecualian eksplisit user 9 Oktober 2026: separate opt-in PostgreSQL suite
+  pada database test khusus untuk locking/refresh/idempotency/concurrency;
+  build tag postgres dan DSN test eksplisit, tidak berjalan dalam default suite.
+  Ini override larangan real-DB integration AGENTS.md hanya untuk suite tersebut,
+  bukan izin memakai DB development/production, Docker, atau menjalankan migration
+  saat dokumentasi. Unit mock tidak menggantikan real-DB verification gate.
+
+  Dokumentasi selesai bukan implementasi MVP selesai. AC-01..35 spec utama dan
+  M/EXT/POST spec MVP memiliki scope, dependencies, status dan actual evidence.
+  PASS hanya setelah implementasi tersedia dan required test dijalankan pada
+  versi deliverable; bila dependency/DB unavailable tandai BLOCKED, bukan PASS.
+  Baseline finalisasi dokumentasi tidak mempunyai evidence test aplikasi/DB;
+  verifikasi implementasi wajib dilakukan pada change yang relevan.
+
+rules:
+  proposal:
+    - Baca spec MVP, spec utama, AGENTS.md dan actual source sebelum menetapkan scope. Nyatakan problem, capability/full RPC terdampak, existing vs target, compatibility dan non-goals; jangan menganggap message existing berarti RPC sudah tersedia.
+    - Pisahkan MVP_REQUIRED, EXTERNAL_REPOSITORY, POST_MVP beserta owner dan prerequisite. Critical auth/session/transaction gate tidak boleh diturunkan menjadi deferred karena dependency belum tersedia.
+    - Batasi increment ke behavior konkret. Catalog read/custom business role/mapping tetap MVP; DeleteRole/reset-password/permission-application CRUD serta relay/CLM/UI bukan dependency wajib implementasi service.
+    - Catat keputusan user yang relevan dan tanyakan ambiguity bisnis/contract yang belum diputuskan sebelum dependent work. Perubahan sibling/schema/public contract harus memiliki scope eksplisit; jangan menganggap proposal memberi izin otomatis.
+  design:
+    - Cocokkan handler, feature, domain, reader/writer, constructor/wiring/interceptors, contract, error dan tests; gunakan graph sebagai routing lalu validasi source. Pertahankan transaction ownership, ctx, reusable pool, konfigurasi env.yaml dan locale/error boundary existing.
+    - Tetapkan exact full-method authentication/permission, restricted allowlist, service-token TLS trust boundary dan authoritative snapshot/recheck. Jelaskan dependency error fail-closed, bukan false allow/deny; jangan mempercayai browser user_id/role/service identity.
+    - Tegaskan call site Begin/Commit/Rollback/TryLock di features atau features/common, injected transaction provider dengan request context dan repository hanya menerima tx untuk read/write; implementasi teknis provider/ORM tetap infrastructure. Jangan menyamarkan lifecycle atau lock mandiri di repository.
+    - Dokumentasikan TryLock actual dialect/handle, key order, last-admin/policy/actor guards, expected entity versions, uniqueness, cancellation/panic/commit failure dan commit-on-denial refresh reuse. State read dan seluruh write setelah lock memakai satu tx.
+    - Setiap mutation RPC memiliki command serta mutation/audit/outbox/no-op/replay matrix, counter dan event aggregate mapping. Preserve catalog/envelope/session revocation outbox; credential tetap hanya response Login/Refresh, bukan safe result/log/audit/event.
+    - Jelaskan persistent idempotency canonical target/fingerprint, wajib vs opsional per RPC, safe response 24 jam, same-key different-target, response-lost dan concurrency. Jangan menyamakan TryLock dengan deduplication atau menyimpan password/hash credential untuk replay.
+    - JWT/refresh design mengikuti TTL/issuer/audience/cutover yang disepakati; include EdDSA key/verifier readiness, client login ulang, strict rotation/reuse/paralel dan restricted rejection. Jangan menambah grace, sliding session atau dual-algorithm tanpa keputusan user.
+    - Gunakan limiter angka/buckets/cap/cleanup/trust boundary pada spec, bukan angka baru tanpa keputusan; external IP sanitization dicatat dependency. Tulis real PostgreSQL scenario/evidence plan dan cutover/rollback yang tidak membuka bypass.
+  specs:
+    - Tulis requirement testable dengan scenario WHEN/THEN, exact full RPC, actor/target, input presence/validation, auth/permission, gRPC catalog/mapping, success dan side effects. Tipe/field number existing dan source ownership api-contracts harus jelas.
+    - Cover validation, cross-user ownership, system role, generic login denial, dependency failure, no-op/replay/stale version, rollback/write failure, response-lost, concurrent locking dan actor privilege change yang relevan; scenario tidak sekadar mengulang implementation.
+    - Tautkan AC spec utama tanpa mengganti ID atau makna; tambah ID lokal unik bila perlu. Setiap criterion mencantumkan scope/repository/prerequisite/test/evidence/status; tidak ada PASS berdasarkan script/schema/source inspection saja.
+    - Nyatakan intentional register token-empty change dan external client adjustment; preserve TesRPC dan pagination existing. Access 15m/session 7d absolute/skew 30s/audience ignored/EdDSA Phase 3 adalah keputusan eksplisit, bukan assumption.
+    - Mutasi grant/revoke role/app dan role-permission/status tidak membatalkan JWT/sesi atau menaikkan auth_version; evaluation baru membaca primary state. Password/revoke-all/suspend/deactivate invalidasi global; session terminal tidak direaktivasi.
+  tasks:
+    - Urutkan increment sesuai prerequisite spec MVP Phase 0–6. Jangan membuka admin RPC sebelum service/user authentication, authoritative authorization dan transaction foundation tersedia; audit/outbox/idempotency diterapkan bersama command sejak awal.
+    - Buat task konkret per capability/layer beserta contract/external dependency dan verification gate. Jika dependency belum tersedia, task terkait BLOCKED; jangan mengimplementasikan dummy contract atau mengedit sibling/generated/module cache sebagai side effect.
+    - Verifikasi source call sites dan feature mock ordering Begin -> TryLock -> repository read/write -> Commit, rollback pada failure/cancellation/panic, handle identity serta tidak ada lifecycle/lock mandiri di repository; jangan menyamakan adapter implementation dengan orchestration caller.
+    - Semua test baru di tests/ mengikuti runner/scenario/mocks/fixtures dan testutils existing. Tambahkan relevant success/edge/dependency/rollback/concurrency tests; jangan memindahkan test legacy atau menambah framework tanpa kebutuhan.
+    - Untuk Go changes jalankan gofmt, targeted tests, go test ./..., go vet ./... bila relevan, race detector untuk concurrency/shared state; make build bila startup/wiring/registration/build berubah. Contract changes diverifikasi parent workspace lalu GOWORK=off setelah published version tersedia.
+    - Real PostgreSQL suite terpisah opt-in pada test DB khusus menguji dua physical connections/barriers, lock cleanup/pool, last-admin, refresh/reuse commit-on-denial, idempotency dan atomic failures. Jangan memakai sleep sebagai satu-satunya proof, default suite real DB, Docker atau DB pengguna; unavailable gate BLOCKED.
+    - Untuk docs/config-only validate YAML shape, local links/anchors, matrices/AC traceability dan scope diff; jangan menjalankan server/DB/migration untuk membuktikan dokumen. Review git diff --check/status dan pertahankan perubahan user; gunakan RTK sesuai AGENTS.md.
+    - Checklist selesai hanya setelah actual result dan evidence dicatat (commit/version, command, environment, waktu, expected/actual). Bedakan verification yang dijalankan, belum dijalankan dan blocker; source review atau mocks bukan pengganti gate real PostgreSQL.

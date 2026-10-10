@@ -1,0 +1,34 @@
+{
+  "verified_at_utc": "2026-10-09T09:33:01.479999+00:00",
+  "scope": "POSTGRES_HARNESS_ONLY",
+  "go_version": "go version go1.26.2 darwin/arm64",
+  "grpc_auth_head": "46dc4debb87281d8357a1c671365407ac8c374ca",
+  "orm_module_version": "v1.7.0",
+  "dedicated_database": {
+    "database": "grpc_auth_test",
+    "server_version": "16.13",
+    "remaining_fixture_schemas": 0,
+    "public_tables": 0
+  },
+  "database_provisioning": "Explicitly authorized by user; created outside suite; application database user excluded.",
+  "tests": {
+    "configuration_and_environment": "PASS",
+    "namespace_replacement_connections_cleanup": "PASS",
+    "setup_collision_cancellation": "PASS",
+    "distinct_backend_ids_barrier_contention": "PASS",
+    "controlled_holder_cancel_explicit_rollback": "PASS",
+    "tagged_race": "PASS",
+    "tagged_vet": "PASS",
+    "default_go_test_all": "PASS",
+    "default_go_vet_all": "PASS",
+    "default_package_exclusion": "PASS",
+    "missing_optin_failure": "PASS_EXPECTED_NONZERO_EXIT"
+  },
+  "fixture_metadata_counts": {
+    "required_columns": 70,
+    "validated_constraints": 35,
+    "indexes": 22
+  },
+  "criterion": "F-12 PASS for isolated opt-in harness; F-01..F-11 not satisfied by harness",
+  "credential_storage": "None; credentials only passed in child-process environment"
+}

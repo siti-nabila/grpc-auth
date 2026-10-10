@@ -1,18 +1,17 @@
 package common
 
-import "github.com/siti-nabila/orm/orm"
+import (
+	"context"
+	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
+)
 
-func DeferTransaction(tx *orm.SqlTransactionAdapter, err *error) {
-	if tx == nil {
-		return
-	}
+// TransactionOwner is request-local; the feature chooses when to commit.
+type TransactionOwner struct {
+	ctx    context.Context
+	tx     domain.Transaction
+	closed bool
+}
 
-	if *err != nil {
-		_ = tx.Rollback()
-		return
-	}
-
-	if commitErr := tx.Commit(); commitErr != nil {
-		*err = commitErr
-	}
+func NewTransactionOwner(ctx context.Context, tx domain.Transaction) *TransactionOwner {
+	return &TransactionOwner{ctx: ctx, tx: tx}
 }

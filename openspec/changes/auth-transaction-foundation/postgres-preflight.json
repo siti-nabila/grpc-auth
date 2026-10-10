@@ -1,0 +1,1065 @@
+{
+  "inspected_at_utc": "2026-10-09T09:08:05.484110+00:00",
+  "scope": "READ_ONLY_SCHEMA_PREFLIGHT_ONLY",
+  "task": "1.2",
+  "metadata": {
+    "database": "user",
+    "server_version": "16.13",
+    "columns": [
+      {
+        "table_name": "audit_logs",
+        "column_name": "id",
+        "data_type": "bigint",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "audit_logs",
+        "column_name": "actor_user_id",
+        "data_type": "integer",
+        "character_maximum_length": null,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "audit_logs",
+        "column_name": "actor_service",
+        "data_type": "character varying",
+        "character_maximum_length": 100,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "audit_logs",
+        "column_name": "action",
+        "data_type": "character varying",
+        "character_maximum_length": 100,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "audit_logs",
+        "column_name": "target_type",
+        "data_type": "character varying",
+        "character_maximum_length": 50,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "audit_logs",
+        "column_name": "target_id",
+        "data_type": "character varying",
+        "character_maximum_length": 100,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "audit_logs",
+        "column_name": "safe_before",
+        "data_type": "jsonb",
+        "character_maximum_length": null,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "audit_logs",
+        "column_name": "safe_after",
+        "data_type": "jsonb",
+        "character_maximum_length": null,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "audit_logs",
+        "column_name": "reason",
+        "data_type": "character varying",
+        "character_maximum_length": 500,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "audit_logs",
+        "column_name": "request_id",
+        "data_type": "character varying",
+        "character_maximum_length": 100,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "audit_logs",
+        "column_name": "trace_id",
+        "data_type": "character varying",
+        "character_maximum_length": 100,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "audit_logs",
+        "column_name": "occurred_at",
+        "data_type": "timestamp with time zone",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": "CURRENT_TIMESTAMP"
+      },
+      {
+        "table_name": "auth",
+        "column_name": "id",
+        "data_type": "integer",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": "nextval('auth_id_seq'::regclass)"
+      },
+      {
+        "table_name": "auth",
+        "column_name": "email",
+        "data_type": "character varying",
+        "character_maximum_length": 100,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "auth",
+        "column_name": "password",
+        "data_type": "character varying",
+        "character_maximum_length": 150,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "auth",
+        "column_name": "created_at",
+        "data_type": "timestamp without time zone",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": "CURRENT_TIMESTAMP"
+      },
+      {
+        "table_name": "auth",
+        "column_name": "updated_at",
+        "data_type": "timestamp without time zone",
+        "character_maximum_length": null,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "auth",
+        "column_name": "deleted_at",
+        "data_type": "timestamp without time zone",
+        "character_maximum_length": null,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "auth",
+        "column_name": "status",
+        "data_type": "character varying",
+        "character_maximum_length": 16,
+        "is_nullable": "NO",
+        "column_default": "'PENDING'::character varying"
+      },
+      {
+        "table_name": "auth",
+        "column_name": "auth_version",
+        "data_type": "bigint",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": "1"
+      },
+      {
+        "table_name": "auth",
+        "column_name": "must_change_password",
+        "data_type": "boolean",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": "false"
+      },
+      {
+        "table_name": "auth",
+        "column_name": "version",
+        "data_type": "bigint",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": "1"
+      },
+      {
+        "table_name": "auth",
+        "column_name": "password_changed_at",
+        "data_type": "timestamp with time zone",
+        "character_maximum_length": null,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "idempotency_records",
+        "column_name": "actor_id",
+        "data_type": "integer",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "idempotency_records",
+        "column_name": "method",
+        "data_type": "character varying",
+        "character_maximum_length": 100,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "idempotency_records",
+        "column_name": "route_scope",
+        "data_type": "character varying",
+        "character_maximum_length": 300,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "idempotency_records",
+        "column_name": "key",
+        "data_type": "character varying",
+        "character_maximum_length": 200,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "idempotency_records",
+        "column_name": "request_hash",
+        "data_type": "bytea",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "idempotency_records",
+        "column_name": "safe_response",
+        "data_type": "jsonb",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "idempotency_records",
+        "column_name": "created_at",
+        "data_type": "timestamp with time zone",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": "CURRENT_TIMESTAMP"
+      },
+      {
+        "table_name": "idempotency_records",
+        "column_name": "expires_at",
+        "data_type": "timestamp with time zone",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "outbox_events",
+        "column_name": "event_id",
+        "data_type": "uuid",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "outbox_events",
+        "column_name": "event_type",
+        "data_type": "character varying",
+        "character_maximum_length": 100,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "outbox_events",
+        "column_name": "schema_version",
+        "data_type": "integer",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": "1"
+      },
+      {
+        "table_name": "outbox_events",
+        "column_name": "aggregate_type",
+        "data_type": "character varying",
+        "character_maximum_length": 50,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "outbox_events",
+        "column_name": "aggregate_id",
+        "data_type": "character varying",
+        "character_maximum_length": 100,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "outbox_events",
+        "column_name": "aggregate_version",
+        "data_type": "bigint",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "outbox_events",
+        "column_name": "payload",
+        "data_type": "jsonb",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "outbox_events",
+        "column_name": "created_at",
+        "data_type": "timestamp with time zone",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": "CURRENT_TIMESTAMP"
+      },
+      {
+        "table_name": "outbox_events",
+        "column_name": "published_at",
+        "data_type": "timestamp with time zone",
+        "character_maximum_length": null,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "outbox_events",
+        "column_name": "attempts",
+        "data_type": "integer",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": "0"
+      },
+      {
+        "table_name": "outbox_events",
+        "column_name": "next_attempt_at",
+        "data_type": "timestamp with time zone",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": "CURRENT_TIMESTAMP"
+      },
+      {
+        "table_name": "outbox_events",
+        "column_name": "lease_owner",
+        "data_type": "character varying",
+        "character_maximum_length": 100,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "outbox_events",
+        "column_name": "lease_expires_at",
+        "data_type": "timestamp with time zone",
+        "character_maximum_length": null,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "outbox_events",
+        "column_name": "last_error_code",
+        "data_type": "character varying",
+        "character_maximum_length": 100,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "profile",
+        "column_name": "id",
+        "data_type": "integer",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": "nextval('profile_id_seq'::regclass)"
+      },
+      {
+        "table_name": "profile",
+        "column_name": "user_id",
+        "data_type": "integer",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "profile",
+        "column_name": "name",
+        "data_type": "character varying",
+        "character_maximum_length": 100,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "profile",
+        "column_name": "address",
+        "data_type": "character varying",
+        "character_maximum_length": 250,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "profile",
+        "column_name": "phone",
+        "data_type": "character varying",
+        "character_maximum_length": 20,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "role",
+        "column_name": "id",
+        "data_type": "integer",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": "nextval('role_id_seq'::regclass)"
+      },
+      {
+        "table_name": "role",
+        "column_name": "role_name",
+        "data_type": "character varying",
+        "character_maximum_length": 50,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "role",
+        "column_name": "role_code",
+        "data_type": "integer",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": "nextval('role_numeric_code_seq'::regclass)"
+      },
+      {
+        "table_name": "role",
+        "column_name": "role_description",
+        "data_type": "character varying",
+        "character_maximum_length": 100,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "role",
+        "column_name": "application_id",
+        "data_type": "integer",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "role",
+        "column_name": "code",
+        "data_type": "character varying",
+        "character_maximum_length": 100,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "role",
+        "column_name": "status",
+        "data_type": "character varying",
+        "character_maximum_length": 16,
+        "is_nullable": "NO",
+        "column_default": "'ACTIVE'::character varying"
+      },
+      {
+        "table_name": "role",
+        "column_name": "is_system",
+        "data_type": "boolean",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": "false"
+      },
+      {
+        "table_name": "role",
+        "column_name": "version",
+        "data_type": "bigint",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": "1"
+      },
+      {
+        "table_name": "role",
+        "column_name": "created_at",
+        "data_type": "timestamp with time zone",
+        "character_maximum_length": null,
+        "is_nullable": "YES",
+        "column_default": "CURRENT_TIMESTAMP"
+      },
+      {
+        "table_name": "role",
+        "column_name": "updated_at",
+        "data_type": "timestamp with time zone",
+        "character_maximum_length": null,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "user_role",
+        "column_name": "id",
+        "data_type": "integer",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": "nextval('user_role_id_seq'::regclass)"
+      },
+      {
+        "table_name": "user_role",
+        "column_name": "user_id",
+        "data_type": "integer",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "user_role",
+        "column_name": "role_id",
+        "data_type": "integer",
+        "character_maximum_length": null,
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "table_name": "user_role",
+        "column_name": "status",
+        "data_type": "character varying",
+        "character_maximum_length": 16,
+        "is_nullable": "NO",
+        "column_default": "'ACTIVE'::character varying"
+      },
+      {
+        "table_name": "user_role",
+        "column_name": "granted_by",
+        "data_type": "integer",
+        "character_maximum_length": null,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "user_role",
+        "column_name": "granted_at",
+        "data_type": "timestamp with time zone",
+        "character_maximum_length": null,
+        "is_nullable": "YES",
+        "column_default": "CURRENT_TIMESTAMP"
+      },
+      {
+        "table_name": "user_role",
+        "column_name": "revoked_by",
+        "data_type": "integer",
+        "character_maximum_length": null,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "user_role",
+        "column_name": "revoked_at",
+        "data_type": "timestamp with time zone",
+        "character_maximum_length": null,
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "table_name": "user_role",
+        "column_name": "revoke_reason",
+        "data_type": "character varying",
+        "character_maximum_length": 500,
+        "is_nullable": "YES",
+        "column_default": null
+      }
+    ],
+    "constraints": [
+      {
+        "table_name": "audit_logs",
+        "name": "audit_actor_ck",
+        "type": "c",
+        "definition": "CHECK (((actor_user_id IS NOT NULL) OR (NULLIF(btrim((actor_service)::text), ''::text) IS NOT NULL)))",
+        "validated": true
+      },
+      {
+        "table_name": "audit_logs",
+        "name": "audit_logs_actor_user_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (actor_user_id) REFERENCES auth(id) ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table_name": "audit_logs",
+        "name": "audit_logs_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table_name": "auth",
+        "name": "PK_auth",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table_name": "auth",
+        "name": "auth_email_normalized_ck",
+        "type": "c",
+        "definition": "CHECK ((((email)::text = lower(btrim((email)::text))) AND ((email)::text <> ''::text)))",
+        "validated": true
+      },
+      {
+        "table_name": "auth",
+        "name": "auth_status_ck",
+        "type": "c",
+        "definition": "CHECK (((status)::text = ANY ((ARRAY['PENDING'::character varying, 'ACTIVE'::character varying, 'SUSPENDED'::character varying, 'DEACTIVATED'::character varying])::text[])))",
+        "validated": true
+      },
+      {
+        "table_name": "auth",
+        "name": "auth_version_ck",
+        "type": "c",
+        "definition": "CHECK (((version >= 1) AND (auth_version >= 1)))",
+        "validated": true
+      },
+      {
+        "table_name": "auth",
+        "name": "unique_key_email",
+        "type": "u",
+        "definition": "UNIQUE (email)",
+        "validated": true
+      },
+      {
+        "table_name": "idempotency_records",
+        "name": "idempotency_expiry_ck",
+        "type": "c",
+        "definition": "CHECK ((expires_at > created_at))",
+        "validated": true
+      },
+      {
+        "table_name": "idempotency_records",
+        "name": "idempotency_hash_ck",
+        "type": "c",
+        "definition": "CHECK ((octet_length(request_hash) > 0))",
+        "validated": true
+      },
+      {
+        "table_name": "idempotency_records",
+        "name": "idempotency_key_ck",
+        "type": "c",
+        "definition": "CHECK ((btrim((key)::text) <> ''::text))",
+        "validated": true
+      },
+      {
+        "table_name": "idempotency_records",
+        "name": "idempotency_records_actor_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (actor_id) REFERENCES auth(id) ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table_name": "idempotency_records",
+        "name": "idempotency_records_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (actor_id, method, route_scope, key)",
+        "validated": true
+      },
+      {
+        "table_name": "outbox_events",
+        "name": "outbox_attempts_ck",
+        "type": "c",
+        "definition": "CHECK ((attempts >= 0))",
+        "validated": true
+      },
+      {
+        "table_name": "outbox_events",
+        "name": "outbox_events_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (event_id)",
+        "validated": true
+      },
+      {
+        "table_name": "outbox_events",
+        "name": "outbox_lease_ck",
+        "type": "c",
+        "definition": "CHECK (((lease_owner IS NULL) = (lease_expires_at IS NULL)))",
+        "validated": true
+      },
+      {
+        "table_name": "outbox_events",
+        "name": "outbox_version_ck",
+        "type": "c",
+        "definition": "CHECK (((aggregate_version >= 1) AND (schema_version >= 1)))",
+        "validated": true
+      },
+      {
+        "table_name": "profile",
+        "name": "fk_user_id_id",
+        "type": "f",
+        "definition": "FOREIGN KEY (user_id) REFERENCES auth(id) ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table_name": "profile",
+        "name": "profile_pk",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table_name": "profile",
+        "name": "profile_user_id_uq",
+        "type": "u",
+        "definition": "UNIQUE (user_id)",
+        "validated": true
+      },
+      {
+        "table_name": "role",
+        "name": "role_application_fk",
+        "type": "f",
+        "definition": "FOREIGN KEY (application_id) REFERENCES applications(id) ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table_name": "role",
+        "name": "role_code_string_ck",
+        "type": "c",
+        "definition": "CHECK (((code)::text ~ '^[a-z][a-z0-9_]*[.][a-z][a-z0-9_]*$'::text))",
+        "validated": true
+      },
+      {
+        "table_name": "role",
+        "name": "role_code_string_uq",
+        "type": "u",
+        "definition": "UNIQUE (code)",
+        "validated": true
+      },
+      {
+        "table_name": "role",
+        "name": "role_status_ck",
+        "type": "c",
+        "definition": "CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'DISABLED'::character varying])::text[])))",
+        "validated": true
+      },
+      {
+        "table_name": "role",
+        "name": "role_version_ck",
+        "type": "c",
+        "definition": "CHECK ((version >= 1))",
+        "validated": true
+      },
+      {
+        "table_name": "role",
+        "name": "uq_role_code",
+        "type": "u",
+        "definition": "UNIQUE (role_code)",
+        "validated": true
+      },
+      {
+        "table_name": "role",
+        "name": "user_id_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table_name": "user_role",
+        "name": "PK_user_role",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table_name": "user_role",
+        "name": "role_fk",
+        "type": "f",
+        "definition": "FOREIGN KEY (role_id) REFERENCES role(id)",
+        "validated": true
+      },
+      {
+        "table_name": "user_role",
+        "name": "user_fk",
+        "type": "f",
+        "definition": "FOREIGN KEY (user_id) REFERENCES auth(id)",
+        "validated": true
+      },
+      {
+        "table_name": "user_role",
+        "name": "user_role_granted_by_fk",
+        "type": "f",
+        "definition": "FOREIGN KEY (granted_by) REFERENCES auth(id) ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table_name": "user_role",
+        "name": "user_role_pair_uq",
+        "type": "u",
+        "definition": "UNIQUE (user_id, role_id)",
+        "validated": true
+      },
+      {
+        "table_name": "user_role",
+        "name": "user_role_revocation_ck",
+        "type": "c",
+        "definition": "CHECK (((((status)::text = 'ACTIVE'::text) AND (revoked_at IS NULL)) OR (((status)::text = 'REVOKED'::text) AND (revoked_at IS NOT NULL) AND (revoke_reason IS NOT NULL) AND ((char_length(btrim((revoke_reason)::text)) >= 3) AND (char_length(btrim((revoke_reason)::text)) <= 500)))))",
+        "validated": true
+      },
+      {
+        "table_name": "user_role",
+        "name": "user_role_revoked_by_fk",
+        "type": "f",
+        "definition": "FOREIGN KEY (revoked_by) REFERENCES auth(id) ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table_name": "user_role",
+        "name": "user_role_status_ck",
+        "type": "c",
+        "definition": "CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'REVOKED'::character varying])::text[])))",
+        "validated": true
+      }
+    ],
+    "indexes": [
+      {
+        "tablename": "audit_logs",
+        "indexname": "audit_actor_time_idx",
+        "indexdef": "CREATE INDEX audit_actor_time_idx ON public.audit_logs USING btree (actor_user_id, occurred_at DESC, id DESC)"
+      },
+      {
+        "tablename": "audit_logs",
+        "indexname": "audit_logs_pkey",
+        "indexdef": "CREATE UNIQUE INDEX audit_logs_pkey ON public.audit_logs USING btree (id)"
+      },
+      {
+        "tablename": "audit_logs",
+        "indexname": "audit_target_time_idx",
+        "indexdef": "CREATE INDEX audit_target_time_idx ON public.audit_logs USING btree (target_type, target_id, occurred_at DESC, id DESC)"
+      },
+      {
+        "tablename": "audit_logs",
+        "indexname": "audit_time_idx",
+        "indexdef": "CREATE INDEX audit_time_idx ON public.audit_logs USING btree (occurred_at DESC, id DESC)"
+      },
+      {
+        "tablename": "auth",
+        "indexname": "PK_auth",
+        "indexdef": "CREATE UNIQUE INDEX \"PK_auth\" ON public.auth USING btree (id)"
+      },
+      {
+        "tablename": "auth",
+        "indexname": "auth_status_id_idx",
+        "indexdef": "CREATE INDEX auth_status_id_idx ON public.auth USING btree (status, id)"
+      },
+      {
+        "tablename": "auth",
+        "indexname": "idx_id_email",
+        "indexdef": "CREATE INDEX idx_id_email ON public.auth USING btree (id DESC, email DESC)"
+      },
+      {
+        "tablename": "auth",
+        "indexname": "unique_key_email",
+        "indexdef": "CREATE UNIQUE INDEX unique_key_email ON public.auth USING btree (email)"
+      },
+      {
+        "tablename": "idempotency_records",
+        "indexname": "idempotency_expiry_idx",
+        "indexdef": "CREATE INDEX idempotency_expiry_idx ON public.idempotency_records USING btree (expires_at)"
+      },
+      {
+        "tablename": "idempotency_records",
+        "indexname": "idempotency_records_pkey",
+        "indexdef": "CREATE UNIQUE INDEX idempotency_records_pkey ON public.idempotency_records USING btree (actor_id, method, route_scope, key)"
+      },
+      {
+        "tablename": "outbox_events",
+        "indexname": "outbox_events_pkey",
+        "indexdef": "CREATE UNIQUE INDEX outbox_events_pkey ON public.outbox_events USING btree (event_id)"
+      },
+      {
+        "tablename": "outbox_events",
+        "indexname": "outbox_pending_idx",
+        "indexdef": "CREATE INDEX outbox_pending_idx ON public.outbox_events USING btree (next_attempt_at, created_at, event_id) WHERE (published_at IS NULL)"
+      },
+      {
+        "tablename": "profile",
+        "indexname": "profile_pk",
+        "indexdef": "CREATE UNIQUE INDEX profile_pk ON public.profile USING btree (id)"
+      },
+      {
+        "tablename": "profile",
+        "indexname": "profile_user_id_uq",
+        "indexdef": "CREATE UNIQUE INDEX profile_user_id_uq ON public.profile USING btree (user_id)"
+      },
+      {
+        "tablename": "role",
+        "indexname": "role_application_status_id_idx",
+        "indexdef": "CREATE INDEX role_application_status_id_idx ON public.role USING btree (application_id, status, id)"
+      },
+      {
+        "tablename": "role",
+        "indexname": "role_code_string_uq",
+        "indexdef": "CREATE UNIQUE INDEX role_code_string_uq ON public.role USING btree (code)"
+      },
+      {
+        "tablename": "role",
+        "indexname": "uq_role_code",
+        "indexdef": "CREATE UNIQUE INDEX uq_role_code ON public.role USING btree (role_code)"
+      },
+      {
+        "tablename": "role",
+        "indexname": "user_id_pkey",
+        "indexdef": "CREATE UNIQUE INDEX user_id_pkey ON public.role USING btree (id)"
+      },
+      {
+        "tablename": "user_role",
+        "indexname": "PK_user_role",
+        "indexdef": "CREATE UNIQUE INDEX \"PK_user_role\" ON public.user_role USING btree (id)"
+      },
+      {
+        "tablename": "user_role",
+        "indexname": "user_role_pair_uq",
+        "indexdef": "CREATE UNIQUE INDEX user_role_pair_uq ON public.user_role USING btree (user_id, role_id)"
+      },
+      {
+        "tablename": "user_role",
+        "indexname": "user_role_role_status_idx",
+        "indexdef": "CREATE INDEX user_role_role_status_idx ON public.user_role USING btree (role_id, status, user_id)"
+      },
+      {
+        "tablename": "user_role",
+        "indexname": "user_role_user_status_idx",
+        "indexdef": "CREATE INDEX user_role_user_status_idx ON public.user_role USING btree (user_id, status, role_id)"
+      }
+    ]
+  },
+  "aggregate_counts": {
+    "database": "user",
+    "auth_rows": 17,
+    "noncanonical_email_rows": 0,
+    "canonical_email_collision_groups": 0,
+    "empty_password_hash_rows": 0,
+    "max_password_hash_length": 97,
+    "password_hash_over_150_rows": 0,
+    "duplicate_profile_owner_groups": 0,
+    "duplicate_assignment_groups": 0,
+    "active_default_member_roles": 1,
+    "identities": [
+      {
+        "table_name": "audit_logs",
+        "column_name": "id",
+        "is_identity": "YES",
+        "identity_generation": "BY DEFAULT"
+      },
+      {
+        "table_name": "auth",
+        "column_name": "id",
+        "is_identity": "NO",
+        "identity_generation": null
+      },
+      {
+        "table_name": "profile",
+        "column_name": "id",
+        "is_identity": "NO",
+        "identity_generation": null
+      },
+      {
+        "table_name": "role",
+        "column_name": "id",
+        "is_identity": "NO",
+        "identity_generation": null
+      },
+      {
+        "table_name": "user_role",
+        "column_name": "id",
+        "is_identity": "NO",
+        "identity_generation": null
+      }
+    ]
+  },
+  "required_columns_checked": {
+    "auth": [
+      "id",
+      "email",
+      "password",
+      "created_at",
+      "updated_at",
+      "deleted_at",
+      "status",
+      "auth_version",
+      "must_change_password",
+      "version",
+      "password_changed_at"
+    ],
+    "profile": [
+      "id",
+      "user_id",
+      "name",
+      "address",
+      "phone"
+    ],
+    "role": [
+      "id",
+      "role_name",
+      "role_code",
+      "role_description",
+      "application_id",
+      "code",
+      "status",
+      "is_system",
+      "version",
+      "created_at",
+      "updated_at"
+    ],
+    "user_role": [
+      "id",
+      "user_id",
+      "role_id",
+      "status",
+      "granted_by",
+      "granted_at",
+      "revoked_by",
+      "revoked_at",
+      "revoke_reason"
+    ],
+    "audit_logs": [
+      "id",
+      "actor_user_id",
+      "actor_service",
+      "action",
+      "target_type",
+      "target_id",
+      "safe_before",
+      "safe_after",
+      "reason",
+      "request_id",
+      "trace_id",
+      "occurred_at"
+    ],
+    "outbox_events": [
+      "event_id",
+      "event_type",
+      "schema_version",
+      "aggregate_type",
+      "aggregate_id",
+      "aggregate_version",
+      "payload",
+      "created_at",
+      "published_at",
+      "attempts",
+      "next_attempt_at",
+      "lease_owner",
+      "lease_expires_at",
+      "last_error_code"
+    ],
+    "idempotency_records": [
+      "actor_id",
+      "method",
+      "route_scope",
+      "key",
+      "request_hash",
+      "safe_response",
+      "created_at",
+      "expires_at"
+    ]
+  },
+  "missing_columns": [],
+  "schema_source_sha256": "be182b78408693b9c45e6189a27001206cf521f30215f150542fb73b4d68f651",
+  "source_difference": "SQL artifact declares auth.password TEXT; actual database and approved MVP use VARCHAR(150). No migration/schema/source repair performed.",
+  "postgres_suite_status": "NOT_RUN",
+  "dedicated_test_database_confirmation": "Database user confirmed to be application database; read-only preflight only, forbidden to fixture suite."
+}

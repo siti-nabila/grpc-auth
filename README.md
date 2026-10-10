@@ -58,12 +58,15 @@ grpc-auth/
 
 3. **Configure environment**
    
-   Update `env.yaml` with your database credentials:
+   Copy `env.example.yaml` to `env.yaml`, then fill in your local database credentials and JWT secret. `env.yaml` is ignored by Git:
+   ```bash
+   cp env.example.yaml env.yaml
+   ```
    ```yaml
    Database:
      User:
        User: postgres
-       Password: your_password
+       Password: "" # Set locally; never commit credentials
        Host: localhost
        Port: 5432
        Name: user
@@ -165,14 +168,14 @@ KeepAliveIdle: 15m
 Database:
   User:
     User: postgres
-    Password: root123
+    Password: "" # Set locally; never commit credentials
     Host: localhost
     Port: 5432
     Name: user
     Driver: postgres
 
 JWT:
-  SecretKey: m3Ga#luC4r1o     # Change in production!
+  SecretKey: "" # Set a private JWT secret locally
 
 Logger:
   HTTPMode: json               # or 'text'
