@@ -1,9 +1,5 @@
 package domain
 
-import (
-	"github.com/siti-nabila/orm/orm"
-)
-
 var (
 	MemberRole RoleCode = 1
 	AdminRole  RoleCode = 2
@@ -12,9 +8,6 @@ var (
 type (
 	RoleCode   uint64
 	RoleWriter interface {
-		UseTransaction(tx *orm.SqlTransactionAdapter)
-		Begin() (*orm.SqlTransactionAdapter, error)
-
 		Create(*RoleRequest) error
 	}
 

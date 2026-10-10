@@ -2,6 +2,7 @@ package authfeature
 
 import (
 	"errors"
+	"strings"
 
 	userv1 "github.com/siti-nabila/api-contracts/pb/user/v1"
 	authdictionary "github.com/siti-nabila/api-contracts/pkg/dictionary/auth"
@@ -9,100 +10,82 @@ import (
 	"github.com/siti-nabila/grpc-auth/internal/features/common"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/internal/sessions"
-	"github.com/siti-nabila/orm/orm"
 	"golang.org/x/sync/errgroup"
 )
 
 func (a *authService) Register(request domain.AuthRequest) (token *string, err error) {
-	var (
-		tx *orm.SqlTransactionAdapter
-	)
-
 	defer func() {
-		if tx != nil {
-			common.DeferTransaction(tx, &err)
-		}
-
-		if r := recover(); r != nil {
-			// Handle the panic and return an error
+		if recover() != nil {
 			err = commondictionary.ErrInternalServerError
 		}
+		if err != nil {
+			token = nil
+		}
 	}()
-	if _, err := a.authReader.GetByEmail(request.Email); err == nil {
+	if err = a.ctx.Err(); err != nil {
+		return nil, err
+	}
+	request.Email = strings.ToLower(strings.TrimSpace(request.Email))
+	if err = request.Validate(); err != nil {
+		return nil, err
+	}
+	hashedPassword, err := a.register.HashPassword(request.Password)
+	if err != nil {
+		return nil, err
+	}
+	tx, err := a.register.Transactions.Begin(a.ctx)
+	if err != nil {
+		return nil, err
+	}
+	owner := common.NewTransactionOwner(a.ctx, tx)
+	defer owner.Finish(&err)
+	if err = common.AcquireLocks(owner, authdictionary.ErrResourceBusy, common.RegisterLockKeys(request.Email)...); err != nil {
+		return nil, err
+	}
+	repos := a.register.Bind(tx)
+	if _, err = repos.AuthReader.GetByEmail(request.Email); err == nil {
 		return nil, authdictionary.ErrDataExists
 	} else if !errors.Is(err, authdictionary.ErrNotFound) {
 		return nil, err
 	}
-
-	tx, err = a.authWriter.Begin()
+	role, err := repos.RoleReader.GetDefaultRole()
 	if err != nil {
 		return nil, err
 	}
-	a.profileWriter.UseTransaction(tx)
-	a.userRoleWriter.UseTransaction(tx)
-
-	passCfg := DefaultArgon2Config()
-	hashedPassword, err := passCfg.HashPassword(request.Password)
+	req := &domain.AuthRequest{Email: request.Email, Password: hashedPassword}
+	if err = repos.AuthWriter.Create(req); err != nil {
+		return nil, err
+	}
+	if err = repos.ProfileWriter.Create(&domain.ProfileRequest{UserId: req.Id}); err != nil {
+		return nil, err
+	}
+	if err = repos.UserRoleWriter.Create(&domain.UserRoleRequest{UserId: req.Id, RoleId: role.Id}); err != nil {
+		return nil, err
+	}
+	token, err = a.register.GenerateToken(req.Id)
 	if err != nil {
 		return nil, err
 	}
-
-	role, err := a.roleReader.GetDefaultRole()
-	if err != nil {
+	if token == nil || *token == "" {
+		return nil, commondictionary.ErrInternalServerError
+	}
+	if err = owner.Commit(); err != nil {
 		return nil, err
 	}
-	req := &domain.AuthRequest{
-		Email:    request.Email,
-		Password: hashedPassword,
-	}
-	err = a.authWriter.Create(req)
-	if err != nil {
-		return nil, err
-	}
-
-	token, err = a.GenerateAuthToken(req.Id)
-	if err != nil {
-		return nil, err
-	}
-
-	g, _ := errgroup.WithContext(a.ctx)
-	g.Go(func() error {
-		profileRequest := &domain.ProfileRequest{
-			UserId: req.Id,
-		}
-		err = a.profileWriter.Create(profileRequest)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-	g.Go(func() error {
-		userRoleRequest := &domain.UserRoleRequest{
-			UserId: req.Id,
-			RoleId: role.Id,
-		}
-		err = a.userRoleWriter.Create(userRoleRequest)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	if err = g.Wait(); err != nil {
-		return nil, err
-	}
-
 	return token, nil
 }
 
 func (a *authService) Login(request domain.AuthRequest) (*string, error) {
-	userData, err := a.authReader.GetByEmail(request.Email)
+	request.Email = strings.ToLower(strings.TrimSpace(request.Email))
+	if err := request.Validate(); err != nil {
+		return nil, err
+	}
+	userData, err := a.login.Reader.GetByEmail(request.Email)
 	if err != nil {
 		return nil, err
 	}
 
-	passCfg := DefaultArgon2Config()
-	valid, err := passCfg.VerifyPassword(userData.Password, request.Password)
+	valid, err := a.login.VerifyPassword(userData.Password, request.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +93,7 @@ func (a *authService) Login(request domain.AuthRequest) (*string, error) {
 		return nil, authdictionary.ErrPasswordMismatch
 	}
 
-	token, err := a.GenerateAuthToken(userData.Id)
+	token, err := a.login.GenerateToken(userData.Id)
 	if err != nil {
 		return nil, err
 	}

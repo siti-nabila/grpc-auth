@@ -6,7 +6,6 @@ import (
 	"reflect"
 
 	profilev1 "github.com/siti-nabila/api-contracts/pb/profile/v1"
-	"github.com/siti-nabila/orm/orm"
 )
 
 type (
@@ -23,8 +22,6 @@ type (
 	}
 
 	ProfileWriter interface {
-		UseTransaction(tx *orm.SqlTransactionAdapter)
-		Begin() (*orm.SqlTransactionAdapter, error)
 
 		// CreateProfile(*AuthRequest) error
 		Create(request *ProfileRequest) (err error)

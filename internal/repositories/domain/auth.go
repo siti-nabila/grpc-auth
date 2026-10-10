@@ -9,7 +9,6 @@ import (
 	contractdictionary "github.com/siti-nabila/api-contracts/pkg/dictionary"
 	authdictionary "github.com/siti-nabila/api-contracts/pkg/dictionary/auth"
 	"github.com/siti-nabila/grpc-auth/pkg/helpers"
-	"github.com/siti-nabila/orm/orm"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -22,9 +21,6 @@ type (
 		RegisterTx(request *AuthRequest) (err error)
 	}
 	AuthWriter interface {
-		UseTransaction(tx *orm.SqlTransactionAdapter)
-		Begin() (*orm.SqlTransactionAdapter, error)
-
 		Create(*AuthRequest) error
 		// RegisterTx(request *AuthRequest) (err error)
 	}

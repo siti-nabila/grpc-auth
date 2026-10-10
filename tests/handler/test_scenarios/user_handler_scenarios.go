@@ -19,6 +19,8 @@ import (
 
 func All() []testutils.Scenario {
 	return []testutils.Scenario{
+		{Name: "Register and Login normalize before validation and preserve feature errors", Run: canonicalAuthHandlers},
+		{Name: "profile handler returns committed identity and forwards failures", Run: committedProfileHandler},
 		{
 			Name: "maps next cursor into list users response",
 			Run:  mapNextCursor,
