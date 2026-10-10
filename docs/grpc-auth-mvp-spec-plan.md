@@ -25,7 +25,7 @@ Keputusan MVP yang telah disepakati:
 - Correctness locking, refresh rotation, dan idempotency paralel harus dibuktikan pada PostgreSQL nyata.
 - Grant/revoke role, role-permission update, serta grant/revoke akses aplikasi tidak menaikkan `auth_version` dan tidak mematikan sesi. Authorization memakai data akses terbaru.
 - Concurrency command user memakai `expected_user_version`; command role memakai `expected_role_version`.
-- JWT audience diabaikan sesuai keputusan pengguna. Migrasi HS256 → EdDSA dilakukan pada cutover Phase 3 setelah gate kesiapan lulus.
+- JWT audience diabaikan sesuai keputusan pengguna. Source EdDSA-only diterapkan bersama session-aware Login pada increment Phase 1/3; readiness deployment/cutover target dipindah ke Phase 6 DEP-01.
 - DeleteRole, reset password administratif/publik, dan CRUD permission ditunda sampai aturan bisnis/permission-nya ditetapkan.
 
 **Pekerjaan sekarang adalah revisi rencana dokumentasi.** Pembuatan spec repository, perubahan OpenSpec, implementasi Go/protobuf, pelaksanaan migration, dan pengujian aplikasi merupakan pekerjaan berikutnya. Penyimpanan rencana ini tidak berarti pekerjaan tersebut telah dilakukan.
@@ -93,7 +93,7 @@ Status, permission union, system role, admin terakhir, revocation, idempotency, 
 | Error | Section 8.6: VERSION_CONFLICT dan IDEMPOTENCY_CONFLICT memakai ABORTED, HTTP 409 pada rest-orc |
 | Event dan session outbox | Section 10.1: nama event/catalog serta compound-event policy dipertahankan; revoke sesi tetap mempunyai outbox |
 | Audience JWT | Override eksplisit keputusan pengguna: audience tidak divalidasi; berbeda dari usulan audience di spec utama Section 7.1 |
-| Algoritma JWT | HS256 existing sampai gate cutover; EdDSA mulai Phase 3. Ini keputusan migration plan, bukan klaim konfigurasi repository telah berubah |
+| Algoritma JWT | HS256 baseline historis; EdDSA source bersama real Login/session-aware guards pada increment Phase 1/3; readiness deployment/cutover target di Phase 6 |
 | Scope runtime | TryLock ORM, limiter lokal, dan penundaan relay/consumer adalah keputusan MVP repository ini; tidak mengganti seluruh scope sistem dalam spec utama |
 
 Perbedaan yang disengaja harus dicatat saat memasang plan ke repository agar spec utama/spec MVP tidak memberi dua instruksi berbeda. Revisi ini mengubah file plan saja; tidak mengubah spec utama secara otomatis.
@@ -241,7 +241,7 @@ Spec final harus memutuskan, bukan meninggalkan placeholder berikut:
 
 | Keputusan | Isi yang wajib ditetapkan |
 | --- | --- |
-| JWT algorithm | HS256 sebelum cutover; EdDSA sesudah cutover Phase 3. Key/algorithm binding eksplisit; algoritma dari token tidak menentukan verifier |
+| JWT algorithm | EdDSA source bersama session-aware Login; deployment cutover digate di Phase 6. HS256 hanya baseline historis; key/algorithm binding ditentukan server |
 | Issuer | Nilai exact per environment; issuer tetap divalidasi, secret/key tidak disimpan di spec |
 | Audience | Diabaikan sesuai keputusan pengguna; aud tidak diwajibkan dan tidak menjadi dasar allow/deny atau trust service |
 | Claims | `sub`, `sid`, `iss`, `iat`, `exp`, `jti`, `auth_version`; aud bukan claim wajib. Token type/restricted marker sesuai existing contract; status restricted tetap authoritative |
@@ -256,16 +256,19 @@ Allowlist restricted session mengikuti spec utama Sections 4.1/7.2: ChangePasswo
 
 #### 3.4.1 Waktu migrasi HS256 → EdDSA
 
-Cutover dilakukan **di Phase 3, bersamaan dengan aktivasi session-aware token dan login ulang seluruh user**, setelah persistence/session dan key configuration siap. Bukan dipicu oleh tanggal kalender atau otomatis saat migration schema dijalankan.
+Keputusan user 10 Oktober 2026 memindahkan readiness deployment ke **Phase 6**,
+phase terakhir. Phase 1/3 mengimplementasikan source EdDSA/session-aware bersama
+real Login dan seluruh consumer setelah backend prerequisites/tests lulus.
+Kesiapan actual rest-orc/deployment tidak menahan completion increment backend.
+Tidak ada HS256 fallback, dual-algorithm window atau runtime bypass.
 
-1. Phase 0 memverifikasi HS256 existing dan JWT consumer. Phase 1 menyiapkan schema/session store serta dependency JWT/key handling yang memang dibutuhkan.
-2. Sebelum cutover, server tetap memakai HS256 sesuai baseline; jangan mengeluarkan EdDSA JWT sebelum verifier/config siap.
-3. Gate cutover: EdDSA signing/verification tests PASS, issuer/TTL/session/auth_version enforcement PASS, key private/public sesuai dan tersimpan di config/secret existing, rest-orc dapat menangani login ulang, serta seluruh caller auth RPC terverifikasi. Audience tetap diabaikan.
-4. Pada cutover Phase 3, revoke sesi/refresh credential lama sesuai migration policy dan tolak JWT lama; mulai signing/verifying token baru dengan EdDSA. User login ulang. Token HS256 tidak tetap diterima sesudah cutover.
-5. Tidak ada dual-algorithm compatibility window pada local MVP. Key binding/allowlist ditentukan server per tahap; jangan mencoba verifier lain sampai signature diterima.
-6. Kalau gate gagal, Phase 3 tetap BLOCKED dan baseline HS256 belum diubah. Setelah cutover berhasil, rollback tidak boleh membuka kembali token/sesi lama atau memulihkan auth_version lama.
-
-Waktu eksekusi aktual dan evidence cutover dicatat pada implementation report. Plan menetapkan milestone dan readiness gate, bukan mengklaim migrasi sudah terjadi.
+Deployment cutover/login ulang menunggu [Phase 6 DEP-01 pada spec MVP](grpc-auth-mvp-spec.md#101-phase-6-readiness-deployment): actual key/TLS/caller rotation/schema/admin,
+consumer credential/storage, PENDING response, trusted IP/proxy, RetryInfo dan
+login ulang. Gate tetap mandatory dan belum PASS; backend fixtures tidak
+menggantikan evidence actual environment. Readiness gagal menahan deployment.
+Rollback hanya ke build security-compatible atau stop serving, tanpa memulihkan
+revoked sessions/auth_version/legacy credentials. Deployment/migration tidak
+dijalankan otomatis oleh revisi rencana ini.
 
 #### 3.4.2 Refresh dan revocation
 
@@ -442,7 +445,7 @@ Konteks OpenSpec mengarahkan AI membaca spec MVP, aturan bisnis yang dirujuk, da
 | --- | --- | --- |
 | DEC-01 | Full RPC method, permission code, status, dan mapping AC spec utama yang aktual | Sebelum spec final |
 | DEC-02 | ORM TryLock dialect, connection ownership, cleanup, dan evidence PostgreSQL | Sebelum concurrency-sensitive implementation |
-| DEC-03 | Audience ignored dan cutover HS256 → EdDSA pada Phase 3 sudah ditetapkan; finalkan issuer/key config/full allowlist serta evidence readiness | Sebelum cutover Phase 3 |
+| DEC-03 | Audience ignored; source EdDSA bersama real Login/guard pada increment Phase 1/3; actual readiness deployment/cutover target pada Phase 6 DEP-01 | Backend prerequisites sebelum source; deployment readiness di phase terakhir |
 | DEC-04 | Strict refresh rotation/reuse/response-lost policy atau alternatif terbatas yang terdokumentasi | Sebelum refresh implementation |
 | DEC-05 | version untuk concurrency, auth_version untuk credential/global invalidation; finalkan mapping aggregate_version/session ke schema existing | Sebelum schema/command implementation |
 | DEC-06 | Pertahankan actor+method+target dan retention 24 jam; finalkan canonical route/gRPC mapping serta fingerprint | Sebelum command implementation |
@@ -495,7 +498,7 @@ Evidence berisi commit/version yang diuji, command test, environment/DB version,
 | AC-09 | Idempotency actor+method+target; same-scope conflict → ABORTED; replay/paralel paling banyak satu effective mutation | MVP_REQUIRED / grpc-auth | Spec utama AC-24–AC-25, AC-35; same/different target tests |
 | AC-10 | Mutation/audit/outbox/idempotency atomik; mandatory write failure rollback | MVP_REQUIRED / grpc-auth | Failure injection dan committed-state checks |
 | AC-11 | Semua mutation RPC MVP mempunyai audit/outbox; nama/envelope catalog utama tetap; session revoke outbox mandatory | MVP_REQUIRED / grpc-auth | Method inventory dan event compatibility tests; deferred RPC tidak muncul |
-| AC-12 | Audience ignored, issuer/session valid; Phase 3 cutover EdDSA menolak HS256 lama; refresh/restricted policy berlaku | MVP_REQUIRED / grpc-auth | Claim/algorithm/readiness tests; spec utama AC-17/AC-33 dan PostgreSQL refresh tests |
+| AC-12 | Audience ignored, issuer/session valid; Source EdDSA/session menolak HS256 lama; refresh/restricted policy berlaku; actual deployment cutover di Phase 6 DEP-01 | MVP_REQUIRED / grpc-auth | Claim/algorithm/readiness tests; spec utama AC-17/AC-33 dan PostgreSQL refresh tests |
 | AC-13 | Failed login/unauthorized attempt tercatat tanpa bergantung pada transaksi rollback | MVP_REQUIRED / grpc-auth | Security-audit dan persistence-failure tests |
 | AC-14 | Rate limiter numerik, concurrency-safe, bounded memory, identity source terpercaya | MVP_REQUIRED / grpc-auth | Clock/concurrent/cap/trust boundary tests |
 | AC-15 | Dependency failure bukan izin akses atau permission denial palsu | MVP_REQUIRED / grpc-auth | Dependency fault/error catalog tests |
@@ -519,10 +522,12 @@ Rate limiter dasar untuk public auth dapat disiapkan lebih awal; Phase 5 adalah 
 | 0 — Baseline dan contract finalization | Repository/spec utama/AGENTS.md tersedia | Verifikasi actual state, RPC inventory, AC mapping, decision log, external dependency | Baseline tercatat; keputusan prerequisite ditutup; blocker eksplisit |
 | 1 — Persistence dan transaction foundation | Phase 0; ORM/proto dependency relevan | Schema yang benar-benar belum ada, transaction ownership, idempotency/audit/outbox repository, PostgreSQL test harness | Compatibility/migration sesuai baseline; rollback, locking dan pool tests PASS |
 | 2 — User, role, permission, application access | Phase 1; permissions/status/guards final | Implement command beserta authorization, versions, idempotency, atomic audit/outbox | Functional/negative/no-op/replay/concurrent admin tests PASS |
-| 3 — Authentication dan session security | Phase 1; key/verifier cutover ready; JWT/refresh contract final; role/status enforcement | Register/login/restricted/password/refresh, atomic revocation outbox, cutover HS256 → EdDSA + login ulang | Readiness gate dan cutover evidence PASS; HS256 lama ditolak; audience ignored; PostgreSQL refresh PASS |
+| 3 — Authentication dan session security | Phase 1; backend key/verifier/caller valid; JWT/refresh contract final; role/status enforcement | Register/login/restricted/password/refresh, atomic revocation outbox, EdDSA source wiring | Backend algorithm/session/TLS/credential dan PostgreSQL refresh tests PASS; deployment readiness/cutover di Phase 6 |
 | 4 — Contract completeness | Setiap implemented mutation tersedia | Reconcile method inventory vs matrices; failure auditing, event policy, write-failure/response-lost cases | Semua required mutation punya evidence; tidak ada audit/outbox gap |
 | 5 — Rate limiting dan hardening | Key trust dan error contract final; base limiter jika sudah ada | Numeric config, memory cap/cleanup, concurrency, redaction, dependency faults | AC limiter/audit/security/error mapping PASS |
-| 6 — Final PostgreSQL verification | Seluruh mandatory behavior tersedia; dependency final | Jalankan complete required suite, compatibility, lock/pool, AC evidence review | Semua MVP_REQUIRED PASS; tidak ada unresolved critical blocker |
+| 6 — Final verification dan readiness deployment | Seluruh mandatory backend behavior tersedia; dependency final | Complete suite, compatibility, lock/pool, AC evidence review dan actual consumer/deployment DEP-01 | Semua MVP_REQUIRED dan Phase 6 DEP-01 PASS; tidak ada critical blocker sebelum deployment |
+
+Readiness deployment dipusatkan pada [Phase 6 DEP-01](grpc-auth-mvp-spec.md#101-phase-6-readiness-deployment), bukan checklist completion increment backend Phase 1–5.
 
 Integration tests dibuat dan dijalankan bertahap sejak Phase 1. Phase 6 merupakan regression/completion gate, bukan pertama kali menggunakan database nyata. Phase 2/3 boleh dibagi menjadi increment capability; prerequisite keamanan setiap increment tetap berlaku.
 
@@ -552,7 +557,7 @@ Unit test/mock/fake tetap mengikuti root `tests/` dan AGENTS.md setelah diverifi
 | Credential/global revocation | Password/revoke-all/suspend/deactivate membatalkan token lama; reactivate tidak memulihkan sesi lama |
 | Policy/actor privilege change | Authorization menggunakan state konsisten sesuai protocol |
 | Event compatibility | Register→created, profile→profile_updated, role batch plural, app grant/revoke compound, session revocation mandatory outbox |
-| JWT cutover | Sebelum cutover HS256 baseline; setelah readiness Phase 3 EdDSA saja; audience tidak required/validated |
+| JWT cutover | Source session-aware memakai EdDSA-only dan menolak HS256/sid-less; actual deployment cutover/login ulang menunggu Phase 6 DEP-01; audience diabaikan |
 
 Gunakan barrier/channel/test hook untuk mengatur interleaving, bukan hanya `time.Sleep`. Setidaknya dua koneksi fisik diperlukan untuk scenario contention; satu connection pool slot tidak membuktikan exclusivity antar-koneksi.
 

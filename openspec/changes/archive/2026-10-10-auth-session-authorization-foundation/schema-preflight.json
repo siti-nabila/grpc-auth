@@ -1,0 +1,1807 @@
+{
+  "active_platform_admin_count": 1,
+  "baseline_database_fixture_writes": false,
+  "columns": [
+    {
+      "table_name": "applications",
+      "column_name": "id",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "applications",
+      "column_name": "code",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 50,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "applications",
+      "column_name": "name",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 100,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "applications",
+      "column_name": "status",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 16,
+      "is_nullable": "NO",
+      "column_default": "'ACTIVE'::character varying"
+    },
+    {
+      "table_name": "applications",
+      "column_name": "is_system",
+      "data_type": "boolean",
+      "udt_name": "bool",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "false"
+    },
+    {
+      "table_name": "audit_logs",
+      "column_name": "id",
+      "data_type": "bigint",
+      "udt_name": "int8",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "audit_logs",
+      "column_name": "actor_user_id",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "audit_logs",
+      "column_name": "actor_service",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 100,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "audit_logs",
+      "column_name": "action",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 100,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "audit_logs",
+      "column_name": "target_type",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 50,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "audit_logs",
+      "column_name": "target_id",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 100,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "audit_logs",
+      "column_name": "safe_before",
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "audit_logs",
+      "column_name": "safe_after",
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "audit_logs",
+      "column_name": "reason",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 500,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "audit_logs",
+      "column_name": "request_id",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 100,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "audit_logs",
+      "column_name": "trace_id",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 100,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "audit_logs",
+      "column_name": "occurred_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "CURRENT_TIMESTAMP"
+    },
+    {
+      "table_name": "auth",
+      "column_name": "id",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "nextval('auth_id_seq'::regclass)"
+    },
+    {
+      "table_name": "auth",
+      "column_name": "email",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 100,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "auth",
+      "column_name": "password",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 150,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "auth",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "CURRENT_TIMESTAMP"
+    },
+    {
+      "table_name": "auth",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "auth",
+      "column_name": "deleted_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "auth",
+      "column_name": "status",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 16,
+      "is_nullable": "NO",
+      "column_default": "'PENDING'::character varying"
+    },
+    {
+      "table_name": "auth",
+      "column_name": "auth_version",
+      "data_type": "bigint",
+      "udt_name": "int8",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "1"
+    },
+    {
+      "table_name": "auth",
+      "column_name": "must_change_password",
+      "data_type": "boolean",
+      "udt_name": "bool",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "false"
+    },
+    {
+      "table_name": "auth",
+      "column_name": "version",
+      "data_type": "bigint",
+      "udt_name": "int8",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "1"
+    },
+    {
+      "table_name": "auth",
+      "column_name": "password_changed_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "idempotency_records",
+      "column_name": "actor_id",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "idempotency_records",
+      "column_name": "method",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 100,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "idempotency_records",
+      "column_name": "route_scope",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 300,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "idempotency_records",
+      "column_name": "key",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 200,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "idempotency_records",
+      "column_name": "request_hash",
+      "data_type": "bytea",
+      "udt_name": "bytea",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "idempotency_records",
+      "column_name": "safe_response",
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "idempotency_records",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "CURRENT_TIMESTAMP"
+    },
+    {
+      "table_name": "idempotency_records",
+      "column_name": "expires_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "outbox_events",
+      "column_name": "event_id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "outbox_events",
+      "column_name": "event_type",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 100,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "outbox_events",
+      "column_name": "schema_version",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "1"
+    },
+    {
+      "table_name": "outbox_events",
+      "column_name": "aggregate_type",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 50,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "outbox_events",
+      "column_name": "aggregate_id",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 100,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "outbox_events",
+      "column_name": "aggregate_version",
+      "data_type": "bigint",
+      "udt_name": "int8",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "outbox_events",
+      "column_name": "payload",
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "outbox_events",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "CURRENT_TIMESTAMP"
+    },
+    {
+      "table_name": "outbox_events",
+      "column_name": "published_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "outbox_events",
+      "column_name": "attempts",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "0"
+    },
+    {
+      "table_name": "outbox_events",
+      "column_name": "next_attempt_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "CURRENT_TIMESTAMP"
+    },
+    {
+      "table_name": "outbox_events",
+      "column_name": "lease_owner",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 100,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "outbox_events",
+      "column_name": "lease_expires_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "outbox_events",
+      "column_name": "last_error_code",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 100,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "permissions",
+      "column_name": "id",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "permissions",
+      "column_name": "application_id",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "permissions",
+      "column_name": "code",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 150,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "permissions",
+      "column_name": "description",
+      "data_type": "text",
+      "udt_name": "text",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "profile",
+      "column_name": "id",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "nextval('profile_id_seq'::regclass)"
+    },
+    {
+      "table_name": "profile",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "profile",
+      "column_name": "name",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 100,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "profile",
+      "column_name": "address",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 250,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "profile",
+      "column_name": "phone",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 20,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "refresh_tokens",
+      "column_name": "id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "refresh_tokens",
+      "column_name": "session_id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "refresh_tokens",
+      "column_name": "token_hash",
+      "data_type": "bytea",
+      "udt_name": "bytea",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "refresh_tokens",
+      "column_name": "family_id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "refresh_tokens",
+      "column_name": "issued_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "CURRENT_TIMESTAMP"
+    },
+    {
+      "table_name": "refresh_tokens",
+      "column_name": "expires_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "refresh_tokens",
+      "column_name": "consumed_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "refresh_tokens",
+      "column_name": "revoked_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "refresh_tokens",
+      "column_name": "replaced_by",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "role",
+      "column_name": "id",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "nextval('role_id_seq'::regclass)"
+    },
+    {
+      "table_name": "role",
+      "column_name": "role_name",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 50,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "role",
+      "column_name": "role_code",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "nextval('role_numeric_code_seq'::regclass)"
+    },
+    {
+      "table_name": "role",
+      "column_name": "role_description",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 100,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "role",
+      "column_name": "application_id",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "role",
+      "column_name": "code",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 100,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "role",
+      "column_name": "status",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 16,
+      "is_nullable": "NO",
+      "column_default": "'ACTIVE'::character varying"
+    },
+    {
+      "table_name": "role",
+      "column_name": "is_system",
+      "data_type": "boolean",
+      "udt_name": "bool",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "false"
+    },
+    {
+      "table_name": "role",
+      "column_name": "version",
+      "data_type": "bigint",
+      "udt_name": "int8",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "1"
+    },
+    {
+      "table_name": "role",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": "CURRENT_TIMESTAMP"
+    },
+    {
+      "table_name": "role",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "role_permissions",
+      "column_name": "role_id",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "role_permissions",
+      "column_name": "permission_id",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "status",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 16,
+      "is_nullable": "NO",
+      "column_default": "'ACTIVE'::character varying"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "CURRENT_TIMESTAMP"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "last_seen_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "CURRENT_TIMESTAMP"
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "expires_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "revoked_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "revoked_by",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "revoke_reason",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 500,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "device_label",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 200,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "user_agent",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 1000,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "sessions",
+      "column_name": "ip_address",
+      "data_type": "inet",
+      "udt_name": "inet",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "user_application_access",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "user_application_access",
+      "column_name": "application_id",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "user_application_access",
+      "column_name": "status",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 16,
+      "is_nullable": "NO",
+      "column_default": "'ACTIVE'::character varying"
+    },
+    {
+      "table_name": "user_application_access",
+      "column_name": "granted_by",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "user_application_access",
+      "column_name": "granted_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "CURRENT_TIMESTAMP"
+    },
+    {
+      "table_name": "user_application_access",
+      "column_name": "revoked_by",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "user_application_access",
+      "column_name": "revoked_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "user_application_access",
+      "column_name": "revoke_reason",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 500,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "user_role",
+      "column_name": "id",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": "nextval('user_role_id_seq'::regclass)"
+    },
+    {
+      "table_name": "user_role",
+      "column_name": "user_id",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "user_role",
+      "column_name": "role_id",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "user_role",
+      "column_name": "status",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 16,
+      "is_nullable": "NO",
+      "column_default": "'ACTIVE'::character varying"
+    },
+    {
+      "table_name": "user_role",
+      "column_name": "granted_by",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "user_role",
+      "column_name": "granted_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": "CURRENT_TIMESTAMP"
+    },
+    {
+      "table_name": "user_role",
+      "column_name": "revoked_by",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "user_role",
+      "column_name": "revoked_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "character_maximum_length": null,
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "user_role",
+      "column_name": "revoke_reason",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "character_maximum_length": 500,
+      "is_nullable": "YES",
+      "column_default": null
+    }
+  ],
+  "constraints": [
+    {
+      "table_name": "applications",
+      "name": "applications_code_ck",
+      "type": "c",
+      "definition": "CHECK (((code)::text ~ '^[a-z][a-z0-9_]*$'::text))",
+      "validated": true
+    },
+    {
+      "table_name": "applications",
+      "name": "applications_code_key",
+      "type": "u",
+      "definition": "UNIQUE (code)",
+      "validated": true
+    },
+    {
+      "table_name": "applications",
+      "name": "applications_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "applications",
+      "name": "applications_status_ck",
+      "type": "c",
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'DISABLED'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "audit_logs",
+      "name": "audit_actor_ck",
+      "type": "c",
+      "definition": "CHECK (((actor_user_id IS NOT NULL) OR (NULLIF(btrim((actor_service)::text), ''::text) IS NOT NULL)))",
+      "validated": true
+    },
+    {
+      "table_name": "audit_logs",
+      "name": "audit_logs_actor_user_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (actor_user_id) REFERENCES auth(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "audit_logs",
+      "name": "audit_logs_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "auth",
+      "name": "PK_auth",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "auth",
+      "name": "auth_email_normalized_ck",
+      "type": "c",
+      "definition": "CHECK ((((email)::text = lower(btrim((email)::text))) AND ((email)::text <> ''::text)))",
+      "validated": true
+    },
+    {
+      "table_name": "auth",
+      "name": "auth_status_ck",
+      "type": "c",
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['PENDING'::character varying, 'ACTIVE'::character varying, 'SUSPENDED'::character varying, 'DEACTIVATED'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "auth",
+      "name": "auth_version_ck",
+      "type": "c",
+      "definition": "CHECK (((version >= 1) AND (auth_version >= 1)))",
+      "validated": true
+    },
+    {
+      "table_name": "auth",
+      "name": "unique_key_email",
+      "type": "u",
+      "definition": "UNIQUE (email)",
+      "validated": true
+    },
+    {
+      "table_name": "idempotency_records",
+      "name": "idempotency_expiry_ck",
+      "type": "c",
+      "definition": "CHECK ((expires_at > created_at))",
+      "validated": true
+    },
+    {
+      "table_name": "idempotency_records",
+      "name": "idempotency_hash_ck",
+      "type": "c",
+      "definition": "CHECK ((octet_length(request_hash) > 0))",
+      "validated": true
+    },
+    {
+      "table_name": "idempotency_records",
+      "name": "idempotency_key_ck",
+      "type": "c",
+      "definition": "CHECK ((btrim((key)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "idempotency_records",
+      "name": "idempotency_records_actor_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (actor_id) REFERENCES auth(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "idempotency_records",
+      "name": "idempotency_records_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (actor_id, method, route_scope, key)",
+      "validated": true
+    },
+    {
+      "table_name": "outbox_events",
+      "name": "outbox_attempts_ck",
+      "type": "c",
+      "definition": "CHECK ((attempts >= 0))",
+      "validated": true
+    },
+    {
+      "table_name": "outbox_events",
+      "name": "outbox_events_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (event_id)",
+      "validated": true
+    },
+    {
+      "table_name": "outbox_events",
+      "name": "outbox_lease_ck",
+      "type": "c",
+      "definition": "CHECK (((lease_owner IS NULL) = (lease_expires_at IS NULL)))",
+      "validated": true
+    },
+    {
+      "table_name": "outbox_events",
+      "name": "outbox_version_ck",
+      "type": "c",
+      "definition": "CHECK (((aggregate_version >= 1) AND (schema_version >= 1)))",
+      "validated": true
+    },
+    {
+      "table_name": "permissions",
+      "name": "permissions_application_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (application_id) REFERENCES applications(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "permissions",
+      "name": "permissions_code_ck",
+      "type": "c",
+      "definition": "CHECK (((code)::text ~ '^[a-z][a-z0-9_]*([.][a-z][a-z0-9_]*){2,}$'::text))",
+      "validated": true
+    },
+    {
+      "table_name": "permissions",
+      "name": "permissions_code_key",
+      "type": "u",
+      "definition": "UNIQUE (code)",
+      "validated": true
+    },
+    {
+      "table_name": "permissions",
+      "name": "permissions_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "profile",
+      "name": "fk_user_id_id",
+      "type": "f",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "profile",
+      "name": "profile_pk",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "profile",
+      "name": "profile_user_id_uq",
+      "type": "u",
+      "definition": "UNIQUE (user_id)",
+      "validated": true
+    },
+    {
+      "table_name": "refresh_tokens",
+      "name": "refresh_tokens_expiry_ck",
+      "type": "c",
+      "definition": "CHECK ((expires_at > issued_at))",
+      "validated": true
+    },
+    {
+      "table_name": "refresh_tokens",
+      "name": "refresh_tokens_hash_ck",
+      "type": "c",
+      "definition": "CHECK ((octet_length(token_hash) > 0))",
+      "validated": true
+    },
+    {
+      "table_name": "refresh_tokens",
+      "name": "refresh_tokens_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "refresh_tokens",
+      "name": "refresh_tokens_replaced_by_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (replaced_by) REFERENCES refresh_tokens(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "refresh_tokens",
+      "name": "refresh_tokens_replaced_by_key",
+      "type": "u",
+      "definition": "UNIQUE (replaced_by)",
+      "validated": true
+    },
+    {
+      "table_name": "refresh_tokens",
+      "name": "refresh_tokens_replacement_ck",
+      "type": "c",
+      "definition": "CHECK (((replaced_by IS NULL) OR ((replaced_by <> id) AND (consumed_at IS NOT NULL))))",
+      "validated": true
+    },
+    {
+      "table_name": "refresh_tokens",
+      "name": "refresh_tokens_session_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "refresh_tokens",
+      "name": "refresh_tokens_token_hash_key",
+      "type": "u",
+      "definition": "UNIQUE (token_hash)",
+      "validated": true
+    },
+    {
+      "table_name": "role",
+      "name": "role_application_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (application_id) REFERENCES applications(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "role",
+      "name": "role_code_string_ck",
+      "type": "c",
+      "definition": "CHECK (((code)::text ~ '^[a-z][a-z0-9_]*[.][a-z][a-z0-9_]*$'::text))",
+      "validated": true
+    },
+    {
+      "table_name": "role",
+      "name": "role_code_string_uq",
+      "type": "u",
+      "definition": "UNIQUE (code)",
+      "validated": true
+    },
+    {
+      "table_name": "role",
+      "name": "role_status_ck",
+      "type": "c",
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'DISABLED'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "role",
+      "name": "role_version_ck",
+      "type": "c",
+      "definition": "CHECK ((version >= 1))",
+      "validated": true
+    },
+    {
+      "table_name": "role",
+      "name": "uq_role_code",
+      "type": "u",
+      "definition": "UNIQUE (role_code)",
+      "validated": true
+    },
+    {
+      "table_name": "role",
+      "name": "user_id_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "role_permissions",
+      "name": "role_permissions_permission_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "role_permissions",
+      "name": "role_permissions_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (role_id, permission_id)",
+      "validated": true
+    },
+    {
+      "table_name": "role_permissions",
+      "name": "role_permissions_role_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "sessions",
+      "name": "sessions_expiry_ck",
+      "type": "c",
+      "definition": "CHECK ((expires_at > created_at))",
+      "validated": true
+    },
+    {
+      "table_name": "sessions",
+      "name": "sessions_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "sessions",
+      "name": "sessions_revocation_ck",
+      "type": "c",
+      "definition": "CHECK (((((status)::text = 'ACTIVE'::text) AND (revoked_at IS NULL)) OR (((status)::text = 'REVOKED'::text) AND (revoked_at IS NOT NULL) AND (revoke_reason IS NOT NULL) AND ((char_length(btrim((revoke_reason)::text)) >= 3) AND (char_length(btrim((revoke_reason)::text)) <= 500)))))",
+      "validated": true
+    },
+    {
+      "table_name": "sessions",
+      "name": "sessions_revoked_by_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (revoked_by) REFERENCES auth(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "sessions",
+      "name": "sessions_status_ck",
+      "type": "c",
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'REVOKED'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "sessions",
+      "name": "sessions_user_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "user_application_access",
+      "name": "application_access_revocation_ck",
+      "type": "c",
+      "definition": "CHECK (((((status)::text = 'ACTIVE'::text) AND (revoked_at IS NULL)) OR (((status)::text = 'REVOKED'::text) AND (revoked_at IS NOT NULL) AND (revoke_reason IS NOT NULL) AND ((char_length(btrim((revoke_reason)::text)) >= 3) AND (char_length(btrim((revoke_reason)::text)) <= 500)))))",
+      "validated": true
+    },
+    {
+      "table_name": "user_application_access",
+      "name": "application_access_status_ck",
+      "type": "c",
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'REVOKED'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "user_application_access",
+      "name": "user_application_access_application_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (application_id) REFERENCES applications(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "user_application_access",
+      "name": "user_application_access_granted_by_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (granted_by) REFERENCES auth(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "user_application_access",
+      "name": "user_application_access_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (user_id, application_id)",
+      "validated": true
+    },
+    {
+      "table_name": "user_application_access",
+      "name": "user_application_access_revoked_by_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (revoked_by) REFERENCES auth(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "user_application_access",
+      "name": "user_application_access_user_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "user_role",
+      "name": "PK_user_role",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "user_role",
+      "name": "role_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (role_id) REFERENCES role(id)",
+      "validated": true
+    },
+    {
+      "table_name": "user_role",
+      "name": "user_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth(id)",
+      "validated": true
+    },
+    {
+      "table_name": "user_role",
+      "name": "user_role_granted_by_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (granted_by) REFERENCES auth(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "user_role",
+      "name": "user_role_pair_uq",
+      "type": "u",
+      "definition": "UNIQUE (user_id, role_id)",
+      "validated": true
+    },
+    {
+      "table_name": "user_role",
+      "name": "user_role_revocation_ck",
+      "type": "c",
+      "definition": "CHECK (((((status)::text = 'ACTIVE'::text) AND (revoked_at IS NULL)) OR (((status)::text = 'REVOKED'::text) AND (revoked_at IS NOT NULL) AND (revoke_reason IS NOT NULL) AND ((char_length(btrim((revoke_reason)::text)) >= 3) AND (char_length(btrim((revoke_reason)::text)) <= 500)))))",
+      "validated": true
+    },
+    {
+      "table_name": "user_role",
+      "name": "user_role_revoked_by_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (revoked_by) REFERENCES auth(id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "user_role",
+      "name": "user_role_status_ck",
+      "type": "c",
+      "definition": "CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'REVOKED'::character varying])::text[])))",
+      "validated": true
+    }
+  ],
+  "database": "user",
+  "indexes": [
+    {
+      "tablename": "applications",
+      "indexname": "applications_code_key",
+      "indexdef": "CREATE UNIQUE INDEX applications_code_key ON public.applications USING btree (code)"
+    },
+    {
+      "tablename": "applications",
+      "indexname": "applications_pkey",
+      "indexdef": "CREATE UNIQUE INDEX applications_pkey ON public.applications USING btree (id)"
+    },
+    {
+      "tablename": "audit_logs",
+      "indexname": "audit_actor_time_idx",
+      "indexdef": "CREATE INDEX audit_actor_time_idx ON public.audit_logs USING btree (actor_user_id, occurred_at DESC, id DESC)"
+    },
+    {
+      "tablename": "audit_logs",
+      "indexname": "audit_logs_pkey",
+      "indexdef": "CREATE UNIQUE INDEX audit_logs_pkey ON public.audit_logs USING btree (id)"
+    },
+    {
+      "tablename": "audit_logs",
+      "indexname": "audit_target_time_idx",
+      "indexdef": "CREATE INDEX audit_target_time_idx ON public.audit_logs USING btree (target_type, target_id, occurred_at DESC, id DESC)"
+    },
+    {
+      "tablename": "audit_logs",
+      "indexname": "audit_time_idx",
+      "indexdef": "CREATE INDEX audit_time_idx ON public.audit_logs USING btree (occurred_at DESC, id DESC)"
+    },
+    {
+      "tablename": "auth",
+      "indexname": "PK_auth",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_auth\" ON public.auth USING btree (id)"
+    },
+    {
+      "tablename": "auth",
+      "indexname": "auth_status_id_idx",
+      "indexdef": "CREATE INDEX auth_status_id_idx ON public.auth USING btree (status, id)"
+    },
+    {
+      "tablename": "auth",
+      "indexname": "idx_id_email",
+      "indexdef": "CREATE INDEX idx_id_email ON public.auth USING btree (id DESC, email DESC)"
+    },
+    {
+      "tablename": "auth",
+      "indexname": "unique_key_email",
+      "indexdef": "CREATE UNIQUE INDEX unique_key_email ON public.auth USING btree (email)"
+    },
+    {
+      "tablename": "idempotency_records",
+      "indexname": "idempotency_expiry_idx",
+      "indexdef": "CREATE INDEX idempotency_expiry_idx ON public.idempotency_records USING btree (expires_at)"
+    },
+    {
+      "tablename": "idempotency_records",
+      "indexname": "idempotency_records_pkey",
+      "indexdef": "CREATE UNIQUE INDEX idempotency_records_pkey ON public.idempotency_records USING btree (actor_id, method, route_scope, key)"
+    },
+    {
+      "tablename": "outbox_events",
+      "indexname": "outbox_events_pkey",
+      "indexdef": "CREATE UNIQUE INDEX outbox_events_pkey ON public.outbox_events USING btree (event_id)"
+    },
+    {
+      "tablename": "outbox_events",
+      "indexname": "outbox_pending_idx",
+      "indexdef": "CREATE INDEX outbox_pending_idx ON public.outbox_events USING btree (next_attempt_at, created_at, event_id) WHERE (published_at IS NULL)"
+    },
+    {
+      "tablename": "permissions",
+      "indexname": "permissions_application_idx",
+      "indexdef": "CREATE INDEX permissions_application_idx ON public.permissions USING btree (application_id, id)"
+    },
+    {
+      "tablename": "permissions",
+      "indexname": "permissions_code_key",
+      "indexdef": "CREATE UNIQUE INDEX permissions_code_key ON public.permissions USING btree (code)"
+    },
+    {
+      "tablename": "permissions",
+      "indexname": "permissions_pkey",
+      "indexdef": "CREATE UNIQUE INDEX permissions_pkey ON public.permissions USING btree (id)"
+    },
+    {
+      "tablename": "profile",
+      "indexname": "profile_pk",
+      "indexdef": "CREATE UNIQUE INDEX profile_pk ON public.profile USING btree (id)"
+    },
+    {
+      "tablename": "profile",
+      "indexname": "profile_user_id_uq",
+      "indexdef": "CREATE UNIQUE INDEX profile_user_id_uq ON public.profile USING btree (user_id)"
+    },
+    {
+      "tablename": "refresh_tokens",
+      "indexname": "refresh_tokens_family_idx",
+      "indexdef": "CREATE INDEX refresh_tokens_family_idx ON public.refresh_tokens USING btree (family_id)"
+    },
+    {
+      "tablename": "refresh_tokens",
+      "indexname": "refresh_tokens_pkey",
+      "indexdef": "CREATE UNIQUE INDEX refresh_tokens_pkey ON public.refresh_tokens USING btree (id)"
+    },
+    {
+      "tablename": "refresh_tokens",
+      "indexname": "refresh_tokens_replaced_by_key",
+      "indexdef": "CREATE UNIQUE INDEX refresh_tokens_replaced_by_key ON public.refresh_tokens USING btree (replaced_by)"
+    },
+    {
+      "tablename": "refresh_tokens",
+      "indexname": "refresh_tokens_session_idx",
+      "indexdef": "CREATE INDEX refresh_tokens_session_idx ON public.refresh_tokens USING btree (session_id, expires_at)"
+    },
+    {
+      "tablename": "refresh_tokens",
+      "indexname": "refresh_tokens_token_hash_key",
+      "indexdef": "CREATE UNIQUE INDEX refresh_tokens_token_hash_key ON public.refresh_tokens USING btree (token_hash)"
+    },
+    {
+      "tablename": "role",
+      "indexname": "role_application_status_id_idx",
+      "indexdef": "CREATE INDEX role_application_status_id_idx ON public.role USING btree (application_id, status, id)"
+    },
+    {
+      "tablename": "role",
+      "indexname": "role_code_string_uq",
+      "indexdef": "CREATE UNIQUE INDEX role_code_string_uq ON public.role USING btree (code)"
+    },
+    {
+      "tablename": "role",
+      "indexname": "uq_role_code",
+      "indexdef": "CREATE UNIQUE INDEX uq_role_code ON public.role USING btree (role_code)"
+    },
+    {
+      "tablename": "role",
+      "indexname": "user_id_pkey",
+      "indexdef": "CREATE UNIQUE INDEX user_id_pkey ON public.role USING btree (id)"
+    },
+    {
+      "tablename": "role_permissions",
+      "indexname": "role_permissions_permission_idx",
+      "indexdef": "CREATE INDEX role_permissions_permission_idx ON public.role_permissions USING btree (permission_id, role_id)"
+    },
+    {
+      "tablename": "role_permissions",
+      "indexname": "role_permissions_pkey",
+      "indexdef": "CREATE UNIQUE INDEX role_permissions_pkey ON public.role_permissions USING btree (role_id, permission_id)"
+    },
+    {
+      "tablename": "sessions",
+      "indexname": "sessions_pkey",
+      "indexdef": "CREATE UNIQUE INDEX sessions_pkey ON public.sessions USING btree (id)"
+    },
+    {
+      "tablename": "sessions",
+      "indexname": "sessions_user_status_expiry_idx",
+      "indexdef": "CREATE INDEX sessions_user_status_expiry_idx ON public.sessions USING btree (user_id, status, expires_at)"
+    },
+    {
+      "tablename": "user_application_access",
+      "indexname": "application_access_application_status_idx",
+      "indexdef": "CREATE INDEX application_access_application_status_idx ON public.user_application_access USING btree (application_id, status, user_id)"
+    },
+    {
+      "tablename": "user_application_access",
+      "indexname": "user_application_access_pkey",
+      "indexdef": "CREATE UNIQUE INDEX user_application_access_pkey ON public.user_application_access USING btree (user_id, application_id)"
+    },
+    {
+      "tablename": "user_role",
+      "indexname": "PK_user_role",
+      "indexdef": "CREATE UNIQUE INDEX \"PK_user_role\" ON public.user_role USING btree (id)"
+    },
+    {
+      "tablename": "user_role",
+      "indexname": "user_role_pair_uq",
+      "indexdef": "CREATE UNIQUE INDEX user_role_pair_uq ON public.user_role USING btree (user_id, role_id)"
+    },
+    {
+      "tablename": "user_role",
+      "indexname": "user_role_role_status_idx",
+      "indexdef": "CREATE INDEX user_role_role_status_idx ON public.user_role USING btree (role_id, status, user_id)"
+    },
+    {
+      "tablename": "user_role",
+      "indexname": "user_role_user_status_idx",
+      "indexdef": "CREATE INDEX user_role_user_status_idx ON public.user_role USING btree (user_id, status, role_id)"
+    }
+  ],
+  "inspected_at_utc": "2026-10-10T06:41:26Z",
+  "scope": "READ_ONLY_SCHEMA_PREFLIGHT_ONLY",
+  "server_version": "16.13",
+  "status": "INSPECTED_NOT_FUNCTIONAL_PASS",
+  "transaction_outcome": "ROLLBACK_READ_ONLY",
+  "transaction_read_only": "on",
+  "required_columns_checked": {
+    "auth": [
+      "id",
+      "email",
+      "password",
+      "status",
+      "auth_version",
+      "must_change_password",
+      "version",
+      "password_changed_at",
+      "created_at",
+      "updated_at",
+      "deleted_at"
+    ],
+    "profile": [
+      "id",
+      "user_id",
+      "name",
+      "address",
+      "phone"
+    ],
+    "role": [
+      "id",
+      "application_id",
+      "code",
+      "role_code",
+      "role_name",
+      "role_description",
+      "status",
+      "is_system",
+      "version",
+      "created_at",
+      "updated_at"
+    ],
+    "user_role": [
+      "id",
+      "user_id",
+      "role_id",
+      "status",
+      "granted_by",
+      "granted_at",
+      "revoked_by",
+      "revoked_at",
+      "revoke_reason"
+    ],
+    "applications": [
+      "id",
+      "code",
+      "name",
+      "status",
+      "is_system"
+    ],
+    "permissions": [
+      "id",
+      "application_id",
+      "code",
+      "description"
+    ],
+    "role_permissions": [
+      "role_id",
+      "permission_id"
+    ],
+    "user_application_access": [
+      "user_id",
+      "application_id",
+      "status",
+      "granted_by",
+      "granted_at",
+      "revoked_by",
+      "revoked_at",
+      "revoke_reason"
+    ],
+    "sessions": [
+      "id",
+      "user_id",
+      "status",
+      "created_at",
+      "last_seen_at",
+      "expires_at",
+      "revoked_at",
+      "revoked_by",
+      "revoke_reason",
+      "device_label",
+      "user_agent",
+      "ip_address"
+    ],
+    "refresh_tokens": [
+      "id",
+      "session_id",
+      "token_hash",
+      "family_id",
+      "issued_at",
+      "expires_at",
+      "consumed_at",
+      "revoked_at",
+      "replaced_by"
+    ],
+    "audit_logs": [
+      "id",
+      "actor_user_id",
+      "actor_service",
+      "action",
+      "target_type",
+      "target_id",
+      "safe_before",
+      "safe_after",
+      "reason",
+      "request_id",
+      "trace_id",
+      "occurred_at"
+    ],
+    "outbox_events": [
+      "event_id",
+      "event_type",
+      "schema_version",
+      "aggregate_type",
+      "aggregate_id",
+      "aggregate_version",
+      "payload",
+      "created_at",
+      "published_at",
+      "attempts",
+      "next_attempt_at",
+      "lease_owner",
+      "lease_expires_at",
+      "last_error_code"
+    ],
+    "idempotency_records": [
+      "actor_id",
+      "method",
+      "route_scope",
+      "key",
+      "request_hash",
+      "safe_response",
+      "created_at",
+      "expires_at"
+    ]
+  },
+  "missing_columns": {},
+  "all_catalog_constraints_validated": true,
+  "preflight_source_sha256": "3d3d079b4664c5c0cbeee250ad8611f86a2a3058b6b0c7569d87ef1a1abe6141"
+}

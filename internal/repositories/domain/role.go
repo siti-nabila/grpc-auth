@@ -1,6 +1,6 @@
 package domain
 
-var (
+const (
 	MemberRole RoleCode = 1
 	AdminRole  RoleCode = 2
 )

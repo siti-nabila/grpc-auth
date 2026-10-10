@@ -1,0 +1,115 @@
+{
+  "change": "auth-login-session-producer",
+  "recorded_at_utc": "2026-10-10T11:35:56.963514+00:00",
+  "status": "PASS",
+  "dedicated_database": "grpc_auth_test",
+  "postgresql_version": "16.13",
+  "private_configuration_source": "env-test.yaml: Database.GRPC_AUTH_TEST",
+  "explicit_opt_in": true,
+  "dsn_and_password_recorded": false,
+  "environment_bridge": "Private temporary Go bootstrap maps provided YAML into the three explicit guarded environment variables; no runtime loader change.",
+  "commands": [
+    {
+      "command": "rtk proxy env GOCACHE=/tmp/grpc-auth-producer-go-cache go run -tags=postgres /tmp/grpc-auth-postgres-runner.go env-test.yaml -run '^TestPostgresLoginProducer$' -count=1 -v",
+      "actual": "PASS"
+    },
+    {
+      "command": "rtk proxy env GOCACHE=/tmp/grpc-auth-producer-go-cache go run -tags=postgres /tmp/grpc-auth-postgres-runner.go env-test.yaml -count=1 -v",
+      "actual": "PASS"
+    },
+    {
+      "command": "rtk proxy env GOCACHE=/tmp/grpc-auth-producer-go-cache go run -tags=postgres /tmp/grpc-auth-postgres-runner.go env-test.yaml -race -count=1 -v",
+      "actual": "PASS"
+    },
+    {
+      "command": "rtk proxy env GOCACHE=/tmp/grpc-auth-producer-go-cache GOWORK=off go run -tags=postgres /tmp/grpc-auth-postgres-runner.go env-test.yaml -run '^TestPostgresLoginProducer$' -count=1 -v",
+      "actual": "PASS"
+    }
+  ],
+  "safe_observations": [
+    "login.go:53: dedicated database=grpc_auth_test PostgreSQL=16.13; owned schema=grpc_auth_test_34484_30",
+    "login.go:53: dedicated database=grpc_auth_test PostgreSQL=16.13; owned schema=grpc_auth_test_34484_31",
+    "login_race.go:97: proof-before-change barrier: mutation backend=34683 Login backend=34689; committed change precedes locked recheck",
+    "login_race.go:97: proof-before-change barrier: mutation backend=34695 Login backend=34696; committed change precedes locked recheck",
+    "login_race.go:175: precommit barrier: holder backend=34699 contender backend=34701; no visible rows or credential, contender RESOURCE_BUSY",
+    "login_race.go:175: precommit barrier: holder backend=34704 contender backend=34705; no visible rows or credential, contender RESOURCE_BUSY",
+    "login_race.go:175: precommit barrier: holder backend=34710 contender backend=34711; no visible rows or credential, contender RESOURCE_BUSY",
+    "login_race.go:175: precommit barrier: holder backend=34714 contender backend=34715; no visible rows or credential, contender RESOURCE_BUSY"
+  ],
+  "expected_actual": {
+    "schema_columns_constraints_indexes": {
+      "expected": [
+        21,
+        14,
+        7
+      ],
+      "actual": "PASS"
+    },
+    "initial_session_refresh_success_audit_rows": {
+      "expected": "1/1/1 per successful Login; 0/0/0 on each precommit/sign/deferred commit failure",
+      "actual": "PASS"
+    },
+    "refresh_digest": {
+      "expected": "SHA-256(encoded returned opaque token), BYTEA 32 bytes; initial consumed/revoked/replaced NULL",
+      "actual": "PASS"
+    },
+    "constraints": {
+      "expected": "PK and digest uniqueness SQLSTATE 23505; nonexistent session FK SQLSTATE 23503",
+      "actual": "PASS"
+    },
+    "repeated_login_response_loss": {
+      "expected": "two distinct sessions, refresh families and credentials; no credential replay",
+      "actual": "PASS"
+    },
+    "normal_restricted_consumers": {
+      "expected": "real Login token \u2192 foundation verifier/session \u2192 normal/restricted Me; ListUsers denied by missing permission/restriction",
+      "actual": "PASS"
+    },
+    "changed_credential_state": {
+      "expected": "committed password/status change after password proof but before locked recheck \u2192 generic LOGIN_FAILED, zero issuance, safe independent service audit",
+      "actual": "PASS"
+    },
+    "contention_cleanup": {
+      "expected": "distinct backends overlap at precommit barrier; contender RESOURCE_BUSY; no early rows/credential; commit/failure/panic/cancel cleanup allows clean retry",
+      "actual": "PASS"
+    },
+    "side_effects": {
+      "expected": "user versions unchanged by Login, no Login outbox or idempotency record",
+      "actual": "PASS"
+    }
+  },
+  "limits": [
+    "Dedicated disposable fixture schemas only; no application migration or application data writes",
+    "Password/status mutation is controlled fixture SQL using canonical user lock; no production lifecycle RPC claim",
+    "Response-loss semantics proven by repeated committed Login; no network fault injection",
+    "Activation and external client/deployment readiness remain foundation-owned and BLOCKED"
+  ],
+  "deliverable_head": "b89f37270d019c8d0d7823a3ff5d3526874d2232",
+  "deliverable_worktree": "uncommitted",
+  "versions": {
+    "go": "go1.26.2",
+    "orm": "v1.7.0",
+    "published_api_contracts": "v0.0.0-20261010071509-42a9e6fa23ad"
+  },
+  "cleanup": {
+    "verification": "READ ONLY post-suite catalog SELECT",
+    "remaining_fixture_schemas": 0,
+    "actual": "PASS"
+  },
+  "private_bootstrap_sha256": "4b64fd28b4f416e14712db64552f570c0ab9c2719868732f2bd55f2fd01d3a08",
+  "test_source_sha256": {
+    "tests/integration/postgres/README.md": "df747ebf365bd8f431702b49d9a7ab10f8795afb8f7adcf2c1a74f7fb4b04cda",
+    "tests/integration/postgres/runner_test.go": "dffb3879f27bca7d2d488947e9137796d2e7fb57c1d0c2a0d4ca30eaa0e277c6",
+    "tests/integration/postgres/test_scenarios/config.go": "030495b637c9c61de533751e56dc775cb71bafb953bbb7b037fb8caf74d4d13d",
+    "tests/integration/postgres/test_scenarios/persistence.go": "995fb6c7119537857b43969ee9fa41bbd8181ea947597acca72c026e1b7680ae",
+    "tests/integration/postgres/test_scenarios/login_support.go": "2e85ca30bcf40431e60e56401e348c523f8ef61d49da04d9e4dae5238020880a",
+    "tests/integration/postgres/test_scenarios/transaction.go": "9c23856e3440a5223f14885143d1252a416b42962cd65e159edb1aac639c1883",
+    "tests/integration/postgres/test_scenarios/login_race.go": "6684b656671f0652c390388e60399acd21a1852f31fc4ee277d51042eed04b46",
+    "tests/integration/postgres/test_scenarios/schema.go": "40505e9d65cb97e463333188ff0a98f371cbe672a0a79c3fe3c557c0e371e936",
+    "tests/integration/postgres/test_scenarios/commands.go": "06f0a1b3bca13507fe33904e89a1b1d1808196318a5a417e5febf88e1397a924",
+    "tests/integration/postgres/test_scenarios/login.go": "6221655d837970a7580d6e27603c1fb6f1d57362bb9468cb1457f8c6018779f6",
+    "tests/integration/postgres/fixtures/config.go": "ab9fb51800f72fc907d867f5024b121bbb90d03c1ea46f7171e5a8ebde480f88",
+    "tests/integration/postgres/fixtures/schema.sql": "dfb95567c9d308169e2e77e12793ef89a42bb7fa21053a5fdcc1fb174fc670e2",
+    "tests/integration/postgres/fixtures/schema.go": "0c5eee38906f4af4b1c649b87e24a609e59d12f133127f4bd4db8011d958966e"
+  }
+}

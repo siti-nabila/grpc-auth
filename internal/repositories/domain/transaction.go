@@ -18,3 +18,9 @@ type Transaction interface {
 type TransactionProvider interface {
 	Begin(context.Context) (Transaction, error)
 }
+
+// ReadSnapshotProvider leaves lifecycle ownership in the feature. Mutation
+// providers retain ReadCommitted; this path is only for consistent read RPCs.
+type ReadSnapshotProvider interface {
+	BeginSnapshot(context.Context) (Transaction, error)
+}

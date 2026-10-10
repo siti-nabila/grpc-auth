@@ -6,4 +6,13 @@ import (
 	"testing"
 )
 
-func TestRegisterTransaction(t *testing.T) { testutils.Run(t, test_scenarios.All()) }
+func TestRegisterTransaction(t *testing.T)   { testutils.Run(t, test_scenarios.All()) }
+func TestSessionAuthentication(t *testing.T) { testutils.Run(t, test_scenarios.Sessions()) }
+func TestInitialCredentials(t *testing.T)    { testutils.Run(t, test_scenarios.Credentials()) }
+
+func TestSessionLogin(t *testing.T) { testutils.Run(t, test_scenarios.SessionLogin()) }
+
+func TestFailedLoginAudit(t *testing.T) { testutils.Run(t, test_scenarios.FailedLoginAudit()) }
+
+func TestLoginPassword(t *testing.T)       { testutils.Run(t, test_scenarios.LoginPassword()) }
+func TestPendingRegistration(t *testing.T) { testutils.Run(t, test_scenarios.PendingRegistration()) }

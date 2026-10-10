@@ -9,6 +9,7 @@ import (
 	contractdictionary "github.com/siti-nabila/api-contracts/pkg/dictionary"
 	authdictionary "github.com/siti-nabila/api-contracts/pkg/dictionary/auth"
 	"github.com/siti-nabila/grpc-auth/pkg/helpers"
+	"github.com/siti-nabila/grpc-auth/pkg/types"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -36,12 +37,17 @@ type (
 		Password string `sql:"column:password" json:"password"`
 	}
 	Auth struct {
-		Id        uint64       `sql:"column:id;primaryKey" json:"id"`
-		Email     string       `sql:"column:email" json:"email"`
-		Password  string       `sql:"column:password" json:"password"`
-		CreatedAt sql.NullTime `sql:"column:created_at" json:"created_at"`
-		UpdatedAt sql.NullTime `sql:"column:updated_at" json:"updated_at"`
-		DeletedAt sql.NullTime `sql:"column:deleted_at" json:"deleted_at"`
+		Id                 uint64           `sql:"column:id;primaryKey" json:"id"`
+		Email              string           `sql:"column:email" json:"email"`
+		Password           string           `sql:"column:password" json:"password"`
+		CreatedAt          sql.NullTime     `sql:"column:created_at" json:"created_at"`
+		UpdatedAt          sql.NullTime     `sql:"column:updated_at" json:"updated_at"`
+		DeletedAt          sql.NullTime     `sql:"column:deleted_at" json:"deleted_at"`
+		Status             types.UserStatus `sql:"column:status" json:"status"`
+		AuthVersion        int64            `sql:"column:auth_version" json:"-"`
+		Version            int64            `sql:"column:version" json:"version"`
+		MustChangePassword bool             `sql:"column:must_change_password" json:"must_change_password"`
+		PasswordChangedAt  sql.NullTime     `sql:"column:password_changed_at" json:"-"`
 	}
 
 	AuthResponse struct {

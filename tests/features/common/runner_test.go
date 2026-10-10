@@ -8,3 +8,4 @@ import (
 
 func TestTransactionOwnership(t *testing.T) { testutils.Run(t, test_scenarios.All()) }
 func TestIdempotency(t *testing.T)          { testutils.Run(t, test_scenarios.Idempotency()) }
+func TestAuthorization(t *testing.T)        { testutils.Run(t, test_scenarios.Authorization()) }

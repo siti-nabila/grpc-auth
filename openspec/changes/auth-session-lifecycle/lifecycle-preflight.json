@@ -1,0 +1,577 @@
+{
+  "change": "auth-session-lifecycle",
+  "inspected_at_utc": "2026-10-10T15:46:16.845806+00:00",
+  "scope": "READ_ONLY_CONTRACT_AND_SAVED_SCHEMA_COMPARISON",
+  "backend_head": "b89f37270d019c8d0d7823a3ff5d3526874d2232",
+  "backend_has_existing_uncommitted_changes": true,
+  "pinned_contract_version": "v0.0.0-20261010071509-42a9e6fa23ad",
+  "commands": [
+    "rtk proxy go list -m -json github.com/siti-nabila/api-contracts",
+    "rtk proxy env GOWORK=off GOPROXY=off go list -m -json github.com/siti-nabila/api-contracts",
+    "rtk proxy python3 (static source/proto/generated inventory and fixture/saved-schema comparison)",
+    "rtk proxy git rev-parse HEAD"
+  ],
+  "contract_gate": {
+    "status": "BLOCKED",
+    "required_methods": [
+      "/auth.v1.AuthService/RefreshSession",
+      "/auth.v1.AuthService/Logout",
+      "/auth.v1.AuthService/ChangePassword",
+      "/session.v1.SessionService/ListMySessions",
+      "/session.v1.SessionService/RevokeMySession",
+      "/session.v1.SessionService/RevokeAllMySessions",
+      "/session.v1.SessionService/ListUserSessions",
+      "/session.v1.SessionService/RevokeUserSession",
+      "/session.v1.SessionService/RevokeAllUserSessions"
+    ],
+    "inventories": {
+      "workspace": {
+        "existing_proto_methods": [
+          "/profile.v1.ProfileService/UpdateProfile",
+          "/user.v1.UserService/Register",
+          "/user.v1.UserService/Login",
+          "/user.v1.UserService/Me",
+          "/user.v1.UserService/ListUsers",
+          "/user.v1.UserService/TesRPC"
+        ],
+        "existing_generated_methods": [
+          "/profile.v1.ProfileService/UpdateProfile",
+          "/user.v1.UserService/Register",
+          "/user.v1.UserService/Login",
+          "/user.v1.UserService/Me",
+          "/user.v1.UserService/ListUsers",
+          "/user.v1.UserService/TesRPC"
+        ],
+        "missing_required_proto_methods": [
+          "/auth.v1.AuthService/ChangePassword",
+          "/auth.v1.AuthService/Logout",
+          "/auth.v1.AuthService/RefreshSession",
+          "/session.v1.SessionService/ListMySessions",
+          "/session.v1.SessionService/ListUserSessions",
+          "/session.v1.SessionService/RevokeAllMySessions",
+          "/session.v1.SessionService/RevokeAllUserSessions",
+          "/session.v1.SessionService/RevokeMySession",
+          "/session.v1.SessionService/RevokeUserSession"
+        ],
+        "missing_required_generated_methods": [
+          "/auth.v1.AuthService/ChangePassword",
+          "/auth.v1.AuthService/Logout",
+          "/auth.v1.AuthService/RefreshSession",
+          "/session.v1.SessionService/ListMySessions",
+          "/session.v1.SessionService/ListUserSessions",
+          "/session.v1.SessionService/RevokeAllMySessions",
+          "/session.v1.SessionService/RevokeAllUserSessions",
+          "/session.v1.SessionService/RevokeMySession",
+          "/session.v1.SessionService/RevokeUserSession"
+        ],
+        "refresh_reuse_symbol_available": false,
+        "source_sha256": {
+          "proto/paginator/v1/paginator.payload.proto": "e800f5e2e719da238066e7d69c809e73ff979feadb2819ebb4b1e203b6f78719",
+          "proto/profile/v1/profile.payload.proto": "360fbe660c3d74fc989fb28873e639a90d443d535f93da4cee8255777802c014",
+          "proto/profile/v1/profile.service.proto": "8390e38a4c05a80bfb843c8ec4bbab66dd9390e543e4d3fe7c3feaff4c2f4e77",
+          "proto/user/v1/user.payload.proto": "4a0108fd7d9fc4488bcb21227463e6c987a8f088f8b2cb72041930b4892d5b0f",
+          "proto/user/v1/user.service.proto": "1429b5609175912b62da36b0d4be2a2d29a03a1bc5852d0172f8e080a10a0427",
+          "pb/profile/v1/profile.service_grpc.pb.go": "335dfc62148e7f622b0e8b7906a64d87ff19b1b20d36655e4cb2cfd62ee2cf8e",
+          "pb/user/v1/user.service_grpc.pb.go": "89e38637d28660953795e54e09bd9aeb73ccdaed10bb7848a68e61411517dd4a"
+        }
+      },
+      "pinned": {
+        "existing_proto_methods": [
+          "/profile.v1.ProfileService/UpdateProfile",
+          "/user.v1.UserService/Register",
+          "/user.v1.UserService/Login",
+          "/user.v1.UserService/Me",
+          "/user.v1.UserService/ListUsers",
+          "/user.v1.UserService/TesRPC"
+        ],
+        "existing_generated_methods": [
+          "/profile.v1.ProfileService/UpdateProfile",
+          "/user.v1.UserService/Register",
+          "/user.v1.UserService/Login",
+          "/user.v1.UserService/Me",
+          "/user.v1.UserService/ListUsers",
+          "/user.v1.UserService/TesRPC"
+        ],
+        "missing_required_proto_methods": [
+          "/auth.v1.AuthService/ChangePassword",
+          "/auth.v1.AuthService/Logout",
+          "/auth.v1.AuthService/RefreshSession",
+          "/session.v1.SessionService/ListMySessions",
+          "/session.v1.SessionService/ListUserSessions",
+          "/session.v1.SessionService/RevokeAllMySessions",
+          "/session.v1.SessionService/RevokeAllUserSessions",
+          "/session.v1.SessionService/RevokeMySession",
+          "/session.v1.SessionService/RevokeUserSession"
+        ],
+        "missing_required_generated_methods": [
+          "/auth.v1.AuthService/ChangePassword",
+          "/auth.v1.AuthService/Logout",
+          "/auth.v1.AuthService/RefreshSession",
+          "/session.v1.SessionService/ListMySessions",
+          "/session.v1.SessionService/ListUserSessions",
+          "/session.v1.SessionService/RevokeAllMySessions",
+          "/session.v1.SessionService/RevokeAllUserSessions",
+          "/session.v1.SessionService/RevokeMySession",
+          "/session.v1.SessionService/RevokeUserSession"
+        ],
+        "refresh_reuse_symbol_available": false,
+        "source_sha256": {
+          "proto/paginator/v1/paginator.payload.proto": "e800f5e2e719da238066e7d69c809e73ff979feadb2819ebb4b1e203b6f78719",
+          "proto/profile/v1/profile.payload.proto": "360fbe660c3d74fc989fb28873e639a90d443d535f93da4cee8255777802c014",
+          "proto/profile/v1/profile.service.proto": "8390e38a4c05a80bfb843c8ec4bbab66dd9390e543e4d3fe7c3feaff4c2f4e77",
+          "proto/user/v1/user.payload.proto": "4a0108fd7d9fc4488bcb21227463e6c987a8f088f8b2cb72041930b4892d5b0f",
+          "proto/user/v1/user.service.proto": "1429b5609175912b62da36b0d4be2a2d29a03a1bc5852d0172f8e080a10a0427",
+          "pb/profile/v1/profile.service_grpc.pb.go": "335dfc62148e7f622b0e8b7906a64d87ff19b1b20d36655e4cb2cfd62ee2cf8e",
+          "pb/user/v1/user.service_grpc.pb.go": "89e38637d28660953795e54e09bd9aeb73ccdaed10bb7848a68e61411517dd4a"
+        }
+      }
+    },
+    "deliverable_gaps": {
+      "SLC-EXT-01": "AuthService RPCs and request credential modes absent",
+      "SLC-EXT-02": "SessionService six RPCs and session DTO/responses absent",
+      "SLC-EXT-03": "Refresh-specific binding absent; existing Login credential fields can be reused by contract owner",
+      "SLC-EXT-04": "REFRESH_TOKEN_REUSED absent; target validation/not-found/version/idempotency catalog/mapping must be agreed and verified in contract change",
+      "SLC-EXT-05": "Current pinned release lacks target methods; publication of compatible release required"
+    }
+  },
+  "schema_comparison": {
+    "status": "COMPLETE_STATIC_COMPARISON_NOT_FUNCTIONAL_PASS",
+    "historical_capture_time": "2026-10-10T06:41:26Z",
+    "historical_report_sha256": "baebd19cda87fcd28912554cbadcfb531c9dbddbfaf4b129e8a1f5f172f28cf5",
+    "fixture_sha256": "9df1e5b40056f22b0bd7c0fbf1a30fefeb3aabae474379aa34476a742fe4c3d2",
+    "matrix": [
+      {
+        "table": "auth",
+        "required_columns": [
+          "id",
+          "password",
+          "password_changed_at",
+          "status",
+          "version",
+          "auth_version",
+          "must_change_password"
+        ],
+        "historical_column_types": {
+          "id": "int4",
+          "password": "varchar",
+          "password_changed_at": "timestamptz",
+          "status": "varchar",
+          "version": "int8",
+          "auth_version": "int8",
+          "must_change_password": "bool"
+        },
+        "missing_historical_columns": [],
+        "missing_fixture_columns": []
+      },
+      {
+        "table": "sessions",
+        "required_columns": [
+          "id",
+          "user_id",
+          "status",
+          "created_at",
+          "last_seen_at",
+          "expires_at",
+          "revoked_at",
+          "revoked_by",
+          "revoke_reason",
+          "device_label",
+          "user_agent",
+          "ip_address"
+        ],
+        "historical_column_types": {
+          "id": "uuid",
+          "user_id": "int4",
+          "status": "varchar",
+          "created_at": "timestamptz",
+          "last_seen_at": "timestamptz",
+          "expires_at": "timestamptz",
+          "revoked_at": "timestamptz",
+          "revoked_by": "int4",
+          "revoke_reason": "varchar",
+          "device_label": "varchar",
+          "user_agent": "varchar",
+          "ip_address": "inet"
+        },
+        "missing_historical_columns": [],
+        "missing_fixture_columns": []
+      },
+      {
+        "table": "refresh_tokens",
+        "required_columns": [
+          "id",
+          "session_id",
+          "token_hash",
+          "family_id",
+          "issued_at",
+          "expires_at",
+          "consumed_at",
+          "revoked_at",
+          "replaced_by"
+        ],
+        "historical_column_types": {
+          "id": "uuid",
+          "session_id": "uuid",
+          "token_hash": "bytea",
+          "family_id": "uuid",
+          "issued_at": "timestamptz",
+          "expires_at": "timestamptz",
+          "consumed_at": "timestamptz",
+          "revoked_at": "timestamptz",
+          "replaced_by": "uuid"
+        },
+        "missing_historical_columns": [],
+        "missing_fixture_columns": []
+      },
+      {
+        "table": "audit_logs",
+        "required_columns": [
+          "actor_user_id",
+          "actor_service",
+          "action",
+          "target_type",
+          "target_id",
+          "safe_before",
+          "safe_after",
+          "reason",
+          "request_id",
+          "trace_id",
+          "occurred_at"
+        ],
+        "historical_column_types": {
+          "actor_user_id": "int4",
+          "actor_service": "varchar",
+          "action": "varchar",
+          "target_type": "varchar",
+          "target_id": "varchar",
+          "safe_before": "jsonb",
+          "safe_after": "jsonb",
+          "reason": "varchar",
+          "request_id": "varchar",
+          "trace_id": "varchar",
+          "occurred_at": "timestamptz"
+        },
+        "missing_historical_columns": [],
+        "missing_fixture_columns": []
+      },
+      {
+        "table": "outbox_events",
+        "required_columns": [
+          "event_id",
+          "event_type",
+          "schema_version",
+          "aggregate_type",
+          "aggregate_id",
+          "aggregate_version",
+          "payload",
+          "published_at"
+        ],
+        "historical_column_types": {
+          "event_id": "uuid",
+          "event_type": "varchar",
+          "schema_version": "int4",
+          "aggregate_type": "varchar",
+          "aggregate_id": "varchar",
+          "aggregate_version": "int8",
+          "payload": "jsonb",
+          "published_at": "timestamptz"
+        },
+        "missing_historical_columns": [],
+        "missing_fixture_columns": []
+      },
+      {
+        "table": "idempotency_records",
+        "required_columns": [
+          "actor_id",
+          "method",
+          "route_scope",
+          "key",
+          "request_hash",
+          "safe_response",
+          "created_at",
+          "expires_at"
+        ],
+        "historical_column_types": {
+          "actor_id": "int4",
+          "method": "varchar",
+          "route_scope": "varchar",
+          "key": "varchar",
+          "request_hash": "bytea",
+          "safe_response": "jsonb",
+          "created_at": "timestamptz",
+          "expires_at": "timestamptz"
+        },
+        "missing_historical_columns": [],
+        "missing_fixture_columns": []
+      }
+    ],
+    "historical_constraints": [
+      {
+        "table_name": "auth",
+        "name": "PK_auth",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table_name": "auth",
+        "name": "auth_email_normalized_ck",
+        "type": "c",
+        "definition": "CHECK ((((email)::text = lower(btrim((email)::text))) AND ((email)::text <> ''::text)))",
+        "validated": true
+      },
+      {
+        "table_name": "auth",
+        "name": "auth_status_ck",
+        "type": "c",
+        "definition": "CHECK (((status)::text = ANY ((ARRAY['PENDING'::character varying, 'ACTIVE'::character varying, 'SUSPENDED'::character varying, 'DEACTIVATED'::character varying])::text[])))",
+        "validated": true
+      },
+      {
+        "table_name": "auth",
+        "name": "auth_version_ck",
+        "type": "c",
+        "definition": "CHECK (((version >= 1) AND (auth_version >= 1)))",
+        "validated": true
+      },
+      {
+        "table_name": "auth",
+        "name": "unique_key_email",
+        "type": "u",
+        "definition": "UNIQUE (email)",
+        "validated": true
+      },
+      {
+        "table_name": "idempotency_records",
+        "name": "idempotency_expiry_ck",
+        "type": "c",
+        "definition": "CHECK ((expires_at > created_at))",
+        "validated": true
+      },
+      {
+        "table_name": "idempotency_records",
+        "name": "idempotency_hash_ck",
+        "type": "c",
+        "definition": "CHECK ((octet_length(request_hash) > 0))",
+        "validated": true
+      },
+      {
+        "table_name": "idempotency_records",
+        "name": "idempotency_key_ck",
+        "type": "c",
+        "definition": "CHECK ((btrim((key)::text) <> ''::text))",
+        "validated": true
+      },
+      {
+        "table_name": "idempotency_records",
+        "name": "idempotency_records_actor_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (actor_id) REFERENCES auth(id) ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table_name": "idempotency_records",
+        "name": "idempotency_records_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (actor_id, method, route_scope, key)",
+        "validated": true
+      },
+      {
+        "table_name": "refresh_tokens",
+        "name": "refresh_tokens_expiry_ck",
+        "type": "c",
+        "definition": "CHECK ((expires_at > issued_at))",
+        "validated": true
+      },
+      {
+        "table_name": "refresh_tokens",
+        "name": "refresh_tokens_hash_ck",
+        "type": "c",
+        "definition": "CHECK ((octet_length(token_hash) > 0))",
+        "validated": true
+      },
+      {
+        "table_name": "refresh_tokens",
+        "name": "refresh_tokens_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table_name": "refresh_tokens",
+        "name": "refresh_tokens_replaced_by_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (replaced_by) REFERENCES refresh_tokens(id) ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table_name": "refresh_tokens",
+        "name": "refresh_tokens_replaced_by_key",
+        "type": "u",
+        "definition": "UNIQUE (replaced_by)",
+        "validated": true
+      },
+      {
+        "table_name": "refresh_tokens",
+        "name": "refresh_tokens_replacement_ck",
+        "type": "c",
+        "definition": "CHECK (((replaced_by IS NULL) OR ((replaced_by <> id) AND (consumed_at IS NOT NULL))))",
+        "validated": true
+      },
+      {
+        "table_name": "refresh_tokens",
+        "name": "refresh_tokens_session_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table_name": "refresh_tokens",
+        "name": "refresh_tokens_token_hash_key",
+        "type": "u",
+        "definition": "UNIQUE (token_hash)",
+        "validated": true
+      },
+      {
+        "table_name": "sessions",
+        "name": "sessions_expiry_ck",
+        "type": "c",
+        "definition": "CHECK ((expires_at > created_at))",
+        "validated": true
+      },
+      {
+        "table_name": "sessions",
+        "name": "sessions_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table_name": "sessions",
+        "name": "sessions_revocation_ck",
+        "type": "c",
+        "definition": "CHECK (((((status)::text = 'ACTIVE'::text) AND (revoked_at IS NULL)) OR (((status)::text = 'REVOKED'::text) AND (revoked_at IS NOT NULL) AND (revoke_reason IS NOT NULL) AND ((char_length(btrim((revoke_reason)::text)) >= 3) AND (char_length(btrim((revoke_reason)::text)) <= 500)))))",
+        "validated": true
+      },
+      {
+        "table_name": "sessions",
+        "name": "sessions_revoked_by_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (revoked_by) REFERENCES auth(id) ON DELETE RESTRICT",
+        "validated": true
+      },
+      {
+        "table_name": "sessions",
+        "name": "sessions_status_ck",
+        "type": "c",
+        "definition": "CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'REVOKED'::character varying])::text[])))",
+        "validated": true
+      },
+      {
+        "table_name": "sessions",
+        "name": "sessions_user_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (user_id) REFERENCES auth(id) ON DELETE RESTRICT",
+        "validated": true
+      }
+    ],
+    "historical_indexes": [
+      {
+        "tablename": "auth",
+        "indexname": "PK_auth",
+        "indexdef": "CREATE UNIQUE INDEX \"PK_auth\" ON public.auth USING btree (id)"
+      },
+      {
+        "tablename": "auth",
+        "indexname": "auth_status_id_idx",
+        "indexdef": "CREATE INDEX auth_status_id_idx ON public.auth USING btree (status, id)"
+      },
+      {
+        "tablename": "auth",
+        "indexname": "idx_id_email",
+        "indexdef": "CREATE INDEX idx_id_email ON public.auth USING btree (id DESC, email DESC)"
+      },
+      {
+        "tablename": "auth",
+        "indexname": "unique_key_email",
+        "indexdef": "CREATE UNIQUE INDEX unique_key_email ON public.auth USING btree (email)"
+      },
+      {
+        "tablename": "idempotency_records",
+        "indexname": "idempotency_expiry_idx",
+        "indexdef": "CREATE INDEX idempotency_expiry_idx ON public.idempotency_records USING btree (expires_at)"
+      },
+      {
+        "tablename": "idempotency_records",
+        "indexname": "idempotency_records_pkey",
+        "indexdef": "CREATE UNIQUE INDEX idempotency_records_pkey ON public.idempotency_records USING btree (actor_id, method, route_scope, key)"
+      },
+      {
+        "tablename": "refresh_tokens",
+        "indexname": "refresh_tokens_family_idx",
+        "indexdef": "CREATE INDEX refresh_tokens_family_idx ON public.refresh_tokens USING btree (family_id)"
+      },
+      {
+        "tablename": "refresh_tokens",
+        "indexname": "refresh_tokens_pkey",
+        "indexdef": "CREATE UNIQUE INDEX refresh_tokens_pkey ON public.refresh_tokens USING btree (id)"
+      },
+      {
+        "tablename": "refresh_tokens",
+        "indexname": "refresh_tokens_replaced_by_key",
+        "indexdef": "CREATE UNIQUE INDEX refresh_tokens_replaced_by_key ON public.refresh_tokens USING btree (replaced_by)"
+      },
+      {
+        "tablename": "refresh_tokens",
+        "indexname": "refresh_tokens_session_idx",
+        "indexdef": "CREATE INDEX refresh_tokens_session_idx ON public.refresh_tokens USING btree (session_id, expires_at)"
+      },
+      {
+        "tablename": "refresh_tokens",
+        "indexname": "refresh_tokens_token_hash_key",
+        "indexdef": "CREATE UNIQUE INDEX refresh_tokens_token_hash_key ON public.refresh_tokens USING btree (token_hash)"
+      },
+      {
+        "tablename": "sessions",
+        "indexname": "sessions_pkey",
+        "indexdef": "CREATE UNIQUE INDEX sessions_pkey ON public.sessions USING btree (id)"
+      },
+      {
+        "tablename": "sessions",
+        "indexname": "sessions_user_status_expiry_idx",
+        "indexdef": "CREATE INDEX sessions_user_status_expiry_idx ON public.sessions USING btree (user_id, status, expires_at)"
+      }
+    ],
+    "missing_required_columns": [],
+    "migration_gap_identified_from_static_review": false,
+    "notes": [
+      "No DB connected or queried in this run; historical schema does not certify current target deployment.",
+      "Session terminal event uses conceptual lifecycle version 2; no session.version column required.",
+      "Immediate replaced_by FK requires successor row insertion before linking predecessor in the same transaction; conditional consume and ordered locks remain mandatory.",
+      "Session REVOKED requires revoked_at and trimmed revoke_reason length 3..500.",
+      "Token digest column accepts nonempty bytea; application must enforce SHA-256 32-byte format.",
+      "PostgreSQL concurrency and atomicity tests still required; static comparison does not pass SLC-09."
+    ]
+  },
+  "source_sha256": {
+    "go.mod": "a05b62794a650b238d46ee5b8d7c6f296bb072ef81175b6ec2c57c59c6ba937c",
+    "go.sum": "363e2e1a67f505fa916153b41aa524c2b7dd6c72d143506c9f3a6d36d5235c42",
+    "internal/features/auth_feature/credentials.go": "255e2ad71d500a23daf338aabdbca24ac94165ef63a3385387bec0d8f9da9652",
+    "internal/features/auth_feature/login_session.go": "9f855ef6590e31db5c33bdebade3a2e3512801bb9bfceb33576895c25ac52d08",
+    "internal/features/common/transaction.go": "64ba1b5d36d5bd17a17fcd27d34e178cb01959011b21f1868fed49c9cba76b45",
+    "internal/repositories/domain/session.go": "f6d154b207812c283ae32770658029c67986107dc6f314c568073b39ac71716a",
+    "internal/repositories/domain/login.go": "505789bae1757d671b114d1b8b93398d7daadfd56d39dcdfe62d1e95b3ee36b6",
+    "internal/repositories/domain/transaction.go": "d0ee3bbea07edfa27743ef6ab6faaa0881781a36eb39d5eca2a19f96e76df0cd",
+    "internal/repositories/domain/outbox.go": "afcc774761a085bb723cbfdce1a88be6b02345b13db394835defe4072d3fe0e8",
+    "internal/configs/register.service.go": "d033f978e2b9ffd9d0440dac2f9959d8c7202fd43adc9cce0c9d1d2872507aa5",
+    "internal/configs/foundation.go": "8cdf1999024ec442ee50fd80fba56b7876fa14d486203380e58001135c83caec",
+    "internal/interceptors/session_interceptor.go": "4b0f4cd54da6c569e108f200c87e2511b31906d3b4461a5d20184051443a9686",
+    "internal/interceptors/rate_interceptor.go": "0883b89be2c6790eee9f0c5e2a8107fdfe8b1f62168b299ba478a9663162266a",
+    "tests/integration/postgres/fixtures/schema.sql": "9df1e5b40056f22b0bd7c0fbf1a30fefeb3aabae474379aa34476a742fe4c3d2"
+  },
+  "runtime_tests_run": false,
+  "database_connections_opened": false,
+  "migration_seed_or_deployment_run": false,
+  "sibling_files_modified": false,
+  "secret_files_read": false
+}

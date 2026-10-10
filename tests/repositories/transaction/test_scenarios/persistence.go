@@ -13,6 +13,7 @@ import (
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/writer"
 	"github.com/siti-nabila/grpc-auth/pkg/database"
+	"github.com/siti-nabila/grpc-auth/pkg/types"
 	"github.com/siti-nabila/grpc-auth/tests/shared/fixtures"
 	"github.com/siti-nabila/grpc-auth/tests/shared/mocks"
 	"github.com/siti-nabila/grpc-auth/tests/shared/testutils"
@@ -31,7 +32,7 @@ func safePersistence(t *testing.T) {
 			}
 		}
 	}
-	for _, change := range []func(*domain.AuditRequest){func(r *domain.AuditRequest) { r.Actor = nil }, func(r *domain.AuditRequest) { r.Action = strings.Repeat("a", 101) }, func(r *domain.AuditRequest) { r.Reason = strings.Repeat("a", 501) }, func(r *domain.AuditRequest) { r.TraceID = strings.Repeat("a", 101) }, func(r *domain.AuditRequest) { r.After = &domain.SafeSnapshot{SessionID: "opaque-token"} }, func(r *domain.AuditRequest) { r.After = &domain.SafeSnapshot{ReasonCode: "free reason"} }} {
+	for _, change := range []func(*domain.AuditRequest){func(r *domain.AuditRequest) { r.Actor = nil }, func(r *domain.AuditRequest) { r.Action = types.AuditAction(strings.Repeat("a", 101)) }, func(r *domain.AuditRequest) { r.Reason = types.AuditReason(strings.Repeat("a", 501)) }, func(r *domain.AuditRequest) { r.TraceID = strings.Repeat("a", 101) }, func(r *domain.AuditRequest) { r.After = &domain.SafeSnapshot{SessionID: "opaque-token"} }, func(r *domain.AuditRequest) { r.After = &domain.SafeSnapshot{ReasonCode: "free reason"} }} {
 		r := fixtures.Audit()
 		change(&r)
 		if _, err := r.Record(); !errors.Is(err, common.ErrBadRequest) {
@@ -63,7 +64,7 @@ func safePersistence(t *testing.T) {
 func eventCatalog(t *testing.T) {
 	for _, name := range []string{"iam.user.created.v1", "iam.user.profile_updated.v1", "iam.user.status_changed.v1", "iam.user.roles_granted.v1", "iam.user.roles_revoked.v1", "iam.user.application_access_granted.v1", "iam.user.application_access_revoked.v1", "iam.role.created.v1", "iam.role.updated.v1", "iam.role.permissions_changed.v1", "iam.session.revoked.v1", "iam.user.sessions_revoked.v1"} {
 		e := fixtures.Event()
-		e.EventType = name
+		e.EventType = types.EventType(name)
 		if strings.HasPrefix(name, "iam.role.") {
 			e.AggregateType = "role"
 			e.Data = domain.EventData{RoleID: 1, PermissionCodes: []string{"iam.user.read"}}
@@ -71,6 +72,7 @@ func eventCatalog(t *testing.T) {
 		if strings.Contains(name, "roles_") || strings.Contains(name, "application_access_") {
 			e.Data.ChangedRoleIDs = []uint64{2, 3}
 			e.Data.ApplicationID = 1
+			e.Data.ApplicationCode = types.ApplicationCLM
 		}
 		if name == "iam.session.revoked.v1" {
 			e.AggregateType = "session"
@@ -94,6 +96,15 @@ func eventCatalog(t *testing.T) {
 		for _, key := range []string{"event_id", "event_type", "schema_version", "occurred_at", "producer", "aggregate_type", "aggregate_id", "aggregate_version", "actor_user_id", "correlation_id", "causation_id", "traceparent", "data"} {
 			if _, ok := fields[key]; !ok {
 				t.Fatal("missing envelope field", key)
+			}
+		}
+		if fields["event_type"] != name || fields["aggregate_type"] != string(e.AggregateType) {
+			t.Fatal("typed event changed wire values")
+		}
+		if e.Data.ApplicationCode != "" {
+			data, ok := fields["data"].(map[string]any)
+			if !ok || data["application_code"] != "clm" {
+				t.Fatal("typed application code changed wire value")
 			}
 		}
 		if len(fields) != 13 {

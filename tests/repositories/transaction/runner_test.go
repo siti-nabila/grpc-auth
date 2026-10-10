@@ -6,6 +6,9 @@ import (
 	"testing"
 )
 
-func TestBoundRepositories(t *testing.T) { testutils.Run(t, test_scenarios.All()) }
-func TestPersistence(t *testing.T)       { testutils.Run(t, test_scenarios.Persistence()) }
-func TestIdempotencyStore(t *testing.T)  { testutils.Run(t, test_scenarios.IdempotencyStore()) }
+func TestBoundRepositories(t *testing.T)  { testutils.Run(t, test_scenarios.All()) }
+func TestPersistence(t *testing.T)        { testutils.Run(t, test_scenarios.Persistence()) }
+func TestIdempotencyStore(t *testing.T)   { testutils.Run(t, test_scenarios.IdempotencyStore()) }
+func TestSessionPersistence(t *testing.T) { testutils.Run(t, test_scenarios.Session()) }
+func TestPermissionSnapshot(t *testing.T) { testutils.Run(t, test_scenarios.Authorization()) }
+func TestLoginPersistence(t *testing.T)   { testutils.Run(t, test_scenarios.LoginPersistence()) }

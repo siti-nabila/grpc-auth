@@ -31,3 +31,18 @@ func TestPostgresExistingCommands(t *testing.T) {
 func TestPostgresPersistenceCommands(t *testing.T) {
 	testutils.Run(t, test_scenarios.PersistenceCommands())
 }
+
+func TestPostgresLoginProducer(t *testing.T) {
+	testutils.Run(t, test_scenarios.LoginProducer())
+}
+func TestPostgresSessionFoundation(t *testing.T) {
+	testutils.Run(t, test_scenarios.SessionFoundation())
+}
+func TestPostgresSessionProfileConcurrency(t *testing.T) {
+	testutils.Run(t, test_scenarios.SessionProfileConcurrency())
+}
+func TestPostgresSecurityAttempts(t *testing.T) {
+	testutils.Run(t, test_scenarios.SecurityAttemptPersistence())
+}
+
+func TestPostgresRegisteredServer(t *testing.T) { testutils.Run(t, test_scenarios.RegisteredServer()) }

@@ -1,8 +1,11 @@
 package configs
 
 import (
+	"errors"
 	"fmt"
+	"io"
 	"log"
+	"os"
 	"time"
 
 	"github.com/siti-nabila/grpc-auth/pkg/config"
@@ -22,10 +25,14 @@ type (
 		KeepAliveTimeout time.Duration
 		KeepAliveIdle    time.Duration
 
-		Database map[string]database.DBConfig
-		Services map[string]ServiceConfig
-		JWT      JWTConfig
-		Logger   LoggerConfig
+		Database     map[string]database.DBConfig
+		Services     map[string]ServiceConfig
+		JWT          JWTConfig
+		Logger       LoggerConfig
+		TLS          config.TLSConfig
+		ServiceAuth  config.ServiceAuthConfig
+		AccessIssuer config.AccessIssuerConfig
+		AuthLimiter  config.AuthLimiterConfig
 	}
 
 	ServiceConfig struct {
@@ -46,25 +53,40 @@ type (
 // var AppCfg *AppConfig
 
 func (c *AppConfig) LoadConfig() error {
-	v := viper.New()
-	v.SetConfigName("env")
-	v.SetConfigType("yaml")
-	v.AddConfigPath(".")
-
-	if err := v.ReadInConfig(); err != nil {
-		return fmt.Errorf("error when reading config env file: %v", err)
+	f, err := os.Open("env.yaml")
+	if err != nil {
+		return fmt.Errorf("open env configuration: %w", err)
 	}
-
-	if err := v.Unmarshal(c); err != nil {
-		return fmt.Errorf("error when unmarshalling config env file: %v", err)
+	defer f.Close()
+	loaded, err := ReadConfig(f, time.Now())
+	if err != nil {
+		return err
 	}
-	// AppCfg = c
+	*c = *loaded
 	c.SetConfigPackage()
-
-	log.Println("✅ Config loaded from:", v.ConfigFileUsed())
-
+	log.Println("Config loaded from env.yaml")
 	return nil
+}
 
+// ReadConfig parses and validates configuration without publishing global state
+// or opening logger/database/network resources.
+func ReadConfig(reader io.Reader, now time.Time) (*AppConfig, error) {
+	v := viper.New()
+	v.SetConfigType("yaml")
+	if err := v.ReadConfig(reader); err != nil {
+		return nil, errors.New("invalid env configuration YAML")
+	}
+	c := new(AppConfig)
+	if err := v.Unmarshal(c); err != nil {
+		return nil, errors.New("invalid env configuration types")
+	}
+	if err := c.TLS.Validate(); err != nil {
+		return nil, err
+	}
+	if err := c.ServiceAuth.Validate(now); err != nil {
+		return nil, err
+	}
+	return c, nil
 }
 
 func (c *AppConfig) SetConfigPackage() {
@@ -89,6 +111,8 @@ func (c *AppConfig) SetConfigPackage() {
 		KeepAliveTimeout: c.KeepAliveTimeout,
 		KeepAliveIdle:    c.KeepAliveIdle,
 		Database:         c.Database,
+		AccessIssuer:     c.AccessIssuer,
+		AuthLimiter:      c.AuthLimiter,
 		Services:         cfgSvcs,
 		JWT: config.JWTConfig{
 			SecretKey: c.JWT.SecretKey,

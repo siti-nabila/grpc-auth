@@ -58,7 +58,11 @@ grpc-auth/
 
 3. **Configure environment**
    
-   Copy `env.example.yaml` to `env.yaml`, then fill in your local database credentials and JWT secret. `env.yaml` is ignored by Git:
+   Copy `env.example.yaml` to `env.yaml`, then fill in local database credentials,
+   Ed25519 issuer key paths, a separate limiter HMAC secret, TLS certificate/key
+   paths and service caller digest/expiry.
+   See [service authentication](docs/service-authentication.md) for credential
+   provisioning, allowlists and rotation. `env.yaml` is ignored by Git:
    ```bash
    cp env.example.yaml env.yaml
    ```
@@ -111,10 +115,16 @@ packages are maintained in the separate `api-contracts` repository.
 
 ## 📡 API Usage
 
+The default server composes all six RPCs with the session foundation pipeline.
+Legacy HS256 and sid-less tokens are rejected. Register returns PENDING metadata
+and an empty token; activation remains an administrator workflow. Initial refresh
+issuance does not provide a RefreshSession endpoint. Backend wiring is complete;
+[the external deployment gate](docs/foundation-activation-readiness.md) remains open.
+
 ### Register User
 
 ```bash
-grpcurl -plaintext \
+grpcurl -cacert "$AUTH_CA_FILE" -H "x-service-token: $SERVICE_TOKEN" \
   -d '{"email": "user@example.com", "password": "password123"}' \
   localhost:50051 user.v1.UserService/Register
 ```
@@ -122,7 +132,7 @@ grpcurl -plaintext \
 ### Login
 
 ```bash
-grpcurl -plaintext \
+grpcurl -cacert "$AUTH_CA_FILE" -H "x-service-token: $SERVICE_TOKEN" \
   -d '{"email": "user@example.com", "password": "password123"}' \
   localhost:50051 user.v1.UserService/Login
 ```
@@ -130,25 +140,21 @@ grpcurl -plaintext \
 ### Test RPC
 
 ```bash
-grpcurl -plaintext \
+grpcurl -cacert "$AUTH_CA_FILE" -H "x-service-token: $SERVICE_TOKEN" \
   localhost:50051 user.v1.UserService/TesRPC
 ```
 
+The RPC examples require a target hostname matching the server certificate SAN.
+`AUTH_CA_FILE` and `SERVICE_TOKEN` refer to values supplied locally by the caller
+owner; do not commit them.
+
 ## 🗄️ Database Setup
 
-Create the required database schema:
-
-```sql
-CREATE TABLE IF NOT EXISTS users (
-  id SERIAL PRIMARY KEY,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  password VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX idx_users_email ON users(email);
-```
+Use the auth/session/RBAC/audit/outbox schema specified in
+[the management spec](docs/user-management-spec.md). Startup requires the primary
+`Database.User` PostgreSQL pool and does not run migrations or seed an admin.
+Verify schema and a minimal ACTIVE administrator before deployment through the
+[readiness checklist](docs/foundation-activation-readiness.md).
 
 ## 📝 Configuration
 
@@ -174,8 +180,12 @@ Database:
     Name: user
     Driver: postgres
 
-JWT:
-  SecretKey: "" # Set a private JWT secret locally
+AccessIssuer:
+  PrivateKeyFile: "" # PKCS#8 Ed25519 private PEM path
+  PublicKeyFile: "" # Matching PKIX public PEM path
+  KeyVersion: ""
+AuthLimiter:
+  AccountHMACSecret: "" # Separate private secret
 
 Logger:
   HTTPMode: json               # or 'text'
@@ -204,10 +214,12 @@ Logger:
 
 ## 🔐 Security
 
-- JWT-based authentication with configurable expiration
-- Password storage (implement hashing in production)
-- Database connection pooling with limits
-- SQL query logging for debugging (disable in production)
+- TLS and separate opaque service authentication for every RPC
+- EdDSA access tokens backed by authoritative primary session state
+- PENDING registration without credentials; Login only for ACTIVE accounts
+- Argon2id password storage and atomic session/refresh/audit creation
+- Primary permission checks and locked self-profile updates
+- Reused database pools; sensitive foundation SQL debugging disabled
 
 ## 📊 Logging
 

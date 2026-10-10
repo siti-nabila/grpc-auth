@@ -1,0 +1,181 @@
+{
+  "change": "auth-login-session-producer",
+  "recorded_at_utc": "2026-10-10T11:37:13.299940+00:00",
+  "deliverable_head": "b89f37270d019c8d0d7823a3ff5d3526874d2232",
+  "deliverable_worktree": "uncommitted",
+  "baseline_recorded_at_utc": "2026-10-10T10:32:09.911424+00:00",
+  "progress": {
+    "complete": 29,
+    "total": 29
+  },
+  "component_ready": true,
+  "activation_ready": false,
+  "default_registration_changed": false,
+  "versions": {
+    "go": "go1.26.2",
+    "orm": "v1.7.0",
+    "published_api_contracts": "v0.0.0-20261010071509-42a9e6fa23ad"
+  },
+  "verification_command_prefix": "rtk proxy env GOCACHE=/tmp/grpc-auth-producer-go-cache",
+  "commands": [
+    {
+      "command": "go test ./...",
+      "actual": "PASS"
+    },
+    {
+      "command": "go vet ./...",
+      "actual": "PASS"
+    },
+    {
+      "command": "go test -race ./tests/features/auth_feature/... ./tests/integration/auth_reads/... ./tests/ratelimit/... ./tests/interceptors/...",
+      "actual": "PASS"
+    },
+    {
+      "command": "make build",
+      "actual": "PASS"
+    },
+    {
+      "command": "GOWORK=off go test ./...",
+      "actual": "PASS"
+    },
+    {
+      "command": "GOWORK=off go build ./...",
+      "actual": "PASS_WITH_NONFATAL_STAT_CACHE_WARNING"
+    },
+    {
+      "command": "go test -tags=postgres ./tests/integration/postgres -run '^TestPostgresConfiguration$'",
+      "actual": "PASS_GUARD_ONLY"
+    },
+    {
+      "command": "go test ./... (after resume)",
+      "actual": "PASS"
+    },
+    {
+      "command": "go vet ./... (after resume)",
+      "actual": "PASS"
+    },
+    {
+      "command": "go test -race ./...",
+      "actual": "PASS"
+    },
+    {
+      "command": "go vet -tags=postgres ./tests/integration/postgres/...",
+      "actual": "PASS"
+    },
+    {
+      "command": "GOWORK=off go test ./... (after resume)",
+      "actual": "PASS"
+    },
+    {
+      "command": "go test -tags=postgres ./tests/integration/postgres -count=1 -v (private guarded YAML environment bridge)",
+      "actual": "PASS"
+    },
+    {
+      "command": "go test -race -tags=postgres ./tests/integration/postgres -count=1 -v (private guarded YAML environment bridge)",
+      "actual": "PASS"
+    },
+    {
+      "command": "GOWORK=off go test -tags=postgres ./tests/integration/postgres -run '^TestPostgresLoginProducer$' -count=1 -v (private guarded YAML environment bridge)",
+      "actual": "PASS"
+    },
+    {
+      "command": "openspec validate auth-login-session-producer --strict; openspec validate --specs",
+      "actual": "PASS"
+    },
+    {
+      "command": "gofmt -l changed Go files; scoped links/whitespace/hash/status/diff review",
+      "actual": "PASS"
+    }
+  ],
+  "source_go_files_changed_since_apply_baseline": 44,
+  "file_sha256": {
+    ".gitignore": "5e344a2ca36ae3f9eca2f2f0ceaf2d5ef06b158351f7ba53478e874fc5dc7e38",
+    "docs/login-session-producer.md": "ab079108b6af11c9ce0abfc2b56f86f20865fd8a3f9f2e85e2e2eaa3e184f706",
+    "env.example.yaml": "4521c9560bb2b1e4bf7aadcb7051f3bcb86ada5cec68cacebc94b02e5da271d3",
+    "internal/configs/env.go": "15b7b728ba489d4ad7eaf6abcd02ff42a1a25325f85a253c623db7863eb17aa4",
+    "internal/configs/login.go": "7321de32ee47b5c158577feb382b21d3b63e16dcda35ff690e957e4cfcd0337f",
+    "internal/configs/login_producer.go": "4628ac30b89cfb354c8298233986712ddf77097fd9dfeb5045c1cc7b07c108bc",
+    "internal/features/auth_feature/credentials.go": "5bd21b861711e5b317bfe16e845e246288def2f9c505178e7ee40bd8ac0e97a4",
+    "internal/features/auth_feature/login_failure.go": "f614df06e3210004c0c895a8bbd385e4e5be10349324c0d33c1742623027dc20",
+    "internal/features/auth_feature/login_password.go": "5d58fca778fe9d8e62d0b36cda8bc74468ea3847cc15139ad02c91d724c8fab8",
+    "internal/features/auth_feature/login_session.go": "e600b75f9394380e807519c8cc58c7d42f2c58ff77e8bbf663e25d80158a7ac7",
+    "internal/features/auth_feature/login_session_impl.go": "bcc5b47751c48095d5feb741c9f93520c815317ad3861a5a35f1a642f7ec474b",
+    "internal/handler/login_session.go": "766d33ddec0c2e10143c6607f11fa0acb93e06dae499d72d031b97e92676c056",
+    "internal/interceptors/rate_interceptor.go": "a7075989a678ff1b097465b0fa7db63b00d02680847d0e1b308ec5b51b506b55",
+    "internal/interceptors/session_interceptor.go": "d379cc09d0b6d4a50f371bebfbafc3bf83be54e6020381c1b8dc1e76d8699d60",
+    "internal/ratelimit/store.go": "fe7ef885c4b183fd3dda304ceb6b26938cfe30f87f82f55c3899df906d024bdc",
+    "internal/repositories/domain/login.go": "3cbdc75d64ec6f386b6248dba19284c15b65dcfa620c306f0c81516b9e9c6383",
+    "internal/repositories/reader/login.go": "9ed5bdfd8e827c9d5dc9a1a07b63c21600bf8013e3b4f8e2c65b28198b06cc52",
+    "internal/repositories/writer/refresh.go": "c203e891ceb7f2136b13473235f1615d1755c88f995036a46defb20c4e6e90f8",
+    "openspec/changes/auth-login-session-producer/.openspec.yaml": "e61703315c59969805e021ec521ca189369aaf8ea902d52c5e39c7fbc603598f",
+    "openspec/changes/auth-login-session-producer/design.md": "8d8042de81eb399be867f2dcb2c8195aabc3e8b8172a12d5be49d3adedf0000d",
+    "openspec/changes/auth-login-session-producer/evidence.md": "3c8d819aaa83a85c5afb8c2dd469d731b4b172da2cfc1c0864424974119cfdfd",
+    "openspec/changes/auth-login-session-producer/postgres-producer-verification.json": "ed3e69863b67916ec2a1df56c6eff6361da4fd4d461dc498df09e017729c20c1",
+    "openspec/changes/auth-login-session-producer/proposal.md": "864cfe7792234b7133fa7299c02c5272f71e5b78cffee79c1e80262628aea360",
+    "openspec/changes/auth-login-session-producer/specs/eddsa-access-issuance/spec.md": "171e7c208bf8512dbf61874ede1967958e1637aa03d032ecaa31f8ca45445413",
+    "openspec/changes/auth-login-session-producer/specs/local-auth-rate-limiting/spec.md": "b240f16b1fbdef15406655a922cf7b56460cc39c633649c2a5db439d531802a8",
+    "openspec/changes/auth-login-session-producer/specs/login-session-issuance/spec.md": "5193ba1dac7ec8312b21da0a757c6776350c0324cf426f3188a314e5d76b0393",
+    "openspec/changes/auth-login-session-producer/tasks.md": "f69f77f5662d405d778ab17e54adcff96c495b736d3b1a2d426c2b024c601183",
+    "pkg/config/config.go": "0c2e6d5ec7dd48d7c9cf7884e97d33f82e009568237b370e4a38038124df6e50",
+    "pkg/config/login.go": "101b98133465260c39773bae647296cbe586493612204b5c0b21935f4108b946",
+    "pkg/jwt/issuer.go": "d5bab0c03019c35dc256f7838f555def64ce26ad368d3d5bd596b14a94105d8f",
+    "tests/configs/runner_test.go": "264a0111e2105c3330d0de21ea4dcd087ec512fa24d1cf49998d35ce432a2d55",
+    "tests/configs/test_scenarios/login.go": "59fc036fb365ce08c7fffa4f9fbd7d5e27e2f7009497ff885f8748cb460f8157",
+    "tests/features/auth_feature/mocks/login.go": "4d3f43a9ee17cba970430cbc85b38eefc0a5b73ae5c4904fa8ccefe86a7b8e33",
+    "tests/features/auth_feature/runner_test.go": "dfbec0505583826293c52e9b3d44a67e5b9710f398c2b77123895ddf7d6eed05",
+    "tests/features/auth_feature/test_scenarios/credentials.go": "dd7c7e67a0b88d5f1a63d7eb742623f469ce6b8445897c904371a29dcdfa7970",
+    "tests/features/auth_feature/test_scenarios/login_failure.go": "c7654d9a27762227452c14ef86c638456d30880df1ac239199cf98f5a1c89622",
+    "tests/features/auth_feature/test_scenarios/login_session.go": "8b52198c6dd3cc4eb23ec5961bf88f878acbb4cfbd657e4718036c12156c43fa",
+    "tests/handler/mocks/login.go": "efb9ec975f5b8b1264b1404763178950b98143d9bd9248bc1a20d7d87ace2b8a",
+    "tests/handler/runner_test.go": "0d1431a7e32b9bbf533f1b6ffbf309641c7e67125318e442c2f24962f4b2a2df",
+    "tests/handler/test_scenarios/login_session.go": "ef84d96cf66e0779554b8bbd63dae35ad57ae31f055e4efb30c0e0cabafed40d",
+    "tests/integration/auth_reads/runner_test.go": "d418c898562516e3bbbc920cf2ce95ea5ee7e8e2b38381d5ca3f593d81a3ff23",
+    "tests/integration/auth_reads/test_scenarios/producer.go": "b5cf9d7067c6d58291afea248d21b485c90a5ecb9f5ca456be4a7ce7b4771260",
+    "tests/integration/postgres/README.md": "df747ebf365bd8f431702b49d9a7ab10f8795afb8f7adcf2c1a74f7fb4b04cda",
+    "tests/integration/postgres/fixtures/schema.sql": "dfb95567c9d308169e2e77e12793ef89a42bb7fa21053a5fdcc1fb174fc670e2",
+    "tests/integration/postgres/runner_test.go": "dffb3879f27bca7d2d488947e9137796d2e7fb57c1d0c2a0d4ca30eaa0e277c6",
+    "tests/integration/postgres/test_scenarios/login.go": "6221655d837970a7580d6e27603c1fb6f1d57362bb9468cb1457f8c6018779f6",
+    "tests/integration/postgres/test_scenarios/login_race.go": "6684b656671f0652c390388e60399acd21a1852f31fc4ee277d51042eed04b46",
+    "tests/integration/postgres/test_scenarios/login_support.go": "2e85ca30bcf40431e60e56401e348c523f8ef61d49da04d9e4dae5238020880a",
+    "tests/interceptors/runner_test.go": "4b4c1f57b05f0880517b7e515992b0f4c8a4ddec6b2a322099517b1809dc2ad9",
+    "tests/interceptors/test_scenarios/rate.go": "03064c56429ecf1976d2f2a8d3317523c2e362f867301ac52507edb73ae76a5c",
+    "tests/pkg/jwt/runner_test.go": "e47f06bb6fe9ab72ed253ea79fb02c3a86f91c3473b137cefb64970ec669cca4",
+    "tests/pkg/jwt/test_scenarios/issuer.go": "2d59bfcea95fa7a509144144f436dce723514578101d88242301cdd41e503dc7",
+    "tests/ratelimit/runner_test.go": "fa2d1b881fe3d29a44cbe35749b2494d5c2eef5ec4fd35a62f907d2cf51613e5",
+    "tests/ratelimit/test_scenarios/store.go": "0decdcb487dc3d5813d1220ca437cb8c7dbcba1432deba353f1e0f79306311f9",
+    "tests/repositories/transaction/runner_test.go": "75916f63df0d04ffc8b448012603194a7f4b3b2cf647c58bc5806cbf7044884a",
+    "tests/repositories/transaction/test_scenarios/login.go": "499623469c0c99e87b16dd280e5358cf00aa8045642f521cc9578552652efca9",
+    "tests/shared/fixtures/issuer.go": "5d1bed59fd09e468b14115335760b958d3259d7594ba8bf02a7f87f9faf57a4c",
+    "tests/shared/fixtures/login.go": "501dc359d846b5487280eaf5eef972f83fecea30fbc90e9a1144c830d7f0be40"
+  },
+  "preserved_baseline_hashes": {
+    "go.mod": "a05b62794a650b238d46ee5b8d7c6f296bb072ef81175b6ec2c57c59c6ba937c",
+    "go.sum": "363e2e1a67f505fa916153b41aa524c2b7dd6c72d143506c9f3a6d36d5235c42",
+    "internal/configs/server.go": "0a6410fdc37f0fdc3997cc8b9052b3e61b6b90841a4f6ef95a88f5787312bbde"
+  },
+  "postgres": {
+    "status": "PASS",
+    "database": "grpc_auth_test",
+    "server_version": "16.13",
+    "explicit_opt_in_present": true,
+    "dsn_provided_privately": true,
+    "expected_database_guard": true,
+    "producer_specific_scenarios_implemented": true,
+    "remaining_fixture_schemas": 0,
+    "report": "postgres-producer-verification.json"
+  },
+  "limitations": [
+    "Foundation consumers and external key/client/IP/deployment readiness remain open; default server not switched",
+    "Default test suite intentionally excludes postgres-tagged tests",
+    "Password/status concurrency uses controlled fixture mutation under canonical user lock, not production lifecycle RPC",
+    "Response-loss semantics use repeated successful Login, without network fault injection",
+    "Earlier release build exit 0 with nonfatal sandbox module stat-cache warning; production source unchanged during resume"
+  ],
+  "remaining_tasks": [],
+  "historical_command_results": [
+    {
+      "command": "go test -tags=postgres ./tests/integration/postgres -run '^TestPostgresEnvironment$' -count=1",
+      "actual": "BLOCKED_EXPLICIT_OPT_IN_ABSENT"
+    }
+  ]
+}

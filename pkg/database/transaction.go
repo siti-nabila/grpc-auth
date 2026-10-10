@@ -24,7 +24,21 @@ func NewTransactionProvider(db *sql.DB, d dialect.Dialector, cfg ormconfig.Confi
 }
 
 func (p *TransactionProvider) Begin(ctx context.Context) (domain.Transaction, error) {
-	tx, err := p.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted})
+	return p.begin(ctx, sql.TxOptions{Isolation: sql.LevelReadCommitted})
+}
+
+func (p *TransactionProvider) BeginSnapshot(ctx context.Context) (domain.Transaction, error) {
+	return p.begin(ctx, sql.TxOptions{Isolation: sql.LevelRepeatableRead, ReadOnly: true})
+}
+
+func (p *TransactionProvider) begin(ctx context.Context, options sql.TxOptions) (domain.Transaction, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	if p.db == nil {
+		return nil, common.ErrDependencyUnavailable
+	}
+	tx, err := p.db.BeginTx(ctx, &options)
 	if err != nil {
 		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 			return nil, err

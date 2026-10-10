@@ -23,6 +23,9 @@ import (
 
 func All() []testutils.Scenario {
 	return []testutils.Scenario{
+		{Name: "service credentials require secure unambiguous metadata", Run: serviceCredentialValidation},
+		{Name: "caller policy is immutable exact and rotation is bounded", Run: serviceRotationPolicy},
+		{Name: "verified callers are safe for concurrent requests", Run: concurrentServiceCallers},
 		{Name: "transaction errors preserve locale identity cause and legacy mappings", Run: encodeTransactionErrors},
 		{
 			Name: "encodes error with request-scoped language",

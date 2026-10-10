@@ -10,3 +10,6 @@ import (
 func TestInterceptors(t *testing.T) {
 	testutils.Run(t, test_scenarios.All())
 }
+
+func TestAuthRateLimiter(t *testing.T)  { testutils.Run(t, test_scenarios.Rate()) }
+func TestSecurityAttempts(t *testing.T) { testutils.Run(t, test_scenarios.SecurityAttempts()) }

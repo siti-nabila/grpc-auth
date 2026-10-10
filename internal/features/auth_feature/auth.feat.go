@@ -10,7 +10,6 @@ import (
 	"github.com/siti-nabila/grpc-auth/internal/features/common"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/internal/sessions"
-	"golang.org/x/sync/errgroup"
 )
 
 func (a *authService) Register(request domain.AuthRequest) (token *string, err error) {
@@ -101,59 +100,31 @@ func (a *authService) Login(request domain.AuthRequest) (*string, error) {
 	return token, nil
 }
 
-func (a *authService) GetUserData() (res userv1.UserData, err error) {
-	var (
-		authData    domain.Auth
-		profileData domain.Profile
-		RolesData   []domain.Role
-	)
-	roleCodes := make([]int32, 0)
-	roleNames := make([]string, 0)
+// The legacy consumer is retained until coordinated activation. Reads are
+// sequential to avoid sharing errors and slices across goroutines. The prepared
+// session consumer uses ReadUserDataSnapshot for authoritative snapshot reads.
+func (a *authService) GetUserData() (userv1.UserData, error) {
 	userSession, err := sessions.GetUserSession(a.ctx)
 	if err != nil {
 		return userv1.UserData{}, err
 	}
-
-	g, _ := errgroup.WithContext(a.ctx)
-	g.Go(func() error {
-		authData, err = a.authReader.GetById(userSession.UserId)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-	g.Go(func() error {
-		profileData, err = a.profileReader.GetByUserId(userSession.UserId)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-	g.Go(func() error {
-		RolesData, err = a.userRoleReader.GetRolesByUserId(userSession.UserId)
-		if err != nil {
-			return err
-		}
-		for _, role := range RolesData {
-			roleCodes = append(roleCodes, int32(role.Code))
-			roleNames = append(roleNames, role.Name)
-		}
-		return nil
-	})
-
-	if err = g.Wait(); err != nil {
+	authData, err := a.authReader.GetById(userSession.UserId)
+	if err != nil {
 		return userv1.UserData{}, err
 	}
-	// protoProfile := profileData.ToProfileResponse()
-	// protoAuth := authData.ToUserDataResponse()
-
-	return userv1.UserData{
-		Id:        authData.Id,
-		Email:     authData.Email,
-		Fullname:  profileData.Name,
-		Address:   profileData.Address,
-		Phone:     profileData.Phone,
-		RoleCodes: roleCodes,
-		RoleNames: roleNames,
-	}, nil
+	profileData, err := a.profileReader.GetByUserId(userSession.UserId)
+	if err != nil {
+		return userv1.UserData{}, err
+	}
+	roles, err := a.userRoleReader.GetRolesByUserId(userSession.UserId)
+	if err != nil {
+		return userv1.UserData{}, err
+	}
+	codes := make([]int32, 0, len(roles))
+	names := make([]string, 0, len(roles))
+	for _, role := range roles {
+		codes = append(codes, int32(role.Code))
+		names = append(names, role.Name)
+	}
+	return userv1.UserData{Id: authData.Id, Email: authData.Email, Fullname: profileData.Name, Address: profileData.Address, Phone: profileData.Phone, RoleCodes: codes, RoleNames: names}, nil
 }

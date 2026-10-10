@@ -10,3 +10,6 @@ import (
 func TestHandler(t *testing.T) {
 	testutils.Run(t, test_scenarios.All())
 }
+
+func TestSessionLoginHandler(t *testing.T)    { testutils.Run(t, test_scenarios.SessionLogin()) }
+func TestSessionCommandHandlers(t *testing.T) { testutils.Run(t, test_scenarios.SessionCommands()) }

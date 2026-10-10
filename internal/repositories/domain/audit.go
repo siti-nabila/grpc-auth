@@ -2,10 +2,12 @@ package domain
 
 import (
 	"encoding/json"
-	"github.com/siti-nabila/api-contracts/pkg/dictionary/common"
 	"strings"
 	"time"
 	"unicode/utf8"
+
+	"github.com/siti-nabila/api-contracts/pkg/dictionary/common"
+	"github.com/siti-nabila/grpc-auth/pkg/types"
 )
 
 // AuditActor is created only after the consumer has authenticated the caller.
@@ -31,12 +33,12 @@ func ActorForVerifiedService(id string) (*AuditActor, error) {
 
 type AuditRequest struct {
 	Actor      *AuditActor
-	Action     string
-	TargetType string
+	Action     types.AuditAction
+	TargetType types.AuditTarget
 	TargetID   string
 	Before     *SafeSnapshot
 	After      *SafeSnapshot
-	Reason     string
+	Reason     types.AuditReason
 	RequestID  string
 	TraceID    string
 	OccurredAt time.Time
@@ -63,7 +65,7 @@ type AuditRecord struct {
 func (AuditRecord) TableName() string { return "audit_logs" }
 
 func (r AuditRequest) Record() (*AuditRecord, error) {
-	if r.Actor == nil || (r.Actor.userID == nil && r.Actor.service == nil) || !boundedText(r.Action, 100, true) || !boundedText(r.TargetType, 50, true) || !boundedText(r.TargetID, 100, true) || !boundedText(r.Reason, 500, false) || !boundedText(r.RequestID, 100, false) || !boundedText(r.TraceID, 100, false) || r.OccurredAt.IsZero() {
+	if r.Actor == nil || (r.Actor.userID == nil && r.Actor.service == nil) || !boundedText(string(r.Action), 100, true) || !boundedText(string(r.TargetType), 50, true) || !boundedText(r.TargetID, 100, true) || !boundedText(string(r.Reason), 500, false) || !boundedText(r.RequestID, 100, false) || !boundedText(r.TraceID, 100, false) || r.OccurredAt.IsZero() {
 		return nil, common.ErrBadRequest
 	}
 	before, err := encodeSnapshot(r.Before)
@@ -74,7 +76,7 @@ func (r AuditRequest) Record() (*AuditRecord, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &AuditRecord{ActorUserID: r.Actor.userID, ActorService: r.Actor.service, Action: r.Action, TargetType: r.TargetType, TargetID: r.TargetID, SafeBefore: before, SafeAfter: after, Reason: optionalText(r.Reason), RequestID: optionalText(r.RequestID), TraceID: optionalText(r.TraceID), OccurredAt: r.OccurredAt.UTC()}, nil
+	return &AuditRecord{ActorUserID: r.Actor.userID, ActorService: r.Actor.service, Action: string(r.Action), TargetType: string(r.TargetType), TargetID: r.TargetID, SafeBefore: before, SafeAfter: after, Reason: optionalText(string(r.Reason)), RequestID: optionalText(r.RequestID), TraceID: optionalText(r.TraceID), OccurredAt: r.OccurredAt.UTC()}, nil
 }
 
 func encodeSnapshot(snapshot *SafeSnapshot) (*string, error) {

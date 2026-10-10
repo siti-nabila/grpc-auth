@@ -1,18 +1,23 @@
 package configs
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
 	"os"
 	"os/signal"
+	"sort"
+	"sync"
 	"syscall"
 
 	"github.com/siti-nabila/api-contracts/pkg/grpcerror"
 	"github.com/siti-nabila/api-contracts/pkg/grpcerror/mapping"
 
 	"github.com/siti-nabila/grpc-auth/internal/interceptors"
+	"github.com/siti-nabila/grpc-auth/internal/serviceauth"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/keepalive"
 )
@@ -22,16 +27,34 @@ type (
 		Server   *grpc.Server
 		Config   *AppConfig
 		Services map[string]*grpc.ClientConn
+		cancel   context.CancelFunc
+		done     chan struct{}
+		stop     sync.Once
 	}
 )
 
-func NewGRPCServer(cfg *AppConfig, register func(*grpc.Server)) *GRPCServerClient {
-	// Implementation for creating a new gRPC server using the provided AppConfig{
+func NewGRPCServer(cfg *AppConfig, pipeline ServerPipeline) (*GRPCServerClient, error) {
+	if cfg == nil {
+		return nil, fmt.Errorf("server configuration is required")
+	}
+	if err := pipeline.validate(); err != nil {
+		return nil, err
+	}
+	tlsConfig, err := serverTLS(cfg.TLS, pipeline.Now())
+	if err != nil {
+		return nil, err
+	}
+	tlsConfig.Time = pipeline.Now
+	verifier, err := serviceauth.NewVerifier(cfg.ServiceAuth, pipeline.Now)
+	if err != nil {
+		return nil, err
+	}
 	var mappings []grpcerror.CodeMapping
 	mappings = append(mapping.CommonCodeMappings(), mapping.AuthCodeMappings()...)
 	mappings = append(mappings, mapping.UserCodeMappings()...)
 	errorEncoder := grpcerror.NewEncoder(mappings...)
 	opts := []grpc.ServerOption{
+		grpc.Creds(credentials.NewTLS(tlsConfig)),
 		grpc.ConnectionTimeout(cfg.Timeout),
 		grpc.KeepaliveParams(keepalive.ServerParameters{
 			MaxConnectionIdle: cfg.KeepAliveIdle,
@@ -42,35 +65,46 @@ func NewGRPCServer(cfg *AppConfig, register func(*grpc.Server)) *GRPCServerClien
 		grpc.ChainUnaryInterceptor(
 			interceptors.LanguageInterceptor,
 			interceptors.NewErrorInterceptor(errorEncoder),
-			interceptors.TokenInterceptor(cfg.JWT.SecretKey),
+			interceptors.ServiceInterceptor(verifier),
+			pipeline.Attempt,
+			pipeline.Session,
+			pipeline.Rate,
 		),
 	}
 
 	server := grpc.NewServer(opts...)
-	if register != nil {
-		register(server)
-	}
+	pipeline.Register(server)
 	svr := &GRPCServerClient{
 		Server:   server,
 		Config:   cfg,
 		Services: make(map[string]*grpc.ClientConn),
 	}
 
-	if len(cfg.Services) != 0 {
-		for svcName, v := range cfg.Services {
-			conn, err := dialService(v)
-			if err != nil {
-				fmt.Println("failed to connect to service: ", err)
-			}
-			svr.Services[svcName] = conn
+	names := make([]string, 0, len(cfg.Services))
+	for name := range cfg.Services {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	for _, name := range names {
+		conn, err := dialService(cfg.Services[name])
+		if err != nil {
+			svr.Stop()
+			return nil, fmt.Errorf("cannot configure outbound gRPC service: %w", err)
 		}
+		svr.Services[name] = conn
 	}
 
-	return svr
+	ctx, cancel := context.WithCancel(context.Background())
+	svr.cancel, svr.done = cancel, make(chan struct{})
+	go func() { defer close(svr.done); pipeline.Cleanup(ctx) }()
+	return svr, nil
 
 }
 
 func dialService(serviceConfig ServiceConfig) (*grpc.ClientConn, error) {
+	if serviceConfig.Host == "" || serviceConfig.Port < 1 || serviceConfig.Port > 65535 {
+		return nil, fmt.Errorf("outbound gRPC host and valid port are required")
+	}
 	addrs := fmt.Sprintf("%s:%d", serviceConfig.Host, serviceConfig.Port)
 
 	opts := []grpc.DialOption{
@@ -92,6 +126,7 @@ func (s *GRPCServerClient) Start() error {
 	addrs := fmt.Sprintf("%s:%d", s.Config.Host, s.Config.Port)
 	lis, err := net.Listen("tcp", addrs)
 	if err != nil {
+		s.Stop()
 		log.Println("err listen: ", err)
 		return err
 	}
@@ -100,7 +135,7 @@ func (s *GRPCServerClient) Start() error {
 	// Jalankan server dalam goroutine agar tidak blocking
 	go func() {
 		if err := s.Server.Serve(lis); err != nil {
-			fmt.Println("[gRPC] server stopped with error: ", err)
+			s.Stop()
 		}
 	}()
 
@@ -108,22 +143,39 @@ func (s *GRPCServerClient) Start() error {
 }
 
 func (s *GRPCServerClient) GracefulStop() {
-	fmt.Println("[gRPC] stopping server...")
+	s.stop.Do(func() { s.Server.GracefulStop(); s.closeResources() })
+}
 
-	if len(s.Services) != 0 {
-		for name, conn := range s.Services {
-			fmt.Printf("[gRPC] closing client connection: %s\n", name)
-			conn.Close()
+func (s *GRPCServerClient) Stop() {
+	s.stop.Do(func() { s.Server.Stop(); s.closeResources() })
+}
+
+func (s *GRPCServerClient) closeResources() {
+	if s.cancel != nil {
+		s.cancel()
+		<-s.done
+	}
+	s.closeServices()
+}
+
+func (s *GRPCServerClient) closeServices() {
+	names := make([]string, 0, len(s.Services))
+	for name := range s.Services {
+		names = append(names, name)
+	}
+	sort.Sort(sort.Reverse(sort.StringSlice(names)))
+	for _, name := range names {
+		conn := s.Services[name]
+		if conn != nil {
+			_ = conn.Close()
 		}
 	}
-
-	s.Server.GracefulStop()
-	fmt.Println("[gRPC] server stopped gracefully")
 }
 
 func (s *GRPCServerClient) WaitForShutdown() {
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
+	defer signal.Stop(stop)
 	<-stop
 	fmt.Println("\n🛑 Received shutdown signal, exiting...")
 }

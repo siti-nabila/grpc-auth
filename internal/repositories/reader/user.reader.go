@@ -3,11 +3,61 @@ package reader
 import (
 	"context"
 	"database/sql"
+	"errors"
 
+	"github.com/siti-nabila/api-contracts/pkg/dictionary/common"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/pkg/database"
 	"github.com/siti-nabila/orm/orm"
+	ormdictionary "github.com/siti-nabila/orm/pkg/dictionary"
 )
+
+type snapshotUserReader struct {
+	ctx    context.Context
+	handle domain.QueryReader
+}
+
+// NewUserReaderInSnapshot never obtains a pool connection. The feature owns
+// the injected read transaction, including authorization and page queries.
+func NewUserReaderInSnapshot(ctx context.Context, handle domain.QueryReader) domain.UserReader {
+	return &snapshotUserReader{ctx: ctx, handle: handle}
+}
+
+func (r *snapshotUserReader) SearchUsers(opts orm.QueryOptions, filter domain.UserListFilter) (orm.PageData[domain.UserSearchRow], error) {
+	if err := r.ctx.Err(); err != nil {
+		return orm.PageData[domain.UserSearchRow]{}, err
+	}
+	if r.handle == nil {
+		return orm.PageData[domain.UserSearchRow]{}, common.ErrDependencyUnavailable
+	}
+	rows := make([]domain.UserSearchRow, 0)
+	fields := &userReader{}
+	res, err := orm.QueryPageWithConfig(r.ctx, buildUserListQuery(r.handle, filter).WithContext(r.ctx), &rows,
+		orm.QueryPageConfig{AllowedFields: fields.AllowedFields(), SearchFields: fields.SearchFields()}, opts)
+	return res, userPageError(err)
+}
+
+func userPageError(err error) error {
+	if err == nil || errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		return err
+	}
+	// ORM returns both option validation and raw driver failures. Only known
+	// frontend option errors are validation; a driver failure cannot become allow.
+	for _, invalid := range []error{
+		ormdictionary.ErrColumnNotFound, ormdictionary.ErrInvalidWhereOperator,
+		ormdictionary.ErrInvalidSearchMode, ormdictionary.ErrUnsupportedSearchModeForDialect,
+		ormdictionary.ErrInvalidFullTextLanguage, ormdictionary.ErrInvalidFullTextOperator,
+		ormdictionary.ErrFullTextColumnRequired, ormdictionary.ErrSearchFieldNotAllowed,
+		ormdictionary.ErrSearchModeNotAllowedForField, ormdictionary.ErrFullTextOperatorRequiresFullTextMode,
+		ormdictionary.ErrPaginationCursorRequired, ormdictionary.ErrWhereValueNil,
+		ormdictionary.ErrPaginationInvalidLimit, ormdictionary.ErrPaginationOffsetOverflow,
+	} {
+		if errors.Is(err, invalid) {
+			return errors.Join(common.ErrBadRequest, err)
+		}
+	}
+	return errors.Join(common.ErrDependencyUnavailable, err)
+}
 
 type (
 	userReader struct {
@@ -88,6 +138,10 @@ func BuildUserListQuery(
 	if db == nil {
 		return nil
 	}
+	return buildUserListQuery(db, filter)
+}
+
+func buildUserListQuery(db domain.QueryReader, filter domain.UserListFilter) *orm.QueryBuilder {
 
 	query := db.UseModel(domain.UserSearchRow{}).
 		Select(

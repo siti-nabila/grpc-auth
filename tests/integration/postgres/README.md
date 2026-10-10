@@ -77,14 +77,56 @@ actual FK/PK failure rollback, pending event, conflict/replay sebelum stale vers
 current permission sebelum replay, different target, concurrent claims, lost
 response, fixed 24-hour expiry replacement serta NO_OP tanpa event/audit kedua.
 Security fixture commit status/auth_version + required audit/event lalu denial;
-failure sebelum commit rollback semuanya. Tidak ada broker, refresh RPC/session
-store atau general idempotency pada Register/self-profile.
+failure sebelum commit rollback semuanya. Tidak ada broker, refresh RPC atau general idempotency pada Register/self-profile.
 
 F-01..F-12 hanya criterion fondasi scoped pada
-[evidence ledger](../../../openspec/changes/auth-transaction-foundation/evidence.md).
+[evidence ledger](../../../openspec/changes/archive/2026-10-10-auth-transaction-foundation/evidence.md).
 Real RefreshSession, last-admin dan production privileged command wiring belum
 dibuktikan. Fixture tidak menandai seluruh source AC atau MVP PASS.
 
 Evidence menyertakan commit/module/PostgreSQL version, waktu, command tanpa
 secret dan expected/actual result. Database test belum tersedia membuat required
 PostgreSQL execution gates BLOCKED; mock/config tests tidak menggantikannya.
+
+## Login session producer
+
+`TestPostgresLoginProducer` menjalankan production Login assembly dengan actual
+Argon2 verifier, issuer, repositories dan foundation Me/ListUsers consumers.
+Fixture menambahkan session/refresh dan dependency authorization read hanya dalam
+schema miliknya; tidak menjalankan migration aplikasi. User/password/hash fixture
+bersifat sintetis dan tidak membaca akun aplikasi.
+
+Coverage: atomic session + digest-only refresh + SESSION_CREATED audit, seven-day
+expiry/initial NULL state/FK/uniqueness, unchanged user versions/no outbox/replay,
+response-loss Login baru, restricted Me/ListUsers, actual write-trigger/sign/deferred
+commit failures, stale password/status proof, busy/cancellation/panic/rollback,
+lock release dan pool reuse. Race memakai channel barriers dan dua backend PID
+berbeda; password/status command masih controlled fixture mutation under the
+canonical user lock, bukan klaim production lifecycle RPC telah tersedia.
+
+```sh
+rtk proxy go test -tags=postgres ./tests/integration/postgres -run '^TestPostgresLoginProducer$' -count=1 -v
+rtk proxy go test -race -tags=postgres ./tests/integration/postgres -count=1 -v
+```
+
+`env-test.yaml` lokal dapat dipakai untuk menyiapkan ketiga environment variable
+secara privat dari `Database.GRPC_AUTH_TEST`. File tersebut di-ignore dan tidak
+dibaca otomatis oleh suite atau runtime. Guard opt-in/explicit DSN/expected database
+tetap wajib; tidak ada fallback `env.yaml`. Simpan hanya safe database identity,
+PostgreSQL version, backend IDs dan hasil di [producer evidence](../../../openspec/changes/archive/2026-10-10-auth-login-session-producer/evidence.md).
+
+## Session foundation consumers
+
+`TestPostgresSessionFoundation`, `TestPostgresSessionProfileConcurrency` dan
+`TestPostgresSecurityAttempts` menjalankan production consumer dengan credential
+dari real Login. Channel barriers dengan dua backend membuktikan RR/read-only
+snapshot, post-commit role/app/permission visibility, locked stale-actor denial,
+contention/retention, cancellation/panic/cleanup dan pool reuse. Required mutation,
+audit, outbox serta deferred commit failures membuktikan atomicity; Profile
+version/no-op/auth_version/session dan Register PENDING/no-credential counts
+diperiksa. Failed-attempt transaction dimulai setelah mutation rollback.
+
+Suite tetap memakai explicit opt-in/tag/DSN/dedicated database guard di atas,
+tanpa Docker, application migration/seed atau baseline database writes. Minimal
+owned search fixture tidak menginstal extension maupun production search
+trigger/index. Readiness external dan actual server cutover belum diklaim PASS.

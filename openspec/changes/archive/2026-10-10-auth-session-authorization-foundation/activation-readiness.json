@@ -1,0 +1,97 @@
+{
+  "access_sign_verify_and_hmac_valid": true,
+  "caller_config_valid": true,
+  "checked_at_utc": "2026-10-10T14:39:21Z",
+  "config_parse_ok": true,
+  "env_file_readable": true,
+  "source": "private env.yaml",
+  "tls_pair_currently_valid": true,
+  "activation_ready": false,
+  "local_rest_orc_tls_verification": {
+    "ca_chain_and_configured_hostname_valid": true,
+    "ca_file_contains_certificate": true,
+    "checked_at_utc": "2026-10-10T14:39:22Z",
+    "external_service_started": false,
+    "in_memory_tls13_handshake_valid": true,
+    "production_environment_config_valid": true,
+    "production_tls_config_valid": true,
+    "server_pair_valid": true,
+    "untrusted_ca_rejected": true,
+    "wrong_hostname_rejected": true
+  },
+  "local_caller_credential_verification": {
+    "private_values_or_hashes_printed": false,
+    "service_token_canonical_and_valid_length": true,
+    "service_token_matches_configured_digest": true,
+    "service_token_whitespace_absent": true
+  },
+  "gates": {
+    "7.1": "BACKEND PASS: real producer and complete registered-RPC integration",
+    "7.2": "BACKEND PASS: limiter/caller/RetryInfo/concurrency and cleanup; consuming-client evidence retained at Phase 6 DEP-01",
+    "7.3": "LOCAL BACKEND PASS: actual key/HMAC/TLS/caller and read-only schema/admin; actual deployment certification retained at Phase 6 DEP-01",
+    "7.4": "BACKEND PASS: all six default methods composed and verified; no legacy fallback",
+    "8.4": "BACKEND PASS: current source identity and nine successful verification commands",
+    "Phase 6 DEP-01": "BLOCKED: all former task 9.1 requirements transferred to docs/grpc-auth-mvp-spec.md section 10.1; mandatory before deployment; not PASS"
+  },
+  "private_values_or_hashes_recorded": false,
+  "grpc_auth_only_followup": {
+    "checked_at_utc": "2026-10-10T14:45:51Z",
+    "rest_orc_work_deferred_by_user": true,
+    "local_schema_admin_report": "grpc-auth-readiness-preflight.json",
+    "local_caller_report": "grpc-auth-caller-verification.json",
+    "canonical_active_platform_admin_count": 1,
+    "unrestricted_admin_with_iam_user_read_count": 1,
+    "safe_default_member_role_count": 1,
+    "historical_columns_missing_or_changed": false,
+    "search_storage_metadata_observed": true,
+    "production_registered_rpc_cutover_verified": false,
+    "grpc_auth_component_tests": "PASS: ./tests/configs/... ./tests/interceptors/... ./tests/ratelimit/...",
+    "deployment_certification": false
+  },
+  "backend_ready": true,
+  "deployment_ready": false,
+  "backend_source_completion": {
+    "checked_at_utc": "2026-10-10T15:12:04.632144+00:00",
+    "user_approved_gate_separation": true,
+    "source_default_pipeline": "Language/Error/Service/Attempt/Session/Rate/authoritative handlers",
+    "production_registered_rpc_source_wiring_verified": true,
+    "report": "server-verification.json",
+    "backend_tasks_complete": 36,
+    "total_tasks": 36,
+    "deployed_environment_certified": false,
+    "rest_orc_source_changed": false,
+    "external_deployment_gate": "Phase 6 DEP-01 (outside this change)"
+  },
+  "previous_gate_allocation": {
+    "gates": {
+      "7.1": "BACKEND PASS: real producer and complete registered-RPC integration",
+      "7.2": "BACKEND PASS: limiter/caller/RetryInfo/concurrency and cleanup; consuming-client evidence retained at Phase 6 DEP-01",
+      "7.3": "LOCAL BACKEND PASS: actual key/HMAC/TLS/caller and read-only schema/admin; actual deployment certification retained at Phase 6 DEP-01",
+      "7.4": "BACKEND PASS: all six default methods composed and verified; no legacy fallback",
+      "8.4": "BACKEND PASS: current source identity and nine successful verification commands",
+      "Phase 6 DEP-01": "BLOCKED: all former task 9.1 requirements transferred to docs/grpc-auth-mvp-spec.md section 10.1; mandatory before deployment; not PASS"
+    },
+    "backend_source_completion": {
+      "checked_at_utc": "2026-10-10T15:12:04.632144+00:00",
+      "user_approved_gate_separation": true,
+      "source_default_pipeline": "Language/Error/Service/Attempt/Session/Rate/authoritative handlers",
+      "production_registered_rpc_source_wiring_verified": true,
+      "report": "server-verification.json",
+      "backend_tasks_complete": 36,
+      "total_tasks": 36,
+      "deployed_environment_certified": false,
+      "rest_orc_source_changed": false,
+      "external_deployment_gate": "Phase 6 DEP-01 (outside this change)"
+    }
+  },
+  "deployment_gate_transfer": {
+    "decision_date": "2026-10-10",
+    "from": "foundation task 9.1",
+    "to": "docs/grpc-auth-mvp-spec.md#101-phase-6-readiness-deployment / DEP-01",
+    "status": "BLOCKED / unchecked",
+    "mandatory": true,
+    "deployment_ready": false,
+    "foundation_tasks": "36/36",
+    "verification_evidence_unchanged": true
+  }
+}
