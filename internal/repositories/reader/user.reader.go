@@ -30,11 +30,7 @@ func (r *snapshotUserReader) SearchUsers(opts orm.QueryOptions, filter domain.Us
 	if r.handle == nil {
 		return orm.PageData[domain.UserSearchRow]{}, common.ErrDependencyUnavailable
 	}
-	rows := make([]domain.UserSearchRow, 0)
-	fields := &userReader{}
-	res, err := orm.QueryPageWithConfig(r.ctx, buildUserListQuery(r.handle, filter).WithContext(r.ctx), &rows,
-		orm.QueryPageConfig{AllowedFields: fields.AllowedFields(), SearchFields: fields.SearchFields()}, opts)
-	return res, userPageError(err)
+	return readUserPage(r.ctx, r.handle, opts, filter)
 }
 
 func userPageError(err error) error {
@@ -89,12 +85,7 @@ func (u *userReader) Model() domain.UserSearchRow {
 }
 
 func (u *userReader) AllowedFields() map[string]string {
-	return map[string]string{
-		"auth_id": "a.id",
-		"email":   "a.email",
-		"name":    `p."name"`,
-		"phone":   "p.phone",
-	}
+	return userSortExpressions()
 }
 
 func (u *userReader) SearchFields() map[string]orm.SearchFieldConfig {
@@ -115,20 +106,7 @@ func (u *userReader) SearchUsers(
 	opts orm.QueryOptions,
 	filter domain.UserListFilter,
 ) (orm.PageData[domain.UserSearchRow], error) {
-	db := u.Adapter()
-	rows := make([]domain.UserSearchRow, 0)
-	query := BuildUserListQuery(db, filter)
-
-	return orm.QueryPageWithConfig(
-		u.ctx,
-		query,
-		&rows,
-		orm.QueryPageConfig{
-			AllowedFields: u.AllowedFields(),
-			SearchFields:  u.SearchFields(),
-		},
-		opts,
-	)
+	return readUserPage(u.ctx, u.Adapter(), opts, filter)
 }
 
 func BuildUserListQuery(
@@ -138,35 +116,5 @@ func BuildUserListQuery(
 	if db == nil {
 		return nil
 	}
-	return buildUserListQuery(db, filter)
-}
-
-func buildUserListQuery(db domain.QueryReader, filter domain.UserListFilter) *orm.QueryBuilder {
-
-	query := db.UseModel(domain.UserSearchRow{}).
-		Select(
-			"a.id AS auth_id",
-			"a.email",
-			`p."name"`,
-			"p.address",
-			"p.phone",
-		).
-		Join("auth a", "a.id = p.user_id").
-		Join("user_profile_search ups", "ups.profile_id = p.id")
-
-	if filter.CreatedFrom != nil {
-		query = query.Where("a.created_at >= ?", *filter.CreatedFrom)
-	}
-	if filter.CreatedTo != nil {
-		query = query.Where("a.created_at < ?", *filter.CreatedTo)
-	}
-	if len(filter.RoleCodes) > 0 {
-		query = query.
-			Join("user_role ur", "ur.user_id = a.id").
-			Join("role r", "r.id = ur.role_id").
-			WhereIn("r.role_code", filter.RoleCodes).
-			Distinct()
-	}
-
-	return query
+	return buildUserListQuery(db, filter).Select(userListProjection()...)
 }

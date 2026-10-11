@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 
+	authv1 "github.com/siti-nabila/api-contracts/pb/auth/v1"
+	sessionv1 "github.com/siti-nabila/api-contracts/pb/session/v1"
 	userv1 "github.com/siti-nabila/api-contracts/pb/user/v1"
 	"github.com/siti-nabila/api-contracts/pkg/dictionary/common"
 	"github.com/siti-nabila/api-contracts/pkg/locale"
@@ -73,12 +75,19 @@ func rateKeys(ctx context.Context, request any, method string, caller serviceaut
 		return []ratelimit.Key{{Group: ratelimit.LoginIP, Value: trustedIPKey(ctx, caller)}, {Group: ratelimit.LoginAccount, Value: hex.EncodeToString(mac.Sum(nil))}}, nil
 	case userv1.UserService_Register_FullMethodName:
 		return []ratelimit.Key{{Group: ratelimit.RegisterIP, Value: trustedIPKey(ctx, caller)}}, nil
-	case userv1.UserService_Me_FullMethodName, userv1.UserService_ListUsers_FullMethodName:
+	case userv1.UserService_GetUser_FullMethodName, userv1.UserService_CreateUser_FullMethodName, userv1.UserService_UpdateUser_FullMethodName, userv1.UserService_ChangeUserStatus_FullMethodName, userv1.UserService_Me_FullMethodName, userv1.UserService_ListUsers_FullMethodName, sessionv1.SessionService_ListMySessions_FullMethodName, sessionv1.SessionService_ListUserSessions_FullMethodName, authv1.AuthService_ChangePassword_FullMethodName, sessionv1.SessionService_RevokeUserSession_FullMethodName, sessionv1.SessionService_RevokeAllUserSessions_FullMethodName:
 		principal, err := sessions.PrincipalFromContext(ctx)
 		if err != nil {
 			return nil, err
 		}
-		return []ratelimit.Key{{Group: ratelimit.ProtectedRead, Value: strconv.FormatUint(principal.UserID(), 10)}}, nil
+		group := ratelimit.ProtectedRead
+		switch method {
+		case authv1.AuthService_ChangePassword_FullMethodName:
+			group = ratelimit.ChangePassword
+		case userv1.UserService_CreateUser_FullMethodName, userv1.UserService_UpdateUser_FullMethodName, userv1.UserService_ChangeUserStatus_FullMethodName, sessionv1.SessionService_RevokeUserSession_FullMethodName, sessionv1.SessionService_RevokeAllUserSessions_FullMethodName:
+			group = ratelimit.AdminMutation
+		}
+		return []ratelimit.Key{{Group: group, Value: strconv.FormatUint(principal.UserID(), 10)}}, nil
 	}
 	return nil, nil
 }

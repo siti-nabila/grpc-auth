@@ -25,14 +25,15 @@ type (
 		KeepAliveTimeout time.Duration
 		KeepAliveIdle    time.Duration
 
-		Database     map[string]database.DBConfig
-		Services     map[string]ServiceConfig
-		JWT          JWTConfig
-		Logger       LoggerConfig
-		TLS          config.TLSConfig
-		ServiceAuth  config.ServiceAuthConfig
-		AccessIssuer config.AccessIssuerConfig
-		AuthLimiter  config.AuthLimiterConfig
+		Database           map[string]database.DBConfig
+		Services           map[string]ServiceConfig
+		JWT                JWTConfig
+		Logger             LoggerConfig
+		TLS                config.TLSConfig
+		ServiceAuth        config.ServiceAuthConfig
+		AccessIssuer       config.AccessIssuerConfig
+		AuthLimiter        config.AuthLimiterConfig
+		CommandFingerprint config.CommandFingerprintConfig
 	}
 
 	ServiceConfig struct {
@@ -101,19 +102,20 @@ func (c *AppConfig) SetConfigPackage() {
 	}
 
 	config.SetAppConfig(&config.AppConfig{
-		ApplicationName:  c.ApplicationName,
-		Environment:      c.Environment,
-		DebugMode:        c.DebugMode,
-		Port:             c.Port,
-		Host:             c.Host,
-		Timeout:          c.Timeout,
-		KeepAlive:        c.KeepAlive,
-		KeepAliveTimeout: c.KeepAliveTimeout,
-		KeepAliveIdle:    c.KeepAliveIdle,
-		Database:         c.Database,
-		AccessIssuer:     c.AccessIssuer,
-		AuthLimiter:      c.AuthLimiter,
-		Services:         cfgSvcs,
+		ApplicationName:    c.ApplicationName,
+		Environment:        c.Environment,
+		DebugMode:          c.DebugMode,
+		Port:               c.Port,
+		Host:               c.Host,
+		Timeout:            c.Timeout,
+		KeepAlive:          c.KeepAlive,
+		KeepAliveTimeout:   c.KeepAliveTimeout,
+		KeepAliveIdle:      c.KeepAliveIdle,
+		Database:           c.Database,
+		AccessIssuer:       c.AccessIssuer,
+		AuthLimiter:        c.AuthLimiter,
+		CommandFingerprint: c.CommandFingerprint,
+		Services:           cfgSvcs,
 		JWT: config.JWTConfig{
 			SecretKey: c.JWT.SecretKey,
 		},

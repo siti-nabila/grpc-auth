@@ -46,3 +46,43 @@ func TestPostgresSecurityAttempts(t *testing.T) {
 }
 
 func TestPostgresRegisteredServer(t *testing.T) { testutils.Run(t, test_scenarios.RegisteredServer()) }
+
+func TestPostgresRefreshLifecycle(t *testing.T) { testutils.Run(t, test_scenarios.RefreshLifecycle()) }
+
+func TestPostgresSessionGeneration(t *testing.T) {
+	testutils.Run(t, test_scenarios.SessionGeneration())
+}
+
+func TestPostgresLogoutLifecycle(t *testing.T) { testutils.Run(t, test_scenarios.LogoutLifecycle()) }
+
+func TestPostgresSelfSessionLifecycle(t *testing.T) {
+	testutils.Run(t, test_scenarios.SelfSessionLifecycle())
+}
+
+func TestPostgresPasswordLifecycle(t *testing.T) {
+	testutils.Run(t, test_scenarios.PasswordLifecycle())
+}
+
+func TestPostgresSessionListLifecycle(t *testing.T) {
+	testutils.Run(t, test_scenarios.SessionListLifecycle())
+}
+
+func TestPostgresAdminSessionLifecycle(t *testing.T) {
+	testutils.Run(t, test_scenarios.AdminSessionLifecycle())
+}
+
+func TestPostgresUserListLifecycle(t *testing.T) {
+	testutils.Run(t, test_scenarios.UserListLifecycle())
+}
+
+func TestPostgresRegisteredLifecycle(t *testing.T) {
+	testutils.Run(t, test_scenarios.RegisteredLifecycle())
+}
+
+func TestPostgresUserManagement(t *testing.T) {
+	testutils.Run(t, test_scenarios.UserManagement())
+}
+
+func TestPostgresUserManagementConcurrency(t *testing.T) {
+	testutils.Run(t, test_scenarios.UserManagementConcurrency())
+}

@@ -13,9 +13,11 @@ import (
 	"google.golang.org/grpc/peer"
 )
 
-func CallerContext(t *testing.T, ctx context.Context, method string) context.Context {
+func CallerContext(t *testing.T, ctx context.Context, method string, extraMethods ...string) context.Context {
 	t.Helper()
-	v, err := serviceauth.NewVerifier(ServiceConfig(), func() time.Time { return ServiceTime })
+	cfg := ServiceConfig()
+	cfg.Callers[0].Methods = append(cfg.Callers[0].Methods, extraMethods...)
+	v, err := serviceauth.NewVerifier(cfg, func() time.Time { return ServiceTime })
 	if err != nil {
 		t.Fatal(err)
 	}

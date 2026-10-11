@@ -3,7 +3,12 @@ package interceptors
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
+
+	authv1 "github.com/siti-nabila/api-contracts/pb/auth/v1"
+	"github.com/siti-nabila/api-contracts/pkg/dictionary"
+	userdictionary "github.com/siti-nabila/api-contracts/pkg/dictionary/user"
 
 	userv1 "github.com/siti-nabila/api-contracts/pb/user/v1"
 	"github.com/siti-nabila/api-contracts/pkg/dictionary/auth"
@@ -26,7 +31,7 @@ func NewSecurityAttemptInterceptor(record func(context.Context, domain.AuditRequ
 		return nil, errors.New("incomplete security attempt dependencies")
 	}
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, next grpc.UnaryHandler) (res any, err error) {
-		res, err = next(ctx, req)
+		res, err = invokeAttempt(ctx, req, next)
 		if err == nil {
 			return res, nil
 		}
@@ -37,7 +42,8 @@ func NewSecurityAttemptInterceptor(record func(context.Context, domain.AuditRequ
 			return res, err
 		}
 		// Login already records its generic credential denial independently.
-		if info.FullMethod == userv1.UserService_Login_FullMethodName && errors.Is(err, auth.ErrLoginFailed) {
+		if info.FullMethod == userv1.UserService_Login_FullMethodName && errors.Is(err, auth.ErrLoginFailed) ||
+			info.FullMethod == authv1.AuthService_RefreshSession_FullMethodName && errors.Is(err, auth.ErrRefreshTokenReused) {
 			return res, err
 		}
 		caller, callerErr := serviceauth.CallerFromContext(ctx)
@@ -46,12 +52,12 @@ func NewSecurityAttemptInterceptor(record func(context.Context, domain.AuditRequ
 			// unknown caller or trust a user identity from rejected credentials.
 			return res, err
 		}
-		recordSafeAttempt(ctx, caller.ID(), info.FullMethod, record, observeFailure, now)
+		recordSafeAttempt(ctx, caller.ID(), info.FullMethod, safeAttemptReason(err), record, observeFailure, now)
 		return res, err
 	}, nil
 }
 
-func recordSafeAttempt(ctx context.Context, service, method string, record func(context.Context, domain.AuditRequest) error, observeFailure func(), now func() time.Time) {
+func recordSafeAttempt(ctx context.Context, service, method string, reason types.AuditReason, record func(context.Context, domain.AuditRequest) error, observeFailure func(), now func() time.Time) {
 	defer func() {
 		if recover() != nil {
 			observeFailure()
@@ -66,8 +72,49 @@ func recordSafeAttempt(ctx context.Context, service, method string, record func(
 	// even when the failed request has already been canceled.
 	attemptCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), attemptAuditTimeout)
 	defer cancel()
-	request := domain.AuditRequest{Actor: actor, Action: types.AuditSecurityAttemptFailed, TargetType: types.AuditTargetRPC, TargetID: method, Reason: types.AuditRequestDenied, OccurredAt: now().UTC()}
+	request := domain.AuditRequest{Actor: actor, Action: types.AuditSecurityAttemptFailed, TargetType: types.AuditTargetRPC, TargetID: method, Reason: reason, OccurredAt: now().UTC()}
 	if err = record(attemptCtx, request); err != nil {
 		observeFailure()
 	}
+}
+
+// Recover only after downstream defers have cleaned up their feature-owned tx.
+func invokeAttempt(ctx context.Context, req any, next grpc.UnaryHandler) (res any, err error) {
+	defer func() {
+		if recover() != nil {
+			res = nil
+			err = common.ErrInternalServerError
+		}
+	}()
+	return next(ctx, req)
+}
+
+// Persist catalog identity/category, never err.Error() or arbitrary status text.
+func safeAttemptReason(err error) types.AuditReason {
+	if errors.Is(err, context.Canceled) {
+		return types.AuditRequestCanceled
+	}
+	if errors.Is(err, context.DeadlineExceeded) {
+		return types.AuditDeadlineExceeded
+	}
+	var fields dictionary.FieldErrors
+	if errors.As(err, &fields) {
+		return types.AuditValidationFailed
+	}
+	var catalog *dictionary.Error
+	key := ""
+	if errors.As(err, &catalog) {
+		key = catalog.Key()
+	} else if decoded, ok := grpcerror.Decode(err); ok {
+		key = decoded.Reason
+	}
+	if len(key) > 100 {
+		return types.AuditInternalFailure
+	}
+	for _, registry := range []dictionary.Registry{common.Registry(), auth.Registry(), userdictionary.Registry()} {
+		if _, ok := registry.Lookup(key); ok {
+			return types.AuditReason(strings.ToUpper(strings.ReplaceAll(key, ".", "_")))
+		}
+	}
+	return types.AuditInternalFailure
 }

@@ -16,3 +16,9 @@ func TestFailedLoginAudit(t *testing.T) { testutils.Run(t, test_scenarios.Failed
 
 func TestLoginPassword(t *testing.T)       { testutils.Run(t, test_scenarios.LoginPassword()) }
 func TestPendingRegistration(t *testing.T) { testutils.Run(t, test_scenarios.PendingRegistration()) }
+
+func TestRefresh(t *testing.T) { testutils.Run(t, test_scenarios.Refresh()) }
+
+func TestLogout(t *testing.T) { testutils.Run(t, test_scenarios.Logout()) }
+
+func TestChangePassword(t *testing.T) { testutils.Run(t, test_scenarios.ChangePassword()) }

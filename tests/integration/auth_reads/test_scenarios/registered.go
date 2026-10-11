@@ -71,14 +71,14 @@ func registeredReads(t *testing.T) {
 				}
 			}
 			if kind != "normal" && !restricted {
-				steps = append(steps, registeredAttempt(userv1.UserService_Me_FullMethodName)...)
+				steps = append(steps, registeredAttempt(userv1.UserService_Me_FullMethodName, map[bool]string{true: "COMMON_DEPENDENCY_UNAVAILABLE", false: "AUTH_INVALID_SESSION"}[kind == "dependency"])...)
 			}
 			if kind == "normal" || restricted {
 				steps = append(steps, state)
 				if !restricted {
 					steps = append(steps, mocks.SQLStep{Op: "begin"}, state, permissionStep(false), mocks.SQLStep{Op: "rollback"})
 				}
-				steps = append(steps, registeredAttempt(userv1.UserService_ListUsers_FullMethodName)...)
+				steps = append(steps, registeredAttempt(userv1.UserService_ListUsers_FullMethodName, "COMMON_FORBIDDEN")...)
 			}
 			mock := &mocks.SQL{Steps: steps}
 			db := mock.Open()
@@ -137,8 +137,8 @@ func registeredReads(t *testing.T) {
 	}
 }
 
-func registeredAttempt(method string) []mocks.SQLStep {
-	return []mocks.SQLStep{{Op: "begin"}, {Op: "query", SQL: "INSERT INTO audit_logs", Args: []driver.Value{nil, "rest-orc", "SECURITY_ATTEMPT_FAILED", "rpc", method, nil, nil, "REQUEST_DENIED", nil, nil, fixtures.ServiceTime}, Columns: []string{"id"}, Rows: [][]driver.Value{{int64(9)}}}, {Op: "commit"}}
+func registeredAttempt(method, reason string) []mocks.SQLStep {
+	return []mocks.SQLStep{{Op: "begin"}, {Op: "query", SQL: "INSERT INTO audit_logs", Args: []driver.Value{nil, "rest-orc", "SECURITY_ATTEMPT_FAILED", "rpc", method, nil, nil, reason, nil, nil, fixtures.ServiceTime}, Columns: []string{"id"}, Rows: [][]driver.Value{{int64(9)}}}, {Op: "commit"}}
 }
 
 func registeredLoginSteps(t *testing.T, data []byte, restricted bool) []mocks.SQLStep {
@@ -160,7 +160,7 @@ func registeredLoginSteps(t *testing.T, data []byte, restricted bool) []mocks.SQ
 		steps = append(steps, mocks.SQLStep{Op: "query", SQL: query, Args: []driver.Value{args[0]}, Columns: []string{"acquired"}, Rows: [][]driver.Value{{true}}})
 	}
 	return append(steps, mocks.SQLStep{Op: "query", SQL: "FROM auth", Args: []driver.Value{int64(42)}, Columns: columns, Rows: [][]driver.Value{row}},
-		mocks.SQLStep{Op: "query", SQL: "INSERT INTO sessions", Args: []driver.Value{c.SessionID, int64(42), "ACTIVE", now, now, end, nil, nil, nil, nil, nil, nil}, Columns: []string{"id"}, Rows: [][]driver.Value{{c.SessionID}}},
+		mocks.SQLStep{Op: "query", SQL: "INSERT INTO sessions", Args: []driver.Value{c.SessionID, int64(42), "ACTIVE", now, now, end, nil, nil, nil, nil, nil, nil, int64(3)}, Columns: []string{"id"}, Rows: [][]driver.Value{{c.SessionID}}},
 		mocks.SQLStep{Op: "query", SQL: "INSERT INTO refresh_tokens", Args: []driver.Value{c.RefreshID, c.SessionID, c.RefreshDigest, c.FamilyID, now, end, nil, nil, nil}, Columns: []string{"id"}, Rows: [][]driver.Value{{c.RefreshID}}},
 		mocks.SQLStep{Op: "query", SQL: "INSERT INTO audit_logs", Args: []driver.Value{int64(42), nil, "SESSION_CREATED", "session", c.SessionID, nil, `{"status":"ACTIVE","session_id":"` + c.SessionID + `"}`, nil, nil, nil, now}, Columns: []string{"id"}, Rows: [][]driver.Value{{int64(1)}}}, mocks.SQLStep{Op: "commit"})
 }

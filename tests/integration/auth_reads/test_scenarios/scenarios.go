@@ -56,8 +56,8 @@ func callerContext(t *testing.T, method string) context.Context {
 func sessionStep(restricted bool) mocks.SQLStep {
 	s := fixtures.SessionState()
 	return mocks.SQLStep{Op: "query", SQL: "JOIN auth a ON a.id = s.user_id", Args: []driver.Value{s.SessionID},
-		Columns: []string{"user_id", "user_status", "auth_version", "user_version", "must_change_password", "deleted_at", "session_id", "session_user_id", "session_status", "created_at", "expires_at", "revoked_at"},
-		Rows:    [][]driver.Value{{int64(s.UserID), s.UserStatus, s.AuthVersion, s.UserVersion, restricted, nil, s.SessionID, int64(s.SessionUserID), s.SessionStatus, s.CreatedAt, s.ExpiresAt, nil}}}
+		Columns: []string{"user_id", "user_status", "auth_version", "user_version", "must_change_password", "deleted_at", "session_id", "session_user_id", "session_status", "created_at", "expires_at", "revoked_at", "session_auth_version"},
+		Rows:    [][]driver.Value{{int64(s.UserID), s.UserStatus, s.AuthVersion, s.UserVersion, restricted, nil, s.SessionID, int64(s.SessionUserID), s.SessionStatus, s.CreatedAt, s.ExpiresAt, nil, int64(3)}}}
 }
 
 func permissionStep(allowed bool) mocks.SQLStep {
@@ -152,7 +152,7 @@ func meReads(t *testing.T) {
 }
 
 func listReads(t *testing.T) {
-	for _, kind := range []string{"allowed", "empty", "denied", "restricted", "missing session", "permission failure", "invalid field", "count failure", "data failure", "commit failure"} {
+	for _, kind := range []string{"allowed", "empty", "denied", "restricted", "missing session", "permission failure", "invalid field", "count failure", "data failure", "role failure", "application failure", "commit failure"} {
 		t.Run(kind, func(t *testing.T) {
 			ctx := callerContext(t, "/user.v1.UserService/ListUsers")
 			cause := errors.New("controlled page failure")
@@ -182,7 +182,7 @@ func listReads(t *testing.T) {
 				want = common.ErrBadRequest
 			}
 			if want == nil {
-				count := mocks.SQLStep{Op: "query", SQL: "COUNT(", Columns: []string{"count"}, Rows: [][]driver.Value{{int64(1)}}}
+				count := mocks.SQLStep{Op: "query", SQL: "COUNT(", Columns: []string{"total"}, Rows: [][]driver.Value{{int64(1)}}}
 				if kind == "empty" {
 					count.Rows[0][0] = int64(0)
 				}
@@ -202,6 +202,22 @@ func listReads(t *testing.T) {
 					want = cause
 				}
 				steps = append(steps, data)
+				if want == nil && kind != "empty" {
+					role := mocks.SQLStep{Op: "query", SQL: "FROM user_role ur", Args: []driver.Value{int64(80), "ACTIVE", "ACTIVE"}, Columns: []string{"user_id", "role_id", "code", "name", "status", "role_status"}}
+					if kind == "role failure" {
+						role.Error = cause
+						want = cause
+					}
+					steps = append(steps, role)
+					if want == nil {
+						app := mocks.SQLStep{Op: "query", SQL: "FROM user_application_access ua", Args: []driver.Value{int64(80), "ACTIVE", "ACTIVE"}, Columns: []string{"user_id", "application_id", "code", "name", "status", "application_status"}}
+						if kind == "application failure" {
+							app.Error = cause
+							want = cause
+						}
+						steps = append(steps, app)
+					}
+				}
 			}
 			if want != nil {
 				steps = append(steps, mocks.SQLStep{Op: "rollback"})

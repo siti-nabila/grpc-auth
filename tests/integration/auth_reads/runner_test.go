@@ -11,3 +11,8 @@ func TestReadSnapshots(t *testing.T) { testutils.Run(t, test_scenarios.All()) }
 func TestLoginProducer(t *testing.T) { testutils.Run(t, test_scenarios.Producer()) }
 
 func TestRegisteredServer(t *testing.T) { testutils.Run(t, test_scenarios.Registered()) }
+
+func TestFailureAudit(t *testing.T) { testutils.Run(t, test_scenarios.FailureAudit()) }
+
+func TestRegisteredLifecycle(t *testing.T) { testutils.Run(t, test_scenarios.RegisteredLifecycle()) }
+func TestUserDetail(t *testing.T)          { testutils.Run(t, test_scenarios.UserDetail()) }

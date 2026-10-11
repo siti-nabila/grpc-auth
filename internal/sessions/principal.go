@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	authv1 "github.com/siti-nabila/api-contracts/pb/auth/v1"
 	userv1 "github.com/siti-nabila/api-contracts/pb/user/v1"
 	"github.com/siti-nabila/api-contracts/pkg/dictionary/auth"
 	"github.com/siti-nabila/api-contracts/pkg/dictionary/common"
@@ -13,8 +14,8 @@ import (
 )
 
 const (
-	restrictedChangePasswordMethod = "/auth.v1.AuthService/ChangePassword"
-	restrictedLogoutMethod         = "/auth.v1.AuthService/Logout"
+	restrictedChangePasswordMethod = authv1.AuthService_ChangePassword_FullMethodName
+	restrictedLogoutMethod         = authv1.AuthService_Logout_FullMethodName
 )
 
 type principalKey struct{}

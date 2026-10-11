@@ -28,14 +28,19 @@ func Session() []testutils.Scenario {
 }
 
 func sessionReads(t *testing.T) {
-	columns := []string{"user_id", "user_status", "auth_version", "user_version", "must_change_password", "deleted_at", "session_id", "session_user_id", "session_status", "created_at", "expires_at", "revoked_at"}
-	row := []driver.Value{int64(42), "ACTIVE", int64(3), int64(4), true, nil, fixtures.SessionID, int64(42), "ACTIVE", fixtures.ServiceTime, fixtures.ServiceTime.Add(7 * 24 * time.Hour), nil}
+	columns := []string{"user_id", "user_status", "auth_version", "user_version", "must_change_password", "deleted_at", "session_id", "session_user_id", "session_status", "created_at", "expires_at", "revoked_at", "session_auth_version"}
+	row := []driver.Value{int64(42), "ACTIVE", int64(3), int64(4), true, nil, fixtures.SessionID, int64(42), "ACTIVE", fixtures.ServiceTime, fixtures.ServiceTime.Add(7 * 24 * time.Hour), nil, int64(3)}
 	for _, bound := range []bool{false, true} {
-		for _, kind := range []string{"success", "missing", "failure", "cancelled"} {
+		for _, kind := range []string{"success", "legacy", "missing", "failure", "cancelled"} {
 			t.Run(kind+map[bool]string{true: " tx", false: " primary"}[bound], func(t *testing.T) {
 				ctx := context.WithValue(context.Background(), struct{}{}, "session-context")
 				cause := errors.New("controlled session read failure")
 				step := mocks.SQLStep{Op: "query", SQL: "JOIN auth a ON a.id = s.user_id", Args: []driver.Value{fixtures.SessionID}, Columns: columns, Rows: [][]driver.Value{row}}
+				if kind == "legacy" {
+					copyRow := append([]driver.Value(nil), row...)
+					copyRow[len(copyRow)-1] = nil
+					step.Rows = [][]driver.Value{copyRow}
+				}
 				if kind == "missing" {
 					step.Rows = nil
 				}
@@ -67,8 +72,8 @@ func sessionReads(t *testing.T) {
 				}
 				got, err := reader.NewSessionStateReader(handle).GetSessionState(ctx, fixtures.SessionID)
 				switch kind {
-				case "success":
-					if err != nil || got.UserStatus != "ACTIVE" || got.SessionStatus != "ACTIVE" || got.UserID != 42 || got.AuthVersion != 3 || got.UserVersion != 4 || !got.MustChangePassword || got.SessionID != fixtures.SessionID || got.SessionUserID != 42 || !got.ExpiresAt.Equal(fixtures.ServiceTime.Add(7*24*time.Hour)) {
+				case "success", "legacy":
+					if err != nil || got.UserStatus != "ACTIVE" || got.SessionStatus != "ACTIVE" || got.UserID != 42 || got.AuthVersion != 3 || got.SessionAuthVersion.Valid != (kind != "legacy") || (kind != "legacy" && got.SessionAuthVersion.Int64 != 3) || got.UserVersion != 4 || !got.MustChangePassword || got.SessionID != fixtures.SessionID || got.SessionUserID != 42 || !got.ExpiresAt.Equal(fixtures.ServiceTime.Add(7*24*time.Hour)) {
 						t.Fatal("session fields not mapped", got, err)
 					}
 				case "missing":
@@ -100,9 +105,9 @@ func sessionWrites(t *testing.T) {
 	for _, fails := range []bool{false, true} {
 		t.Run(map[bool]string{true: "failure", false: "success"}[fails], func(t *testing.T) {
 			ctx := context.WithValue(context.Background(), struct{}{}, "session-context")
-			session := domain.Session{ID: fixtures.SessionID, UserID: 42, Status: "ACTIVE", CreatedAt: fixtures.ServiceTime, LastSeenAt: fixtures.ServiceTime, ExpiresAt: fixtures.ServiceTime.Add(7 * 24 * time.Hour)}
+			session := domain.Session{ID: fixtures.SessionID, UserID: 42, AuthVersion: 3, Status: "ACTIVE", CreatedAt: fixtures.ServiceTime, LastSeenAt: fixtures.ServiceTime, ExpiresAt: fixtures.ServiceTime.Add(7 * 24 * time.Hour)}
 			cause := errors.New("controlled session insert failure")
-			step := mocks.SQLStep{Op: "query", SQL: "INSERT INTO sessions", Args: []driver.Value{session.ID, int64(42), "ACTIVE", session.CreatedAt, session.LastSeenAt, session.ExpiresAt, nil, nil, nil, nil, nil, nil}, Columns: []string{"id"}, Rows: [][]driver.Value{{session.ID}}}
+			step := mocks.SQLStep{Op: "query", SQL: "INSERT INTO sessions", Args: []driver.Value{session.ID, int64(42), "ACTIVE", session.CreatedAt, session.LastSeenAt, session.ExpiresAt, nil, nil, nil, nil, nil, nil, int64(3)}, Columns: []string{"id"}, Rows: [][]driver.Value{{session.ID}}}
 			if fails {
 				step.Error = cause
 			}

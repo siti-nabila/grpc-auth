@@ -29,6 +29,10 @@ func InitAllConfigs() {
 
 func run(appCfg *AppConfig) error {
 	// Reject security configuration before initializing logger, pools or listeners.
+	fingerprinter, err := LoadCommandFingerprinter(appCfg)
+	if err != nil {
+		return err
+	}
 	security, err := LoadLoginSecurity(appCfg, os.ReadFile, time.Now)
 	if err != nil {
 		return err
@@ -79,7 +83,7 @@ func run(appCfg *AppConfig) error {
 		opened = append(opened, src)
 		logger.Logs.DB.WithField("database name", dbName).Info("✅ DB connection established")
 	}
-	foundation, err := PrepareFoundation(context.Background(), security, database.DBGetNativePool(database.UserDbSource), dialect.NewPostgres(), database.GetORMConfig(), time.Now, rand.Reader)
+	foundation, err := PrepareFoundation(context.Background(), security, database.DBGetNativePool(database.UserDbSource), dialect.NewPostgres(), database.GetORMConfig(), time.Now, rand.Reader, fingerprinter)
 	if err != nil {
 		return err
 	}

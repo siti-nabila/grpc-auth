@@ -8,6 +8,7 @@ import (
 	"errors"
 	"io"
 	"net"
+	"strings"
 	"testing"
 	"time"
 
@@ -25,13 +26,15 @@ import (
 
 // FoundationServer uses the production assembly and pipeline over controlled
 // in-memory TLS transport. The caller owns the injected database and entropy.
-func FoundationServer(t *testing.T, db *sql.DB, now func() time.Time, entropy io.Reader) (*grpc.ClientConn, *configs.Foundation) {
+func FoundationServer(t *testing.T, db *sql.DB, now func() time.Time, entropy io.Reader, methods ...string) (*grpc.ClientConn, *configs.Foundation) {
 	t.Helper()
 	private, public := AccessPEM(t)
 	cfg := &configs.AppConfig{ApplicationName: AccessIssuer,
-		AccessIssuer: config.AccessIssuerConfig{PrivateKeyFile: "private", PublicKeyFile: "public", KeyVersion: "test-v1"},
-		AuthLimiter:  config.AuthLimiterConfig{AccountHMACSecret: "test-only-account-secret"},
-		ServiceAuth:  ServiceConfig(), Timeout: time.Second}
+		AccessIssuer:       config.AccessIssuerConfig{PrivateKeyFile: "private", PublicKeyFile: "public", KeyVersion: "test-v1"},
+		AuthLimiter:        config.AuthLimiterConfig{AccountHMACSecret: "test-only-account-secret"},
+		CommandFingerprint: config.CommandFingerprintConfig{ActiveVersion: "test-v1", Keys: map[string]string{"test-v1": strings.Repeat("m", 32)}},
+		ServiceAuth:        ServiceConfig(), Timeout: time.Second}
+	cfg.ServiceAuth.Callers[0].Methods = append(cfg.ServiceAuth.Callers[0].Methods, methods...)
 	security, err := configs.LoadLoginSecurity(cfg, func(path string) ([]byte, error) {
 		if path == "private" {
 			return private, nil
@@ -41,7 +44,11 @@ func FoundationServer(t *testing.T, db *sql.DB, now func() time.Time, entropy io
 	if err != nil {
 		t.Fatal(err)
 	}
-	foundation, err := configs.PrepareFoundation(context.Background(), security, db, dialect.NewPostgres(), database.GetORMConfig(), now, entropy)
+	fingerprinter, err := configs.LoadCommandFingerprinter(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	foundation, err := configs.PrepareFoundation(context.Background(), security, db, dialect.NewPostgres(), database.GetORMConfig(), now, entropy, fingerprinter)
 	if err != nil {
 		t.Fatal(err)
 	}

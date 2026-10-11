@@ -89,7 +89,7 @@ func postgresRegisteredServer(t *testing.T) {
 					t.Fatal("owned grant fixture failed")
 				}
 				page, err := users.ListUsers(actor, list)
-				if err != nil || len(page.Items) != 1 || page.Items[0].Id != 1 || page.NextCursor != "1" {
+				if err != nil || len(page.Items) != 2 || page.Total != 2 || page.Items[0].Id != 1 || page.Items[1].Id != 2 || page.NextCursor != "2" {
 					t.Fatal("registered authorized list failed", err)
 				}
 				changed, err := profiles.UpdateProfile(actor, &profilev1.ProfileRequest{Name: "Changed"})

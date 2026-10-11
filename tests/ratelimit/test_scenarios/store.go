@@ -22,7 +22,7 @@ func rates(t *testing.T) {
 		group  ratelimit.Group
 		burst  int
 		refill time.Duration
-	}{{ratelimit.LoginIP, 10, 2 * time.Second}, {ratelimit.LoginAccount, 3, 12 * time.Second}, {ratelimit.RegisterIP, 2, 12 * time.Second}, {ratelimit.ProtectedRead, 20, time.Second / 2}} {
+	}{{ratelimit.LoginIP, 10, 2 * time.Second}, {ratelimit.LoginAccount, 3, 12 * time.Second}, {ratelimit.RegisterIP, 2, 12 * time.Second}, {ratelimit.ProtectedRead, 20, time.Second / 2}, {ratelimit.RefreshIP, 10, time.Second}, {ratelimit.RefreshSession, 2, 6 * time.Second}, {ratelimit.ChangePassword, 2, 12 * time.Second}, {ratelimit.AdminMutation, 5, 2 * time.Second}} {
 		now := fixtures.ServiceTime
 		s, err := ratelimit.NewStore(func() time.Time { return now })
 		if err != nil {
@@ -147,4 +147,42 @@ func retention(t *testing.T) {
 	if _, err := s.Admit(ratelimit.Key{Group: "unknown", Value: "key"}); err == nil {
 		t.Fatal("unknown group accepted")
 	}
+}
+
+func RefreshAtomic() []testutils.Scenario {
+	return []testutils.Scenario{{Name: "refresh IP and proven session concurrent quota has no partial consumption", Run: func(t *testing.T) {
+		s, _ := ratelimit.NewStore(func() time.Time { return fixtures.ServiceTime })
+		ip := ratelimit.Key{Group: ratelimit.RefreshIP, Value: "verified-IP"}
+		session := ratelimit.Key{Group: ratelimit.RefreshSession, Value: fixtures.SessionID}
+		var allowed atomic.Int64
+		var wg sync.WaitGroup
+		start := make(chan struct{})
+		for n := 0; n < 100; n++ {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				<-start
+				d, e := s.Admit(ip, session)
+				if e != nil {
+					t.Error(e)
+				}
+				if d.Allowed {
+					allowed.Add(1)
+				}
+			}()
+		}
+		close(start)
+		wg.Wait()
+		if allowed.Load() != 2 {
+			t.Fatal("over-admission", allowed.Load())
+		}
+		for n := 0; n < 8; n++ {
+			if d, e := s.Admit(ip); e != nil || !d.Allowed {
+				t.Fatal("session rejection consumed IP", n, e)
+			}
+		}
+		if d, e := s.Admit(ip, ratelimit.Key{Group: ratelimit.RefreshSession, Value: "another-proven-session"}); e != nil || d.Allowed || s.Counts().Entries != 2 {
+			t.Fatal("IP rejection allocated session", d, e)
+		}
+	}}}
 }

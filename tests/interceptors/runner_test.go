@@ -13,3 +13,6 @@ func TestInterceptors(t *testing.T) {
 
 func TestAuthRateLimiter(t *testing.T)  { testutils.Run(t, test_scenarios.Rate()) }
 func TestSecurityAttempts(t *testing.T) { testutils.Run(t, test_scenarios.SecurityAttempts()) }
+
+func TestLifecycleInterceptors(t *testing.T) { testutils.Run(t, test_scenarios.Lifecycle()) }
+func TestLifecycleRateGroups(t *testing.T)   { testutils.Run(t, test_scenarios.LifecycleRateGroups()) }

@@ -8,7 +8,7 @@ require (
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/lib/pq v1.12.3
 	github.com/sirupsen/logrus v1.9.3
-	github.com/siti-nabila/api-contracts v0.0.0-20261010071509-42a9e6fa23ad
+	github.com/siti-nabila/api-contracts v0.0.0-20261011113651-729758974696
 	github.com/siti-nabila/orm v1.7.0
 	github.com/spf13/viper v1.21.0
 	golang.org/x/crypto v0.50.0

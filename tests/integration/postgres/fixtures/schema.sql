@@ -9,6 +9,11 @@ CREATE TABLE applications (
  CHECK (code ~ '^[a-z][a-z0-9_]*$')
 );
 
+CREATE TABLE admin_guard (
+ id integer PRIMARY KEY CHECK (id = 1)
+);
+INSERT INTO admin_guard(id) VALUES (1);
+
 CREATE SEQUENCE role_numeric_code_seq AS integer MINVALUE 1;
 
 CREATE TABLE auth (
@@ -183,6 +188,7 @@ CREATE TABLE sessions (
  device_label varchar(200),
  user_agent varchar(1000),
  ip_address inet,
+ auth_version bigint CONSTRAINT sessions_auth_version_ck CHECK (auth_version IS NULL OR auth_version >= 1),
  CHECK (expires_at > created_at),
  CHECK ((status='ACTIVE' AND revoked_at IS NULL) OR
         (status='REVOKED' AND revoked_at IS NOT NULL AND revoke_reason IS NOT NULL AND char_length(btrim(revoke_reason)) BETWEEN 3 AND 500))

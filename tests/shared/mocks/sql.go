@@ -18,6 +18,8 @@ type SQLStep struct {
 	Columns []string
 	Rows    [][]driver.Value
 	Error   error
+	Result  driver.Result
+	After   func()
 }
 
 // SQL is a per-test connector; no driver registration or external database.
@@ -95,14 +97,23 @@ func (c *sqlConnection) QueryContext(ctx context.Context, q string, args []drive
 	return &sqlRows{columns: step.Columns, rows: step.Rows}, nil
 }
 func (c *sqlConnection) ExecContext(ctx context.Context, q string, args []driver.NamedValue) (driver.Result, error) {
-	_, err := c.s.step(ctx, "exec", q, args)
+	step, err := c.s.step(ctx, "exec", q, args)
+	if step.Result != nil {
+		return step.Result, err
+	}
 	return driver.RowsAffected(1), err
 }
 
 type sqlTransaction struct{ s *SQL }
 
-func (t *sqlTransaction) Commit() error   { _, err := t.s.step(nil, "commit", "", nil); return err }
-func (t *sqlTransaction) Rollback() error { _, err := t.s.step(nil, "rollback", "", nil); return err }
+func (t *sqlTransaction) Commit() error { _, err := t.s.step(nil, "commit", "", nil); return err }
+func (t *sqlTransaction) Rollback() error {
+	step, err := t.s.step(nil, "rollback", "", nil)
+	if step.After != nil {
+		step.After()
+	}
+	return err
+}
 
 type sqlRows struct {
 	columns []string

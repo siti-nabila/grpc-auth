@@ -75,7 +75,11 @@ func postgresSecurityAttempt(t *testing.T) {
 			}
 			var attempts int
 			var safe bool
-			err = fixture.DB.QueryRowContext(ctx, `SELECT count(*),coalesce(bool_and(actor_user_id IS NULL AND actor_service='rest-orc' AND target_type='rpc' AND target_id='/profile.v1.ProfileService/UpdateProfile' AND safe_before IS NULL AND safe_after IS NULL AND reason='REQUEST_DENIED'),true) FROM audit_logs WHERE action='SECURITY_ATTEMPT_FAILED'`).Scan(&attempts, &safe)
+			reason := "COMMON_DEPENDENCY_UNAVAILABLE"
+			if kind == "canceled" {
+				reason = "REQUEST_CANCELED"
+			}
+			err = fixture.DB.QueryRowContext(ctx, `SELECT count(*),coalesce(bool_and(actor_user_id IS NULL AND actor_service='rest-orc' AND target_type='rpc' AND target_id='/profile.v1.ProfileService/UpdateProfile' AND safe_before IS NULL AND safe_after IS NULL AND reason=$1),true) FROM audit_logs WHERE action='SECURITY_ATTEMPT_FAILED'`, reason).Scan(&attempts, &safe)
 			if err != nil || attempts != want || !safe || observed != 1-want {
 				t.Fatal("safe independent attempt counts", attempts, observed, err)
 			}

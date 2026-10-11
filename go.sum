@@ -75,6 +75,10 @@ github.com/siti-nabila/api-contracts v0.0.0-20261010044649-bfbbeb282ec7 h1:rdvYT
 github.com/siti-nabila/api-contracts v0.0.0-20261010044649-bfbbeb282ec7/go.mod h1:Jb5bNxnX/aW6YWghT/pXorXlmIDRRxXltY8gL7Udzg4=
 github.com/siti-nabila/api-contracts v0.0.0-20261010071509-42a9e6fa23ad h1:AHC3W1uS8foXjeGzXwARaZ+x/JIrAuJ1AhjikCHcXAo=
 github.com/siti-nabila/api-contracts v0.0.0-20261010071509-42a9e6fa23ad/go.mod h1:Jb5bNxnX/aW6YWghT/pXorXlmIDRRxXltY8gL7Udzg4=
+github.com/siti-nabila/api-contracts v0.0.0-20261011040220-668cbd2cc925 h1:PnoO5de4B9l1UjNDpVFWLJwLQ0BqlTWKmE3GD+omOwg=
+github.com/siti-nabila/api-contracts v0.0.0-20261011040220-668cbd2cc925/go.mod h1:Jb5bNxnX/aW6YWghT/pXorXlmIDRRxXltY8gL7Udzg4=
+github.com/siti-nabila/api-contracts v0.0.0-20261011113651-729758974696 h1:MZ1/0dEXvGZIHfWPlGYFOPfDg55lOnxtEYR/HiPr92Q=
+github.com/siti-nabila/api-contracts v0.0.0-20261011113651-729758974696/go.mod h1:Jb5bNxnX/aW6YWghT/pXorXlmIDRRxXltY8gL7Udzg4=
 github.com/siti-nabila/error-package v0.0.8 h1:tIQk6tLiU3SjgQms5WVmThguJmJUYJFl3q0xBpS47t0=
 github.com/siti-nabila/error-package v0.0.8/go.mod h1:424IwZoGrk0jDWOUJi9t17dCykYk5Wes5N0zjnl+OBk=
 github.com/siti-nabila/error-package v0.0.9 h1:NR4+dy/egafTaZ+R+bOebOU1qb8TrCYPYQ/hM3rqB3Y=

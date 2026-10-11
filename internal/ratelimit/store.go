@@ -14,6 +14,10 @@ const (
 	LoginAccount    Group = "login-account"
 	RegisterIP      Group = "register-ip"
 	ProtectedRead   Group = "protected-read"
+	RefreshIP       Group = "refresh-ip"
+	RefreshSession  Group = "refresh-session"
+	ChangePassword  Group = "change-password"
+	AdminMutation   Group = "admin-mutation"
 	IdleTTL               = 15 * time.Minute
 	CleanupInterval       = time.Minute
 	MaxEntries            = 10000
@@ -68,6 +72,14 @@ func policy(group Group) (int64, int64) {
 		return 5, 3
 	case RegisterIP:
 		return 5, 2
+	case RefreshIP:
+		return 60, 10
+	case RefreshSession:
+		return 10, 2
+	case ChangePassword:
+		return 5, 2
+	case AdminMutation:
+		return 30, 5
 	case ProtectedRead:
 		return 120, 20
 	}

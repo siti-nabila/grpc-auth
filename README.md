@@ -115,11 +115,18 @@ packages are maintained in the separate `api-contracts` repository.
 
 ## 📡 API Usage
 
-The default server composes all six RPCs with the session foundation pipeline.
+The default server composes nineteen RPCs across UserService, ProfileService,
+AuthService and SessionService with the session foundation pipeline.
 Legacy HS256 and sid-less tokens are rejected. Register returns PENDING metadata
-and an empty token; activation remains an administrator workflow. Initial refresh
-issuance does not provide a RefreshSession endpoint. Backend wiring is complete;
+and an empty token; activation remains an administrator workflow. RefreshSession rotates the latest opaque refresh token; consumed reuse revokes
+the session. Logout, self/admin session operations and ChangePassword are wired.
+ListUsers supports public scalar/collection multi-sort, query-bound keyset cursors
+and combined role/status/application/keyword filtering; total counts unique users.
+See [lifecycle API rules](docs/session-lifecycle.md). Backend wiring is complete;
 [the external deployment gate](docs/foundation-activation-readiness.md) remains open.
+GetUser, CreateUser, UpdateUser and ChangeUserStatus provide authoritative admin
+management with safe responses, version checks, atomic audit/outbox/idempotency
+and last-admin protection. See [management API rules](docs/user-management-api.md).
 
 ### Register User
 
@@ -186,6 +193,10 @@ AccessIssuer:
   KeyVersion: ""
 AuthLimiter:
   AccountHMACSecret: "" # Separate private secret
+CommandFingerprint:
+  ActiveVersion: v1
+  Keys:
+    v1: "" # Independent secret, minimum 32 bytes; retain old keys for replay24h
 
 Logger:
   HTTPMode: json               # or 'text'

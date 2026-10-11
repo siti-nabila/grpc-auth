@@ -15,7 +15,7 @@ import (
 )
 
 func Credentials() []testutils.Scenario {
-	return []testutils.Scenario{{Name: "initial credentials use independent UUID entropy and only encoded-token digest", Run: initialCredentials}, {Name: "entropy failure never returns partial credentials", Run: credentialFailures}}
+	return []testutils.Scenario{{Name: "initial credentials use independent UUID entropy and only encoded-token digest", Run: initialCredentials}, {Name: "entropy failure never returns partial credentials", Run: credentialFailures}, {Name: "rotated credentials allocate only token IDs and 32-byte opaque successor", Run: rotatedCredentials}}
 }
 
 func initialCredentials(t *testing.T) {
@@ -74,5 +74,27 @@ func loginPassword(t *testing.T) {
 		if ok, err := authfeature.VerifyLoginPassword(bad, "secret12"); err == nil || ok {
 			t.Fatal("malformed stored credential accepted")
 		}
+	}
+}
+
+func rotatedCredentials(t *testing.T) {
+	data := make([]byte, 64)
+	for n := range data {
+		data[n] = byte(n)
+	}
+	c, err := authfeature.GenerateRotatedCredentials(bytes.NewReader(data))
+	raw, e := base64.RawURLEncoding.DecodeString(c.RefreshToken)
+	digest := sha256.Sum256([]byte(c.RefreshToken))
+	if err != nil || e != nil || c.RefreshID == c.TokenID || len(c.RefreshID) != 36 || len(c.TokenID) != 36 || !bytes.Equal(raw, data[32:]) || !bytes.Equal(c.RefreshDigest, digest[:]) {
+		t.Fatal("rotated entropy/digest")
+	}
+	for _, n := range []int{0, 15, 16, 31, 32, 63} {
+		c, err := authfeature.GenerateRotatedCredentials(bytes.NewReader(make([]byte, n)))
+		if !errors.Is(err, common.ErrDependencyUnavailable) || c.RefreshToken != "" || c.RefreshID != "" || c.TokenID != "" || len(c.RefreshDigest) != 0 {
+			t.Fatal("partial rotated credential", n)
+		}
+	}
+	if _, err := authfeature.GenerateRotatedCredentials(nil); !errors.Is(err, common.ErrDependencyUnavailable) {
+		t.Fatal("nil entropy accepted")
 	}
 }

@@ -32,6 +32,7 @@ type Session struct {
 	DeviceLabel  sql.NullString      `sql:"column:device_label"`
 	UserAgent    sql.NullString      `sql:"column:user_agent"`
 	IPAddress    sql.NullString      `sql:"column:ip_address"`
+	AuthVersion  int64               `sql:"column:auth_version"`
 }
 
 func (Session) TableName() string { return "sessions" }
@@ -50,12 +51,13 @@ type SessionState struct {
 	CreatedAt          time.Time           `sql:"column:created_at"`
 	ExpiresAt          time.Time           `sql:"column:expires_at"`
 	RevokedAt          sql.NullTime        `sql:"column:revoked_at"`
+	SessionAuthVersion sql.NullInt64       `sql:"column:session_auth_version"`
 }
 
 func (SessionState) TableName() string { return "sessions s" }
 
 func (s Session) Validate() error {
-	if !canonicalUUID.MatchString(s.ID) || s.UserID == 0 || s.UserID > 2147483647 || s.Status != types.SessionActive {
+	if !canonicalUUID.MatchString(s.ID) || s.UserID == 0 || s.UserID > 2147483647 || s.Status != types.SessionActive || s.AuthVersion < 1 {
 		return common.ErrBadRequest
 	}
 	if s.CreatedAt.IsZero() || !s.ExpiresAt.After(s.CreatedAt) || s.ExpiresAt.Sub(s.CreatedAt) > 7*24*time.Hour {

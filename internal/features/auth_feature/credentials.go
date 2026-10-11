@@ -16,6 +16,30 @@ type InitialCredentials struct {
 	RefreshDigest                           []byte
 }
 
+// RotatedCredentials does not allocate a new session or family.
+type RotatedCredentials struct {
+	RefreshID, TokenID, RefreshToken string
+	RefreshDigest                    []byte
+}
+
+func GenerateRotatedCredentials(entropy io.Reader) (RotatedCredentials, error) {
+	id, err := randomUUID(entropy)
+	if err != nil {
+		return RotatedCredentials{}, err
+	}
+	tokenID, err := randomUUID(entropy)
+	if err != nil {
+		return RotatedCredentials{}, err
+	}
+	var secret [32]byte
+	if _, err = io.ReadFull(entropy, secret[:]); err != nil {
+		return RotatedCredentials{}, fmt.Errorf("%w: %w", common.ErrDependencyUnavailable, err)
+	}
+	encoded := base64.RawURLEncoding.EncodeToString(secret[:])
+	digest := sha256.Sum256([]byte(encoded))
+	return RotatedCredentials{RefreshID: id, TokenID: tokenID, RefreshToken: encoded, RefreshDigest: append([]byte(nil), digest[:]...)}, nil
+}
+
 func GenerateInitialCredentials(entropy io.Reader) (InitialCredentials, error) {
 	if entropy == nil {
 		return InitialCredentials{}, common.ErrDependencyUnavailable

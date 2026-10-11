@@ -112,7 +112,7 @@ func (s *sessionLoginService) persistLogin(ctx context.Context, repos LoginRepos
 	}
 	now := s.deps.Now().UTC().Truncate(time.Second)
 	expires := now.Add(jwt.MaxSessionLifetime)
-	session := domain.Session{ID: c.SessionID, UserID: account.ID, Status: types.SessionActive, CreatedAt: now, LastSeenAt: now, ExpiresAt: expires}
+	session := domain.Session{ID: c.SessionID, UserID: account.ID, Status: types.SessionActive, CreatedAt: now, LastSeenAt: now, ExpiresAt: expires, AuthVersion: account.AuthVersion}
 	refresh := domain.InitialRefresh{ID: c.RefreshID, SessionID: c.SessionID, TokenHash: c.RefreshDigest, FamilyID: c.FamilyID, IssuedAt: now, ExpiresAt: expires}
 	if err := repos.Session.Create(session); err != nil {
 		return nil, featurecommon.DependencyError(err)

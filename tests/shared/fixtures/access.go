@@ -3,6 +3,7 @@ package fixtures
 import (
 	"bytes"
 	"crypto/ed25519"
+	"database/sql"
 	"testing"
 	"time"
 
@@ -46,5 +47,5 @@ func AccessClaims(t *testing.T) jwtPackage.VerifiedClaims {
 
 func SessionState() domain.SessionState {
 	return domain.SessionState{UserID: 42, UserStatus: "ACTIVE", AuthVersion: 3, UserVersion: 4,
-		SessionID: SessionID, SessionUserID: 42, SessionStatus: "ACTIVE", CreatedAt: ServiceTime.Add(-time.Hour), ExpiresAt: ServiceTime.Add(-time.Hour).Add(7 * 24 * time.Hour)}
+		SessionAuthVersion: sql.NullInt64{Int64: 3, Valid: true}, SessionID: SessionID, SessionUserID: 42, SessionStatus: "ACTIVE", CreatedAt: ServiceTime.Add(-time.Hour), ExpiresAt: ServiceTime.Add(-time.Hour).Add(7 * 24 * time.Hour)}
 }

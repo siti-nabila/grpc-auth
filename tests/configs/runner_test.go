@@ -6,5 +6,6 @@ import (
 	"testing"
 )
 
-func TestConfigs(t *testing.T)       { testutils.Run(t, test_scenarios.All()) }
-func TestLoginSecurity(t *testing.T) { testutils.Run(t, test_scenarios.Login()) }
+func TestConfigs(t *testing.T)            { testutils.Run(t, test_scenarios.All()) }
+func TestLoginSecurity(t *testing.T)      { testutils.Run(t, test_scenarios.Login()) }
+func TestCommandFingerprint(t *testing.T) { testutils.Run(t, test_scenarios.CommandFingerprint()) }

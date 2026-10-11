@@ -1,7 +1,9 @@
 package domain
 
 import (
+	"database/sql"
 	"errors"
+	"github.com/siti-nabila/grpc-auth/pkg/types"
 	"strconv"
 	"strings"
 	"time"
@@ -30,17 +32,29 @@ type (
 	}
 
 	UserListFilter struct {
-		CreatedFrom *time.Time
-		CreatedTo   *time.Time
-		RoleCodes   []uint64
+		CreatedFrom     *time.Time
+		CreatedTo       *time.Time
+		RoleCodes       []uint64
+		Statuses        []types.UserStatus
+		ApplicationCode string
 	}
 
 	UserSearchRow struct {
-		AuthID  int64  `sql:"column:auth_id" json:"auth_id"`
-		Email   string `sql:"column:email" json:"email"`
-		Name    string `sql:"column:name" json:"name"`
-		Address string `sql:"column:address" json:"address"`
-		Phone   string `sql:"column:phone" json:"phone"`
+		AuthID            int64                 `sql:"column:auth_id" json:"auth_id"`
+		Email             string                `sql:"column:email" json:"email"`
+		Name              string                `sql:"column:name" json:"name"`
+		Address           string                `sql:"column:address" json:"address"`
+		Phone             string                `sql:"column:phone" json:"phone"`
+		Status            types.UserStatus      `sql:"column:status" json:"status"`
+		Version           int64                 `sql:"column:version" json:"version"`
+		CreatedAt         time.Time             `sql:"column:created_at" json:"created_at"`
+		Roles             []UserListRole        `sql:"-" json:"roles"`
+		ApplicationAccess []UserListApplication `sql:"-" json:"application_access"`
+		NameKey           sql.NullString        `sql:"column:key_name" json:"-"`
+		AddressKey        sql.NullString        `sql:"column:key_address" json:"-"`
+		PhoneKey          sql.NullString        `sql:"column:key_phone" json:"-"`
+		RolesKey          sql.NullString        `sql:"column:key_roles" json:"-"`
+		ApplicationsKey   sql.NullString        `sql:"column:key_application_access" json:"-"`
 	}
 
 	UserListCursorOptions struct {
@@ -51,7 +65,7 @@ type (
 )
 
 func (UserSearchRow) TableName() string {
-	return "profile p"
+	return "auth a"
 }
 
 func ValidateUserListSortDesc(sorts []orm.SortField) (bool, error) {

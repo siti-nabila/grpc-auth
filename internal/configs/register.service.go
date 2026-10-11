@@ -12,9 +12,10 @@ import (
 
 type sessionUserServer struct {
 	userv1.UnimplementedUserServiceServer
-	login    *handler.SessionLoginHandler
-	register *handler.PendingRegistrationHandler
-	reads    *handler.SessionReadHandler
+	login      *handler.SessionLoginHandler
+	register   *handler.PendingRegistrationHandler
+	reads      *handler.SessionReadHandler
+	management *handler.UserManagementHandler
 }
 
 func (s *sessionUserServer) Login(ctx context.Context, req *userv1.AuthRequest) (*userv1.UserTokenResponse, error) {
@@ -28,6 +29,10 @@ func (s *sessionUserServer) Me(ctx context.Context, req *emptypb.Empty) (*userv1
 }
 func (s *sessionUserServer) ListUsers(ctx context.Context, req *userv1.ListUsersRequest) (*userv1.ListUsersResponse, error) {
 	return s.reads.ListUsers(ctx, req)
+}
+
+func (s *sessionUserServer) GetUser(ctx context.Context, req *userv1.GetUserRequest) (*userv1.GetUserResponse, error) {
+	return s.reads.GetUser(ctx, req)
 }
 
 func (s *sessionUserServer) TesRPC(ctx context.Context, req *emptypb.Empty) (*userv1.TestRPC, error) {
@@ -46,4 +51,14 @@ func (s *sessionProfileServer) UpdateProfile(ctx context.Context, req *profilev1
 func registerFoundation(s *grpc.Server, users *sessionUserServer, profile *sessionProfileServer) {
 	userv1.RegisterUserServiceServer(s, users)
 	profilev1.RegisterProfileServiceServer(s, profile)
+}
+
+func (s *sessionUserServer) CreateUser(ctx context.Context, r *userv1.CreateUserRequest) (*userv1.CreateUserResponse, error) {
+	return s.management.CreateUser(ctx, r)
+}
+func (s *sessionUserServer) UpdateUser(ctx context.Context, r *userv1.UpdateUserRequest) (*userv1.UpdateUserResponse, error) {
+	return s.management.UpdateUser(ctx, r)
+}
+func (s *sessionUserServer) ChangeUserStatus(ctx context.Context, r *userv1.ChangeUserStatusRequest) (*userv1.ChangeUserStatusResponse, error) {
+	return s.management.ChangeUserStatus(ctx, r)
 }

@@ -152,7 +152,7 @@ func loginSessionMatrix(t *testing.T) {
 						return b, nil
 					}},
 					Session: mocks.SessionWriter{Write: func(s domain.Session) error {
-						if s.Validate() != nil || s.ID != c.SessionID || s.UserID != 42 || !s.ExpiresAt.Equal(fixtures.ServiceTime.Add(7*24*time.Hour)) {
+						if s.Validate() != nil || s.ID != c.SessionID || s.UserID != 42 || s.AuthVersion != 3 || !s.ExpiresAt.Equal(fixtures.ServiceTime.Add(7*24*time.Hour)) {
 							t.Fatal("session state")
 						}
 						if kind == "panic session" {

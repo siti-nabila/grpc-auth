@@ -77,7 +77,7 @@ func producerFlow(t *testing.T) {
 			}
 			steps = append(steps, mocks.SQLStep{Op: "query", SQL: "FROM auth", Args: []driver.Value{int64(42)}, Columns: accountCols, Rows: [][]driver.Value{accountRow}})
 			writes := []mocks.SQLStep{
-				{Op: "query", SQL: "INSERT INTO sessions", Args: []driver.Value{c.SessionID, int64(42), "ACTIVE", now, now, end, nil, nil, nil, nil, nil, nil}, Columns: []string{"id"}, Rows: [][]driver.Value{{c.SessionID}}},
+				{Op: "query", SQL: "INSERT INTO sessions", Args: []driver.Value{c.SessionID, int64(42), "ACTIVE", now, now, end, nil, nil, nil, nil, nil, nil, int64(3)}, Columns: []string{"id"}, Rows: [][]driver.Value{{c.SessionID}}},
 				{Op: "query", SQL: "INSERT INTO refresh_tokens", Args: []driver.Value{c.RefreshID, c.SessionID, c.RefreshDigest, c.FamilyID, now, end, nil, nil, nil}, Columns: []string{"id"}, Rows: [][]driver.Value{{c.RefreshID}}},
 				{Op: "query", SQL: "INSERT INTO audit_logs", Args: []driver.Value{int64(42), nil, "SESSION_CREATED", "session", c.SessionID, nil, `{"status":"ACTIVE","session_id":"` + c.SessionID + `"}`, nil, nil, nil, now}, Columns: []string{"id"}, Rows: [][]driver.Value{{int64(1)}}},
 				{Op: "commit"},
@@ -133,7 +133,7 @@ func producerFlow(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			stateStep := mocks.SQLStep{Op: "query", SQL: "JOIN auth a ON a.id = s.user_id", Args: []driver.Value{response.SessionId}, Columns: []string{"user_id", "user_status", "auth_version", "user_version", "must_change_password", "deleted_at", "session_id", "session_user_id", "session_status", "created_at", "expires_at", "revoked_at"}, Rows: [][]driver.Value{{int64(42), "ACTIVE", int64(3), int64(4), restricted, nil, response.SessionId, int64(42), "ACTIVE", now, end, nil}}}
+			stateStep := mocks.SQLStep{Op: "query", SQL: "JOIN auth a ON a.id = s.user_id", Args: []driver.Value{response.SessionId}, Columns: []string{"user_id", "user_status", "auth_version", "user_version", "must_change_password", "deleted_at", "session_id", "session_user_id", "session_status", "created_at", "expires_at", "revoked_at", "session_auth_version"}, Rows: [][]driver.Value{{int64(42), "ACTIVE", int64(3), int64(4), restricted, nil, response.SessionId, int64(42), "ACTIVE", now, end, nil, int64(3)}}}
 			// Returned state is the expected result of actual session INSERT above;
 			// only the SQL boundary is faked, never the Login producer or signer.
 			provider := database.NewTransactionProvider(db, d, database.GetORMConfig())

@@ -24,7 +24,7 @@ func (r *sessionStateReader) GetSessionState(ctx context.Context, id string) (st
 	}
 	err = r.handle.UseModel(domain.SessionState{}).WithContext(ctx).Select(
 		"a.id AS user_id", "a.status AS user_status", "a.auth_version", "a.version AS user_version", "a.must_change_password", "a.deleted_at",
-		"s.id AS session_id", "s.user_id AS session_user_id", "s.status AS session_status", "s.created_at", "s.expires_at", "s.revoked_at",
+		"s.id AS session_id", "s.user_id AS session_user_id", "s.status AS session_status", "s.created_at", "s.expires_at", "s.revoked_at", "s.auth_version AS session_auth_version",
 	).Join("auth a", "a.id = s.user_id").Where("s.id = ?", id).Limit(1).Scan(&state)
 	return state, helpers.HandleDBError(err)
 }

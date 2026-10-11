@@ -54,7 +54,7 @@ func postgresLogin(t *testing.T) {
 			if err := fixture.DB.QueryRowContext(ctx, `SELECT
 			 (SELECT count(*) FROM information_schema.columns WHERE table_schema=$1 AND table_name IN ('sessions','refresh_tokens')),
 			 (SELECT count(*) FROM pg_constraint c JOIN pg_class r ON r.oid=c.conrelid JOIN pg_namespace n ON n.oid=r.relnamespace WHERE n.nspname=$1 AND r.relname IN ('sessions','refresh_tokens') AND c.convalidated),
-			 (SELECT count(*) FROM pg_indexes WHERE schemaname=$1 AND tablename IN ('sessions','refresh_tokens'))`, fixture.Name).Scan(&columns, &constraints, &indexes); err != nil || columns != 21 || constraints != 14 || indexes != 7 {
+			 (SELECT count(*) FROM pg_indexes WHERE schemaname=$1 AND tablename IN ('sessions','refresh_tokens'))`, fixture.Name).Scan(&columns, &constraints, &indexes); err != nil || columns != 22 || constraints != 15 || indexes != 7 {
 				t.Fatal("actual producer schema column/constraint/index prerequisite mismatch")
 			}
 			var responses []*userv1.UserTokenResponse

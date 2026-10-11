@@ -6,4 +6,5 @@ import (
 	"testing"
 )
 
-func TestLocalLimiter(t *testing.T) { testutils.Run(t, test_scenarios.All()) }
+func TestLocalLimiter(t *testing.T)           { testutils.Run(t, test_scenarios.All()) }
+func TestRefreshAtomicAdmission(t *testing.T) { testutils.Run(t, test_scenarios.RefreshAtomic()) }
