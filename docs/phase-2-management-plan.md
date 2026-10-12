@@ -1,7 +1,7 @@
 # Plan implementasi Phase 2 — User, Role, dan Application Access
 
 Tanggal baseline: 11 Oktober 2026. Status: **IN_PROGRESS**; increment A telah
-diimplementasikan, B–E belum dimulai. Owner backend: `grpc-auth`.
+diimplementasikan, increment B selesai dengan required backend gates PASS; C–E belum dimulai. Owner backend: `grpc-auth`.
 Evidence A: [auth-user-management](../openspec/changes/archive/2026-10-11-auth-user-management/evidence.md).
 
 ## 1. Sumber dan batas phase
@@ -32,8 +32,8 @@ role hierarchy dan direct user permission adalah POST_MVP.
 | TLS/service token, verified principal, authoritative permission dan primary snapshot | [Authorization foundation archive](../openspec/changes/archive/2026-10-10-auth-session-authorization-foundation/evidence.md) | Gate backend sebelum admin RPC diaktifkan |
 | Register PENDING, session-aware Login/Me/UpdateProfile | [Login producer archive](../openspec/changes/archive/2026-10-10-auth-login-session-producer/evidence.md) | Creation/status harus kompatibel dengan alur ini |
 | Refresh, Logout, ChangePassword, enam session RPC dan dynamic ListUsers | [Lifecycle archive: 41/41 task](../openspec/changes/archive/2026-10-11-auth-session-lifecycle/evidence.md) | Jangan diimplementasikan ulang; regression tetap wajib |
-| Contract published baseline | `api-contracts v0.0.0-20261011113651-729758974696` dalam go.mod | Empat RPC management additive, generation/catalog tests dan publication PASS |
-| UserService pada checkout contract | Register, Login, Me, ListUsers, TesRPC serta GetUser/CreateUser/UpdateUser/ChangeUserStatus | Default server19 methods; detail evidence increment A |
+| Contract published baseline | `api-contracts v0.0.0-20261012030550-fd1147049d52` dalam go.mod | Contract A+B additive; generation/catalog tests dan publication PASS |
+| UserService pada checkout contract | Register, Login, Me, ListUsers, TesRPC serta GetUser/CreateUser/UpdateUser/ChangeUserStatus | Default server27 methods; [inventory B](role-management-api.md#registered-method-inventory-and-ownership) |
 | SQL fixture dan migration yang disiapkan | [SQL management](sql/user-management/README.md), [session generation](sql/session-lifecycle/01_session_generation.sql) | Periksa kebutuhan command terhadap metadata read-only; jangan otomatis menjalankan migration aplikasi |
 
 Graph `graphify-out/graph.json` dibangun pada commit
@@ -45,14 +45,14 @@ berada di working tree; pertahankan semuanya, jangan reset atau commit otomatis.
 
 ## 3. Urutan increment
 
-Nama change B–E berikut adalah rencana, belum dibuat. Increment A **IMPLEMENTED**;
-B–E **NOT_STARTED**. Setiap increment wajib mendapat contract yang
+Change B **IMPLEMENTED**, required backend verification **PASS**.
+Increment A **IMPLEMENTED**; C–E **NOT_STARTED**. Setiap increment wajib mendapat contract yang
 sesuai, test backend, evidence dan validasi sebelum sync/archive.
 
 | Urutan | Change | RPC baru | Prasyarat utama |
 | --- | --- | --- | --- |
 | A | [auth-user-management](../openspec/changes/archive/2026-10-11-auth-user-management/proposal.md) | GetUser, CreateUser, UpdateUser, ChangeUserStatus | Foundation yang diarsipkan + publication contract A |
-| B | `auth-role-management` | ListRoles, GetRole, CreateRole, UpdateRole, ChangeRoleStatus, ReplaceRolePermissions; ListPermissions, ListApplications | A, catalog existing + publication contract B |
+| B | [auth-role-management](../openspec/changes/archive/2026-10-12-auth-role-management/proposal.md) | ListRoles, GetRole, CreateRole, UpdateRole, ChangeRoleStatus, ReplaceRolePermissions; ListPermissions, ListApplications | A, catalog existing + publication contract B |
 | C | `auth-user-role-assignment` | ListUserRoles, GrantUserRoles, RevokeUserRoles | A/B; last-admin guard bersama + publication contract C |
 | D | `auth-application-access` | ListUserApplicationAccess, GrantApplicationAccess, RevokeApplicationAccess | A/B/C; compound mutation + publication contract D |
 | E | `auth-effective-permission-reads` | GetMyEffectivePermissions, GetUserEffectivePermissions | B/C/D untuk acceptance end-to-end; resolver existing + publication contract E |
@@ -108,6 +108,11 @@ eksternal. Dependency dan backend wiring sudah diterapkan; hasil ada pada
 terbatas pada contract; grpc-auth belum di-commit/push atau di-deploy.
 
 ## 5. Increment B — Role dan catalog
+
+Implementasi dan required gates **PASS**: [API/inventory27](role-management-api.md),
+[evidence B](../openspec/changes/archive/2026-10-12-auth-role-management/evidence.md). Full
+workspace/standalone test/vet/race/build serta dedicated PostgreSQL normal/race
+lulus. C–E dan actual deployment Phase6 tetap belum selesai.
 
 - ListRoles/GetRole memerlukan `iam.role.read`; GetRole menyertakan version,
   permission dan affected_user_count. Catalog role menampilkan role sesuai
@@ -206,8 +211,10 @@ field itu wajib kosong pada management response, tidak boleh meng-echo request.
 Jangan menghapus/renumber field lama. Untuk increment A, contract empat RPC,
 generator/test/docs, publication dan dependency update sudah masuk task plan;
 implementasi dimulai saat apply, dengan commit/push sesuai otorisasi Git yang
-berlaku. Scope tidak melebar ke contract role/application atau code runtime
-sibling. Workspace sukses belum cukup: GOWORK=off harus memakai versi published.
+berlaku. Scope increment A tidak mencakup contract role/application. Increment B
+menambahkan contract role/permission/application sesuai [tasks B](../openspec/changes/archive/2026-10-12-auth-role-management/tasks.md),
+tanpa perubahan runtime sibling. Workspace sukses belum cukup: GOWORK=off
+harus memakai versi published.
 
 ## 10. Filter user dan batas REST
 
@@ -232,7 +239,7 @@ fitur filter-options atau integrasi rest-orc.
 | Behavior | Success/validation/permission/restricted/system-role/ownership/no-op/replay/version/dependency tests melalui registered gRPC paths | grpc-auth |
 | Atomicity | Failure injection pada tiap write/guard/read, independent audit, cancellation/panic/commit uncertainty | grpc-auth |
 | PostgreSQL | Dedicated opt-in test DB, dua physical connections/barriers; last-admin lintas status/revoke, uniqueness, response-loss/replay/expiry, pool cleanup | grpc-auth |
-| Regression | gofmt, targeted/default/race/vet/make build, workspace dan GOWORK=off; existing 15 RPCs dan dynamic ListUsers dipertahankan | grpc-auth |
+| Regression | gofmt, targeted/default/race/vet/make build, workspace dan GOWORK=off; prior19 RPCs dan dynamic ListUsers dipertahankan | grpc-auth |
 | Documentation | Requirement/scenario traceability, actual evidence per increment, strict OpenSpec validation, diff/status/link checks | grpc-auth |
 | Deployment | Actual schema/admin/key/caller/consumer readiness dan rollback/cutover | Phase 6 DEP-01 |
 

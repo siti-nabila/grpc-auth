@@ -68,6 +68,10 @@ type leasedTransaction struct {
 	conn   *sql.Conn
 }
 
+func (t *leasedTransaction) ExecContext(ctx context.Context, statement string, args ...any) (sql.Result, error) {
+	return t.native.ExecContext(ctx, statement, args...)
+}
+
 func (t *leasedTransaction) Commit() error {
 	err := t.Transaction.Commit()
 	if err != nil {

@@ -16,3 +16,5 @@ func TestSecurityAttempts(t *testing.T) { testutils.Run(t, test_scenarios.Securi
 
 func TestLifecycleInterceptors(t *testing.T) { testutils.Run(t, test_scenarios.Lifecycle()) }
 func TestLifecycleRateGroups(t *testing.T)   { testutils.Run(t, test_scenarios.LifecycleRateGroups()) }
+
+func TestRoleRateGroups(t *testing.T) { testutils.Run(t, test_scenarios.RoleRateGroups()) }

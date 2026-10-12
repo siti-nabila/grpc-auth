@@ -31,3 +31,9 @@ func TestAdminSessionsHandler(t *testing.T) { testutils.Run(t, test_scenarios.Ad
 func TestUserManagementHandlers(t *testing.T) {
 	testutils.Run(t, test_scenarios.UserManagementHandlers())
 }
+
+func TestCatalogReadHandlers(t *testing.T) { testutils.Run(t, test_scenarios.CatalogReadHandlers()) }
+
+func TestRoleManagementHandlers(t *testing.T) {
+	testutils.Run(t, test_scenarios.RoleManagementHandlers())
+}

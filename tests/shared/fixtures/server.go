@@ -28,13 +28,19 @@ import (
 // in-memory TLS transport. The caller owns the injected database and entropy.
 func FoundationServer(t *testing.T, db *sql.DB, now func() time.Time, entropy io.Reader, methods ...string) (*grpc.ClientConn, *configs.Foundation) {
 	t.Helper()
+	service := ServiceConfig()
+	service.Callers[0].Methods = append(service.Callers[0].Methods, methods...)
+	return FoundationServerWithService(t, db, now, entropy, service)
+}
+
+func FoundationServerWithService(t *testing.T, db *sql.DB, now func() time.Time, entropy io.Reader, service config.ServiceAuthConfig) (*grpc.ClientConn, *configs.Foundation) {
+	t.Helper()
 	private, public := AccessPEM(t)
 	cfg := &configs.AppConfig{ApplicationName: AccessIssuer,
 		AccessIssuer:       config.AccessIssuerConfig{PrivateKeyFile: "private", PublicKeyFile: "public", KeyVersion: "test-v1"},
 		AuthLimiter:        config.AuthLimiterConfig{AccountHMACSecret: "test-only-account-secret"},
 		CommandFingerprint: config.CommandFingerprintConfig{ActiveVersion: "test-v1", Keys: map[string]string{"test-v1": strings.Repeat("m", 32)}},
-		ServiceAuth:        ServiceConfig(), Timeout: time.Second}
-	cfg.ServiceAuth.Callers[0].Methods = append(cfg.ServiceAuth.Callers[0].Methods, methods...)
+		ServiceAuth:        service, Timeout: time.Second}
 	security, err := configs.LoadLoginSecurity(cfg, func(path string) ([]byte, error) {
 		if path == "private" {
 			return private, nil

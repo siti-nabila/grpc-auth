@@ -137,7 +137,7 @@ func (d EventData) validate() error {
 		}
 	}
 	for _, code := range d.PermissionCodes {
-		if !boundedText(code, 100, true) {
+		if !boundedText(code, 150, true) {
 			return common.ErrBadRequest
 		}
 	}

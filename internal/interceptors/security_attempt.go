@@ -8,6 +8,8 @@ import (
 
 	authv1 "github.com/siti-nabila/api-contracts/pb/auth/v1"
 	"github.com/siti-nabila/api-contracts/pkg/dictionary"
+	applicationerrors "github.com/siti-nabila/api-contracts/pkg/dictionary/application"
+	roleerrors "github.com/siti-nabila/api-contracts/pkg/dictionary/role"
 	userdictionary "github.com/siti-nabila/api-contracts/pkg/dictionary/user"
 
 	userv1 "github.com/siti-nabila/api-contracts/pb/user/v1"
@@ -111,7 +113,7 @@ func safeAttemptReason(err error) types.AuditReason {
 	if len(key) > 100 {
 		return types.AuditInternalFailure
 	}
-	for _, registry := range []dictionary.Registry{common.Registry(), auth.Registry(), userdictionary.Registry()} {
+	for _, registry := range []dictionary.Registry{common.Registry(), auth.Registry(), userdictionary.Registry(), roleerrors.Registry(), applicationerrors.Registry()} {
 		if _, ok := registry.Lookup(key); ok {
 			return types.AuditReason(strings.ToUpper(strings.ReplaceAll(key, ".", "_")))
 		}

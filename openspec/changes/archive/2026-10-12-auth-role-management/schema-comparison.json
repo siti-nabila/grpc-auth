@@ -1,0 +1,930 @@
+{
+  "baseline_read_only": {
+    "columns": [
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "id",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "applications",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": 50,
+        "column_default": null,
+        "column_name": "code",
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "table_name": "applications",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": 100,
+        "column_default": null,
+        "column_name": "name",
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "table_name": "applications",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": 16,
+        "column_default": "'ACTIVE'::character varying",
+        "column_name": "status",
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "table_name": "applications",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": "false",
+        "column_name": "is_system",
+        "data_type": "boolean",
+        "is_nullable": "NO",
+        "table_name": "applications",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "id",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "permissions",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "application_id",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "permissions",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": 150,
+        "column_default": null,
+        "column_name": "code",
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "table_name": "permissions",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "description",
+        "data_type": "text",
+        "is_nullable": "NO",
+        "table_name": "permissions",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": "nextval('role_id_seq'::regclass)",
+        "column_name": "id",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "role",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": 50,
+        "column_default": null,
+        "column_name": "role_name",
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "table_name": "role",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": "nextval('role_numeric_code_seq'::regclass)",
+        "column_name": "role_code",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "role",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": 100,
+        "column_default": null,
+        "column_name": "role_description",
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "table_name": "role",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "application_id",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "role",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": 100,
+        "column_default": null,
+        "column_name": "code",
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "table_name": "role",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": 16,
+        "column_default": "'ACTIVE'::character varying",
+        "column_name": "status",
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "table_name": "role",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": "false",
+        "column_name": "is_system",
+        "data_type": "boolean",
+        "is_nullable": "NO",
+        "table_name": "role",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": "1",
+        "column_name": "version",
+        "data_type": "bigint",
+        "is_nullable": "NO",
+        "table_name": "role",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": "CURRENT_TIMESTAMP",
+        "column_name": "created_at",
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "table_name": "role",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "updated_at",
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "table_name": "role",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "role_id",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "role_permissions",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "permission_id",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "role_permissions",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": "nextval('user_role_id_seq'::regclass)",
+        "column_name": "id",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "user_role",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "user_id",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "user_role",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "role_id",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "user_role",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": 16,
+        "column_default": "'ACTIVE'::character varying",
+        "column_name": "status",
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "table_name": "user_role",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "granted_by",
+        "data_type": "integer",
+        "is_nullable": "YES",
+        "table_name": "user_role",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": "CURRENT_TIMESTAMP",
+        "column_name": "granted_at",
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "table_name": "user_role",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "revoked_by",
+        "data_type": "integer",
+        "is_nullable": "YES",
+        "table_name": "user_role",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "revoked_at",
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "table_name": "user_role",
+        "table_schema": "public"
+      },
+      {
+        "character_maximum_length": 500,
+        "column_default": null,
+        "column_name": "revoke_reason",
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "table_name": "user_role",
+        "table_schema": "public"
+      }
+    ],
+    "constraints": [
+      {
+        "definition": "CHECK (((code)::text ~ '^[a-z][a-z0-9_]*$'::text))",
+        "name": "applications_code_ck",
+        "schema": "public",
+        "table_name": "applications"
+      },
+      {
+        "definition": "UNIQUE (code)",
+        "name": "applications_code_key",
+        "schema": "public",
+        "table_name": "applications"
+      },
+      {
+        "definition": "PRIMARY KEY (id)",
+        "name": "applications_pkey",
+        "schema": "public",
+        "table_name": "applications"
+      },
+      {
+        "definition": "CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'DISABLED'::character varying])::text[])))",
+        "name": "applications_status_ck",
+        "schema": "public",
+        "table_name": "applications"
+      },
+      {
+        "definition": "FOREIGN KEY (application_id) REFERENCES applications(id) ON DELETE RESTRICT",
+        "name": "permissions_application_id_fkey",
+        "schema": "public",
+        "table_name": "permissions"
+      },
+      {
+        "definition": "CHECK (((code)::text ~ '^[a-z][a-z0-9_]*([.][a-z][a-z0-9_]*){2,}$'::text))",
+        "name": "permissions_code_ck",
+        "schema": "public",
+        "table_name": "permissions"
+      },
+      {
+        "definition": "UNIQUE (code)",
+        "name": "permissions_code_key",
+        "schema": "public",
+        "table_name": "permissions"
+      },
+      {
+        "definition": "PRIMARY KEY (id)",
+        "name": "permissions_pkey",
+        "schema": "public",
+        "table_name": "permissions"
+      },
+      {
+        "definition": "FOREIGN KEY (application_id) REFERENCES applications(id) ON DELETE RESTRICT",
+        "name": "role_application_fk",
+        "schema": "public",
+        "table_name": "role"
+      },
+      {
+        "definition": "CHECK (((code)::text ~ '^[a-z][a-z0-9_]*[.][a-z][a-z0-9_]*$'::text))",
+        "name": "role_code_string_ck",
+        "schema": "public",
+        "table_name": "role"
+      },
+      {
+        "definition": "UNIQUE (code)",
+        "name": "role_code_string_uq",
+        "schema": "public",
+        "table_name": "role"
+      },
+      {
+        "definition": "CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'DISABLED'::character varying])::text[])))",
+        "name": "role_status_ck",
+        "schema": "public",
+        "table_name": "role"
+      },
+      {
+        "definition": "CHECK ((version >= 1))",
+        "name": "role_version_ck",
+        "schema": "public",
+        "table_name": "role"
+      },
+      {
+        "definition": "UNIQUE (role_code)",
+        "name": "uq_role_code",
+        "schema": "public",
+        "table_name": "role"
+      },
+      {
+        "definition": "PRIMARY KEY (id)",
+        "name": "user_id_pkey",
+        "schema": "public",
+        "table_name": "role"
+      },
+      {
+        "definition": "FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE RESTRICT",
+        "name": "role_permissions_permission_id_fkey",
+        "schema": "public",
+        "table_name": "role_permissions"
+      },
+      {
+        "definition": "PRIMARY KEY (role_id, permission_id)",
+        "name": "role_permissions_pkey",
+        "schema": "public",
+        "table_name": "role_permissions"
+      },
+      {
+        "definition": "FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE RESTRICT",
+        "name": "role_permissions_role_id_fkey",
+        "schema": "public",
+        "table_name": "role_permissions"
+      },
+      {
+        "definition": "PRIMARY KEY (id)",
+        "name": "PK_user_role",
+        "schema": "public",
+        "table_name": "user_role"
+      },
+      {
+        "definition": "FOREIGN KEY (role_id) REFERENCES role(id)",
+        "name": "role_fk",
+        "schema": "public",
+        "table_name": "user_role"
+      },
+      {
+        "definition": "FOREIGN KEY (user_id) REFERENCES auth(id)",
+        "name": "user_fk",
+        "schema": "public",
+        "table_name": "user_role"
+      },
+      {
+        "definition": "FOREIGN KEY (granted_by) REFERENCES auth(id) ON DELETE RESTRICT",
+        "name": "user_role_granted_by_fk",
+        "schema": "public",
+        "table_name": "user_role"
+      },
+      {
+        "definition": "UNIQUE (user_id, role_id)",
+        "name": "user_role_pair_uq",
+        "schema": "public",
+        "table_name": "user_role"
+      },
+      {
+        "definition": "CHECK (((((status)::text = 'ACTIVE'::text) AND (revoked_at IS NULL)) OR (((status)::text = 'REVOKED'::text) AND (revoked_at IS NOT NULL) AND (revoke_reason IS NOT NULL) AND ((char_length(btrim((revoke_reason)::text)) >= 3) AND (char_length(btrim((revoke_reason)::text)) <= 500)))))",
+        "name": "user_role_revocation_ck",
+        "schema": "public",
+        "table_name": "user_role"
+      },
+      {
+        "definition": "FOREIGN KEY (revoked_by) REFERENCES auth(id) ON DELETE RESTRICT",
+        "name": "user_role_revoked_by_fk",
+        "schema": "public",
+        "table_name": "user_role"
+      },
+      {
+        "definition": "CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'REVOKED'::character varying])::text[])))",
+        "name": "user_role_status_ck",
+        "schema": "public",
+        "table_name": "user_role"
+      }
+    ],
+    "identity": [
+      {
+        "database": "user",
+        "postgres_version": "16.13",
+        "schema": "public"
+      }
+    ],
+    "sequence": [
+      {
+        "data_type": "integer",
+        "increment_by": 1,
+        "max_value": 2147483647,
+        "min_value": 1,
+        "schemaname": "public",
+        "sequencename": "role_numeric_code_seq"
+      }
+    ]
+  },
+  "dedicated_owned_fixture": {
+    "columns": [
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "id",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "applications",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": 50,
+        "column_default": null,
+        "column_name": "code",
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "table_name": "applications",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": 100,
+        "column_default": null,
+        "column_name": "name",
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "table_name": "applications",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": 16,
+        "column_default": "'ACTIVE'::character varying",
+        "column_name": "status",
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "table_name": "applications",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": "false",
+        "column_name": "is_system",
+        "data_type": "boolean",
+        "is_nullable": "NO",
+        "table_name": "applications",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "id",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "permissions",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "application_id",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "permissions",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": 150,
+        "column_default": null,
+        "column_name": "code",
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "table_name": "permissions",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "description",
+        "data_type": "text",
+        "is_nullable": "NO",
+        "table_name": "permissions",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "id",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "role",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": 50,
+        "column_default": null,
+        "column_name": "role_name",
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "table_name": "role",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": "nextval('role_numeric_code_seq'::regclass)",
+        "column_name": "role_code",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "role",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": 100,
+        "column_default": null,
+        "column_name": "role_description",
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "table_name": "role",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "application_id",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "role",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": 100,
+        "column_default": null,
+        "column_name": "code",
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "table_name": "role",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": 16,
+        "column_default": "'ACTIVE'::character varying",
+        "column_name": "status",
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "table_name": "role",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": "false",
+        "column_name": "is_system",
+        "data_type": "boolean",
+        "is_nullable": "NO",
+        "table_name": "role",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": "1",
+        "column_name": "version",
+        "data_type": "bigint",
+        "is_nullable": "NO",
+        "table_name": "role",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": "CURRENT_TIMESTAMP",
+        "column_name": "created_at",
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "table_name": "role",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "updated_at",
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "table_name": "role",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "role_id",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "role_permissions",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "permission_id",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "role_permissions",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "id",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "user_role",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "user_id",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "user_role",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "role_id",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "table_name": "user_role",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": 16,
+        "column_default": "'ACTIVE'::character varying",
+        "column_name": "status",
+        "data_type": "character varying",
+        "is_nullable": "NO",
+        "table_name": "user_role",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "granted_by",
+        "data_type": "integer",
+        "is_nullable": "YES",
+        "table_name": "user_role",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": "CURRENT_TIMESTAMP",
+        "column_name": "granted_at",
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "table_name": "user_role",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "revoked_by",
+        "data_type": "integer",
+        "is_nullable": "YES",
+        "table_name": "user_role",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": null,
+        "column_default": null,
+        "column_name": "revoked_at",
+        "data_type": "timestamp with time zone",
+        "is_nullable": "YES",
+        "table_name": "user_role",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      },
+      {
+        "character_maximum_length": 500,
+        "column_default": null,
+        "column_name": "revoke_reason",
+        "data_type": "character varying",
+        "is_nullable": "YES",
+        "table_name": "user_role",
+        "table_schema": "grpc_auth_test_role_preflight_34228"
+      }
+    ],
+    "constraints": [
+      {
+        "definition": "CHECK (((code)::text ~ '^[a-z][a-z0-9_]*$'::text))",
+        "name": "applications_code_check",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "applications"
+      },
+      {
+        "definition": "UNIQUE (code)",
+        "name": "applications_code_key",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "applications"
+      },
+      {
+        "definition": "PRIMARY KEY (id)",
+        "name": "applications_pkey",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "applications"
+      },
+      {
+        "definition": "CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'DISABLED'::character varying])::text[])))",
+        "name": "applications_status_check",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "applications"
+      },
+      {
+        "definition": "FOREIGN KEY (application_id) REFERENCES applications(id) ON DELETE RESTRICT",
+        "name": "permissions_application_id_fkey",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "permissions"
+      },
+      {
+        "definition": "CHECK (((code)::text ~ '^[a-z][a-z0-9_]*([.][a-z][a-z0-9_]*){2,}$'::text))",
+        "name": "permissions_code_ck",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "permissions"
+      },
+      {
+        "definition": "UNIQUE (code)",
+        "name": "permissions_code_key",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "permissions"
+      },
+      {
+        "definition": "PRIMARY KEY (id)",
+        "name": "permissions_pkey",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "permissions"
+      },
+      {
+        "definition": "FOREIGN KEY (application_id) REFERENCES applications(id) ON DELETE RESTRICT",
+        "name": "role_application_fk",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "role"
+      },
+      {
+        "definition": "CHECK (((code)::text ~ '^[a-z][a-z0-9_]*[.][a-z][a-z0-9_]*$'::text))",
+        "name": "role_code_string_ck",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "role"
+      },
+      {
+        "definition": "UNIQUE (code)",
+        "name": "role_code_string_uq",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "role"
+      },
+      {
+        "definition": "CHECK (((status)::text = ANY (ARRAY[('ACTIVE'::character varying)::text, ('DISABLED'::character varying)::text])))",
+        "name": "role_status_ck",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "role"
+      },
+      {
+        "definition": "CHECK ((version >= 1))",
+        "name": "role_version_ck",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "role"
+      },
+      {
+        "definition": "UNIQUE (role_code)",
+        "name": "uq_role_code",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "role"
+      },
+      {
+        "definition": "PRIMARY KEY (id)",
+        "name": "user_id_pkey",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "role"
+      },
+      {
+        "definition": "FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE RESTRICT",
+        "name": "role_permissions_permission_id_fkey",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "role_permissions"
+      },
+      {
+        "definition": "PRIMARY KEY (role_id, permission_id)",
+        "name": "role_permissions_pkey",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "role_permissions"
+      },
+      {
+        "definition": "FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE RESTRICT",
+        "name": "role_permissions_role_id_fkey",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "role_permissions"
+      },
+      {
+        "definition": "PRIMARY KEY (id)",
+        "name": "PK_user_role",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "user_role"
+      },
+      {
+        "definition": "FOREIGN KEY (role_id) REFERENCES role(id)",
+        "name": "role_fk",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "user_role"
+      },
+      {
+        "definition": "FOREIGN KEY (user_id) REFERENCES auth(id)",
+        "name": "user_fk",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "user_role"
+      },
+      {
+        "definition": "FOREIGN KEY (granted_by) REFERENCES auth(id) ON DELETE RESTRICT",
+        "name": "user_role_granted_by_fk",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "user_role"
+      },
+      {
+        "definition": "UNIQUE (user_id, role_id)",
+        "name": "user_role_pair_uq",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "user_role"
+      },
+      {
+        "definition": "CHECK (((((status)::text = 'ACTIVE'::text) AND (revoked_at IS NULL)) OR (((status)::text = 'REVOKED'::text) AND (revoked_at IS NOT NULL) AND (revoke_reason IS NOT NULL) AND ((char_length(btrim((revoke_reason)::text)) >= 3) AND (char_length(btrim((revoke_reason)::text)) <= 500)))))",
+        "name": "user_role_revocation_ck",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "user_role"
+      },
+      {
+        "definition": "FOREIGN KEY (revoked_by) REFERENCES auth(id) ON DELETE RESTRICT",
+        "name": "user_role_revoked_by_fk",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "user_role"
+      },
+      {
+        "definition": "CHECK (((status)::text = ANY (ARRAY[('ACTIVE'::character varying)::text, ('REVOKED'::character varying)::text])))",
+        "name": "user_role_status_ck",
+        "schema": "grpc_auth_test_role_preflight_34228",
+        "table_name": "user_role"
+      }
+    ],
+    "identity": [
+      {
+        "database": "grpc_auth_test",
+        "postgres_version": "16.13",
+        "schema": "grpc_auth_test_role_preflight_34228"
+      }
+    ],
+    "sequence": [
+      {
+        "data_type": "integer",
+        "increment_by": 1,
+        "max_value": 2147483647,
+        "min_value": 1,
+        "schemaname": "grpc_auth_test_role_preflight_34228",
+        "sequencename": "role_numeric_code_seq"
+      }
+    ]
+  },
+  "comparison": {
+    "columns": 31,
+    "constraints": 26,
+    "numeric_sequences": 1,
+    "bounds_match": true,
+    "known_fixture_identity_difference": [
+      "role.id",
+      "user_role.id"
+    ],
+    "application_writes": false,
+    "test_fixture_permission_grammar_check_added": true
+  }
+}

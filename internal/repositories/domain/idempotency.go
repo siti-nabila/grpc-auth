@@ -102,9 +102,14 @@ type SafeCommandResult struct {
 	MustChangePassword *bool                 `json:"must_change_password,omitempty"`
 	Roles              []UserListRole        `json:"roles,omitempty"`
 	ApplicationAccess  []UserListApplication `json:"application_access,omitempty"`
+	Role               *RoleSummary          `json:"role,omitempty"`
+	Permissions        []PermissionItem      `json:"permissions,omitempty"`
 }
 
 func (r SafeCommandResult) Validate() error {
+	if err := r.validateRoleResult(); err != nil {
+		return err
+	}
 	if r.Email != nil && (!userText(*r.Email, 6, 50) || strings.TrimSpace(strings.ToLower(*r.Email)) != *r.Email || !strings.Contains(*r.Email, "@")) {
 		return common.ErrBadRequest
 	}

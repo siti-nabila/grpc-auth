@@ -13,6 +13,12 @@ func TestPostgresConfiguration(t *testing.T) {
 	testutils.Run(t, test_scenarios.Configuration())
 }
 
+func TestPostgresRoleSchema(t *testing.T) { testutils.Run(t, test_scenarios.RoleSchema()) }
+
+func TestPostgresRolePersistence(t *testing.T) { testutils.Run(t, test_scenarios.RolePersistence()) }
+
+func TestPostgresCatalogSnapshots(t *testing.T) { testutils.Run(t, test_scenarios.CatalogSnapshots()) }
+
 func TestPostgresEnvironment(t *testing.T) {
 	testutils.Run(t, test_scenarios.Environment())
 }
@@ -86,3 +92,9 @@ func TestPostgresUserManagement(t *testing.T) {
 func TestPostgresUserManagementConcurrency(t *testing.T) {
 	testutils.Run(t, test_scenarios.UserManagementConcurrency())
 }
+
+func TestPostgresRoleManagement(t *testing.T) { testutils.Run(t, test_scenarios.RoleManagement()) }
+
+func TestPostgresRoleEvaluation(t *testing.T) { testutils.Run(t, test_scenarios.RoleEvaluation()) }
+
+func TestPostgresRoleConcurrency(t *testing.T) { testutils.Run(t, test_scenarios.RoleConcurrency()) }

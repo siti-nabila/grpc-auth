@@ -12,6 +12,7 @@ type SafeSnapshot struct {
 	Version         int64    `json:"version,omitempty"`
 	Status          string   `json:"status,omitempty"`
 	Name            *string  `json:"name,omitempty"`
+	Description     *string  `json:"description,omitempty"`
 	Address         *string  `json:"address,omitempty"`
 	Phone           *string  `json:"phone,omitempty"`
 	RoleIDs         []uint64 `json:"role_ids,omitempty"`
@@ -29,7 +30,7 @@ func (s SafeSnapshot) Validate() error {
 	for _, field := range []struct {
 		value *string
 		max   int
-	}{{s.Name, 100}, {s.Address, 250}, {s.Phone, 20}} {
+	}{{s.Name, 100}, {s.Description, 100}, {s.Address, 250}, {s.Phone, 20}} {
 		if field.value != nil && !boundedText(*field.value, field.max, false) {
 			return common.ErrBadRequest
 		}
@@ -40,7 +41,7 @@ func (s SafeSnapshot) Validate() error {
 		}
 	}
 	for _, code := range s.PermissionCodes {
-		if !boundedText(code, 100, true) {
+		if !boundedText(code, 150, true) {
 			return common.ErrBadRequest
 		}
 	}

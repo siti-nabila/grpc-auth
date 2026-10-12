@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"database/sql"
 	"github.com/siti-nabila/orm/query"
 )
 
@@ -23,4 +24,11 @@ type TransactionProvider interface {
 // providers retain ReadCommitted; this path is only for consistent read RPCs.
 type ReadSnapshotProvider interface {
 	BeginSnapshot(context.Context) (Transaction, error)
+}
+
+// StatementWriter is a capability of the supplied primary transaction. The ORM
+// has no delete builder; mapping replacement needs a parameterized DELETE on
+// this same handle, without creating another pool or owning its lifecycle.
+type StatementWriter interface {
+	ExecContext(context.Context, string, ...any) (sql.Result, error)
 }

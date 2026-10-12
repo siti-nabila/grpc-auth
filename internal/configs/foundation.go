@@ -44,7 +44,7 @@ type Foundation struct {
 	Login    *LoginProducer
 }
 
-// PrepareFoundation shares one primary pool between all nineteen RPCs. It opens no
+// PrepareFoundation shares one primary pool between all twenty-seven RPCs. It opens no
 // resource; NewGRPCServer owns the limiter worker and run owns the pool.
 func PrepareFoundation(ctx context.Context, security *LoginSecurity, db *sql.DB, d dialect.Dialector, cfg ormconfig.Config, now func() time.Time, entropy io.Reader, fingerprinter *common.Fingerprinter) (*Foundation, error) {
 	if entropy == nil {
@@ -101,12 +101,17 @@ func PrepareFoundation(ctx context.Context, security *LoginSecurity, db *sql.DB,
 	if err != nil {
 		return nil, err
 	}
+	roles, catalogs, err := prepareRoles(provider, now, eventID)
+	if err != nil {
+		return nil, err
+	}
 	users := &sessionUserServer{login: login.Handler, register: register, reads: reads, management: managementHandler}
 	profiles := &sessionProfileServer{handler: profileHandler}
 	return &Foundation{Login: login, Pipeline: ServerPipeline{
 		Register: func(s *grpc.Server) {
 			registerFoundation(s, users, profiles)
 			registerLifecycle(s, authServer, sessionServer)
+			registerRoles(s, roles, catalogs)
 		},
 		Attempt: attempt, Session: login.SessionInterceptor, Rate: rate, Now: now,
 		Cleanup: func(ctx context.Context) {

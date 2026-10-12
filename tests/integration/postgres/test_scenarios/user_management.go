@@ -17,6 +17,7 @@ import (
 	"github.com/siti-nabila/grpc-auth/tests/integration/postgres/fixtures"
 	shared "github.com/siti-nabila/grpc-auth/tests/shared/fixtures"
 	"github.com/siti-nabila/grpc-auth/tests/shared/testutils"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
@@ -88,6 +89,7 @@ func postgresManagementRetention(t *testing.T) {
 type managementHarness struct {
 	ctx           context.Context
 	f             *fixtures.Schema
+	conn          *grpc.ClientConn
 	users         userv1.UserServiceClient
 	auths         authv1.AuthServiceClient
 	clock         atomic.Int64
@@ -98,7 +100,7 @@ func managementMethods() []string {
 	return []string{userv1.UserService_GetUser_FullMethodName, userv1.UserService_CreateUser_FullMethodName, userv1.UserService_UpdateUser_FullMethodName, userv1.UserService_ChangeUserStatus_FullMethodName}
 }
 
-func newManagementHarness(t *testing.T) *managementHarness {
+func newManagementHarness(t *testing.T, extra ...string) *managementHarness {
 	t.Helper()
 	ctx, f := loginFixture(t, false)
 	_, e := f.DB.ExecContext(ctx, `
@@ -122,8 +124,9 @@ UPDATE profile SET name=name;`)
 	}
 	h := &managementHarness{ctx: ctx, f: f}
 	h.clock.Store(shared.ServiceTime.UnixNano())
-	methods := append(shared.LifecycleMethods(), managementMethods()...)
+	methods := append(append(shared.LifecycleMethods(), managementMethods()...), extra...)
 	conn, _ := shared.FoundationServer(t, f.DB, h.now, shared.LifecycleEntropy(), methods...)
+	h.conn = conn
 	h.users, h.auths = userv1.NewUserServiceClient(conn), authv1.NewAuthServiceClient(conn)
 	h.admin = h.login(t, "fixture@example.test", "secret12")
 	h.target = h.login(t, "target@example.test", "secret12")

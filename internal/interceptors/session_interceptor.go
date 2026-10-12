@@ -6,8 +6,11 @@ import (
 	"strings"
 	"time"
 
+	applicationv1 "github.com/siti-nabila/api-contracts/pb/application/v1"
 	authv1 "github.com/siti-nabila/api-contracts/pb/auth/v1"
+	permissionv1 "github.com/siti-nabila/api-contracts/pb/permission/v1"
 	profilev1 "github.com/siti-nabila/api-contracts/pb/profile/v1"
+	rolev1 "github.com/siti-nabila/api-contracts/pb/role/v1"
 	sessionv1 "github.com/siti-nabila/api-contracts/pb/session/v1"
 	userv1 "github.com/siti-nabila/api-contracts/pb/user/v1"
 	"github.com/siti-nabila/api-contracts/pkg/dictionary/auth"
@@ -34,7 +37,7 @@ func NewSessionInterceptor(verifier *jwt.AccessVerifier, reader domain.SessionSt
 			return nil, err
 		}
 		switch info.FullMethod {
-		case userv1.UserService_GetUser_FullMethodName, userv1.UserService_CreateUser_FullMethodName, userv1.UserService_UpdateUser_FullMethodName, userv1.UserService_ChangeUserStatus_FullMethodName, authv1.AuthService_RefreshSession_FullMethodName, authv1.AuthService_Logout_FullMethodName, authv1.AuthService_ChangePassword_FullMethodName, sessionv1.SessionService_ListMySessions_FullMethodName, sessionv1.SessionService_RevokeMySession_FullMethodName, sessionv1.SessionService_RevokeAllMySessions_FullMethodName, sessionv1.SessionService_ListUserSessions_FullMethodName, sessionv1.SessionService_RevokeUserSession_FullMethodName, sessionv1.SessionService_RevokeAllUserSessions_FullMethodName:
+		case rolev1.RoleService_ListRoles_FullMethodName, rolev1.RoleService_GetRole_FullMethodName, rolev1.RoleService_CreateRole_FullMethodName, rolev1.RoleService_UpdateRole_FullMethodName, rolev1.RoleService_ChangeRoleStatus_FullMethodName, rolev1.RoleService_ReplaceRolePermissions_FullMethodName, permissionv1.PermissionService_ListPermissions_FullMethodName, applicationv1.ApplicationService_ListApplications_FullMethodName, userv1.UserService_GetUser_FullMethodName, userv1.UserService_CreateUser_FullMethodName, userv1.UserService_UpdateUser_FullMethodName, userv1.UserService_ChangeUserStatus_FullMethodName, authv1.AuthService_RefreshSession_FullMethodName, authv1.AuthService_Logout_FullMethodName, authv1.AuthService_ChangePassword_FullMethodName, sessionv1.SessionService_ListMySessions_FullMethodName, sessionv1.SessionService_RevokeMySession_FullMethodName, sessionv1.SessionService_RevokeAllMySessions_FullMethodName, sessionv1.SessionService_ListUserSessions_FullMethodName, sessionv1.SessionService_RevokeUserSession_FullMethodName, sessionv1.SessionService_RevokeAllUserSessions_FullMethodName:
 			if err = caller.AuthorizeNamespace(string(types.ApplicationIAM)); err != nil {
 				return nil, err
 			}
@@ -52,7 +55,7 @@ func NewSessionInterceptor(verifier *jwt.AccessVerifier, reader domain.SessionSt
 			// The specialized handler proves access or latest refresh ownership, including
 			// terminal repeat Logout. It never grants a protected Principal.
 			return next(ctx, request)
-		case userv1.UserService_GetUser_FullMethodName, userv1.UserService_CreateUser_FullMethodName, userv1.UserService_UpdateUser_FullMethodName, userv1.UserService_ChangeUserStatus_FullMethodName, userv1.UserService_Me_FullMethodName, userv1.UserService_ListUsers_FullMethodName, profilev1.ProfileService_UpdateProfile_FullMethodName, authv1.AuthService_ChangePassword_FullMethodName, sessionv1.SessionService_ListMySessions_FullMethodName, sessionv1.SessionService_RevokeMySession_FullMethodName, sessionv1.SessionService_RevokeAllMySessions_FullMethodName, sessionv1.SessionService_ListUserSessions_FullMethodName, sessionv1.SessionService_RevokeUserSession_FullMethodName, sessionv1.SessionService_RevokeAllUserSessions_FullMethodName:
+		case rolev1.RoleService_ListRoles_FullMethodName, rolev1.RoleService_GetRole_FullMethodName, rolev1.RoleService_CreateRole_FullMethodName, rolev1.RoleService_UpdateRole_FullMethodName, rolev1.RoleService_ChangeRoleStatus_FullMethodName, rolev1.RoleService_ReplaceRolePermissions_FullMethodName, permissionv1.PermissionService_ListPermissions_FullMethodName, applicationv1.ApplicationService_ListApplications_FullMethodName, userv1.UserService_GetUser_FullMethodName, userv1.UserService_CreateUser_FullMethodName, userv1.UserService_UpdateUser_FullMethodName, userv1.UserService_ChangeUserStatus_FullMethodName, userv1.UserService_Me_FullMethodName, userv1.UserService_ListUsers_FullMethodName, profilev1.ProfileService_UpdateProfile_FullMethodName, authv1.AuthService_ChangePassword_FullMethodName, sessionv1.SessionService_ListMySessions_FullMethodName, sessionv1.SessionService_RevokeMySession_FullMethodName, sessionv1.SessionService_RevokeAllMySessions_FullMethodName, sessionv1.SessionService_ListUserSessions_FullMethodName, sessionv1.SessionService_RevokeUserSession_FullMethodName, sessionv1.SessionService_RevokeAllUserSessions_FullMethodName:
 		default:
 			return nil, common.ErrForbidden
 		}

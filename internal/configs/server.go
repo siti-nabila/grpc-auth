@@ -52,6 +52,8 @@ func NewGRPCServer(cfg *AppConfig, pipeline ServerPipeline) (*GRPCServerClient, 
 	var mappings []grpcerror.CodeMapping
 	mappings = append(mapping.CommonCodeMappings(), mapping.AuthCodeMappings()...)
 	mappings = append(mappings, mapping.UserCodeMappings()...)
+	mappings = append(mappings, mapping.RoleCodeMappings()...)
+	mappings = append(mappings, mapping.ApplicationCodeMappings()...)
 	errorEncoder := grpcerror.NewEncoder(mappings...)
 	opts := []grpc.ServerOption{
 		grpc.Creds(credentials.NewTLS(tlsConfig)),

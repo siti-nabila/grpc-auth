@@ -4,7 +4,10 @@ import (
 	"context"
 	"crypto/ed25519"
 	"errors"
+	applicationv1 "github.com/siti-nabila/api-contracts/pb/application/v1"
 	authv1 "github.com/siti-nabila/api-contracts/pb/auth/v1"
+	permissionv1 "github.com/siti-nabila/api-contracts/pb/permission/v1"
+	rolev1 "github.com/siti-nabila/api-contracts/pb/role/v1"
 	sessionv1 "github.com/siti-nabila/api-contracts/pb/session/v1"
 	"github.com/siti-nabila/api-contracts/pkg/dictionary/auth"
 	"github.com/siti-nabila/api-contracts/pkg/dictionary/common"
@@ -28,6 +31,7 @@ import (
 func Lifecycle() []testutils.Scenario {
 	cases := []testutils.Scenario{{Name: "refresh applicable bucket admission is atomic and early failures use only IP", Run: refreshRate}}
 	methods := []string{authv1.AuthService_RefreshSession_FullMethodName, authv1.AuthService_Logout_FullMethodName, authv1.AuthService_ChangePassword_FullMethodName, sessionv1.SessionService_ListMySessions_FullMethodName, sessionv1.SessionService_ListUserSessions_FullMethodName, sessionv1.SessionService_RevokeMySession_FullMethodName, sessionv1.SessionService_RevokeAllMySessions_FullMethodName, sessionv1.SessionService_RevokeUserSession_FullMethodName, sessionv1.SessionService_RevokeAllUserSessions_FullMethodName}
+	methods = append(methods, rolePolicyMethods()...)
 	for _, method := range methods {
 		for _, kind := range []string{"success", "restricted", "missing", "duplicate", "expired", "revoked", "dependency", "namespace"} {
 			cases = append(cases, testutils.Scenario{Name: method + " " + kind, Run: func(t *testing.T) {
@@ -221,4 +225,8 @@ func LifecycleRateGroups() []testutils.Scenario {
 		}})
 	}
 	return cases
+}
+
+func rolePolicyMethods() []string {
+	return []string{rolev1.RoleService_ListRoles_FullMethodName, rolev1.RoleService_GetRole_FullMethodName, rolev1.RoleService_CreateRole_FullMethodName, rolev1.RoleService_UpdateRole_FullMethodName, rolev1.RoleService_ChangeRoleStatus_FullMethodName, rolev1.RoleService_ReplaceRolePermissions_FullMethodName, permissionv1.PermissionService_ListPermissions_FullMethodName, applicationv1.ApplicationService_ListApplications_FullMethodName}
 }
