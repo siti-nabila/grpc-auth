@@ -19,10 +19,15 @@ func NewRoleManagementReader(handle domain.QueryReader) domain.RoleManagementRea
 	return &roleManagementReader{handle}
 }
 
-const affectedRoleUsers = "(SELECT COUNT(DISTINCT ur.user_id) FROM user_role ur JOIN auth u ON u.id = ur.user_id WHERE ur.role_id = r.id AND ur.status = 'ACTIVE')"
+const affectedRoleUsers = "COALESCE(role_users.total, 0)"
+
+func roleSummaryBase(handle domain.QueryReader) *query.QueryBuilder {
+	users := handle.UseModel(domain.UserListRole{}).Select("ur.role_id", "COUNT(DISTINCT ur.user_id) AS total").Join("auth u", "u.id = ur.user_id").Where("ur.status = 'ACTIVE'").GroupBy("ur.role_id")
+	return handle.UseModel(domain.RoleSummary{}).Join("applications a", "a.id = r.application_id").LeftJoinQuery(users, "role_users", "role_users.role_id = r.id")
+}
 
 func roleSummaryQuery(handle domain.QueryReader) *query.QueryBuilder {
-	return handle.UseModel(domain.RoleSummary{}).Join("applications a", "a.id = r.application_id").Select(
+	return roleSummaryBase(handle).Select(
 		"r.id", "r.code", "r.role_name AS name", "r.role_description AS description", "r.application_id", "a.code AS application_code", "r.status", "r.is_system", "r.version", "r.role_code", "r.created_at", "r.updated_at", affectedRoleUsers+" AS affected_user_count")
 }
 
@@ -95,7 +100,7 @@ func (r *roleManagementReader) RolePermissions(ctx context.Context, id uint64) (
 		return nil, common.ErrDependencyUnavailable
 	}
 	rows := []domain.PermissionItem{}
-	err := permissionItemsQuery(r.handle).WithContext(ctx).Join("role_permissions rp", "rp.permission_id = p.id").Where("rp.role_id = ?", id).OrderBy(`p.code COLLATE "C" ASC`, "p.id ASC").Scan(&rows)
+	err := permissionItemsQuery(r.handle).WithContext(ctx).Join("role_permissions rp", "rp.permission_id = p.id").Where("rp.deleted_at IS NULL").Where("rp.role_id = ?", id).OrderBy(`p.code COLLATE "C" ASC`, "p.id ASC").Scan(&rows)
 	if err != nil {
 		return nil, helpers.HandleDBError(err)
 	}

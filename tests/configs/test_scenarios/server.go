@@ -19,8 +19,10 @@ import (
 	"github.com/siti-nabila/api-contracts/pkg/locale"
 	"github.com/siti-nabila/grpc-auth/internal/configs"
 	"github.com/siti-nabila/grpc-auth/internal/interceptors"
+	"github.com/siti-nabila/grpc-auth/internal/ratelimit"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/internal/serviceauth"
+	"github.com/siti-nabila/grpc-auth/internal/telemetry"
 	jwtPackage "github.com/siti-nabila/grpc-auth/pkg/jwt"
 	"github.com/siti-nabila/grpc-auth/tests/configs/mocks"
 	"github.com/siti-nabila/grpc-auth/tests/shared/fixtures"
@@ -265,9 +267,13 @@ func serverPipeline(t *testing.T, register func(*grpc.Server)) configs.ServerPip
 	if err != nil {
 		t.Fatal(err)
 	}
-	return configs.ServerPipeline{Register: register, Attempt: attempt, Session: session,
+	limiter, err := ratelimit.NewStore(now)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return configs.ServerPipeline{Metrics: telemetry.NewStore(), Limiter: limiter, Register: register, Attempt: attempt, Session: session,
 		Rate: func(ctx context.Context, req any, _ *grpc.UnaryServerInfo, next grpc.UnaryHandler) (any, error) {
 			return next(ctx, req)
 		},
-		Cleanup: func(ctx context.Context) { <-ctx.Done() }, Now: now}
+		Cleanup: func(ctx context.Context) { <-ctx.Done() }, Telemetry: func(ctx context.Context) { <-ctx.Done() }, Now: now}
 }

@@ -5,7 +5,6 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
-	"slices"
 	"strconv"
 	"time"
 
@@ -106,78 +105,74 @@ func (s *managementService) commandTransaction(ctx context.Context, c roleComman
 	if !r.complete() {
 		return nil, nil, common.ErrDependencyUnavailable
 	}
-	held := featurecommon.CanonicalLockKeys(keys...)
-	for check := 0; check < 3; check++ {
-		discovered, e := roleAuthorityKeys(ctx, r, p, c)
-		if e != nil {
-			return nil, nil, e
-		}
-		missing := []string{}
-		for _, key := range discovered {
-			if !slices.Contains(held, key) {
-				missing = append(missing, key)
-			}
-		}
-		if featurecommon.RequiresLockRestart(held, missing) {
-			return nil, append(held, missing...), nil
-		}
-		if err = roleLocks(owner, missing...); err != nil {
-			return nil, nil, err
-		}
-		held = featurecommon.CanonicalLockKeys(append(held, missing...)...)
-		next, e := roleAuthorityKeys(ctx, r, p, c)
-		if e != nil {
-			return nil, nil, e
-		}
-		if slices.Equal(discovered, next) {
-			break
-		}
-		if check == 2 {
-			return nil, append(held, next...), nil
-		}
+	restart, err = featurecommon.LockDiscoveredAuthority(owner, keys, func() ([]string, error) { return roleAuthorityKeys(ctx, r, p, c) }, roleerrors.ErrResourceBusy)
+	if err != nil || len(restart) > 0 {
+		return nil, restart, err
 	}
 	now := s.deps.Now().UTC()
-	if err = authfeature.AuthorizeCurrentPermission(ctx, p.Claims(), c.method, c.permission, r.State, r.Permissions, now); err != nil {
+	if _, err = authfeature.AuthorizeCurrentPermission(ctx, p.Claims(), c.method, c.permission, r.State, r.Permissions, now); err != nil {
 		return nil, nil, err
 	}
-	if c.key != "" {
-		record, e := r.Idempotency.Lookup(scope)
-		if e != nil {
-			return nil, nil, featurecommon.DependencyError(e)
-		}
-		result, err = featurecommon.Replay(record, hash, now)
-		if errors.Is(err, usererrors.ErrIdempotencyConflict) {
-			return nil, nil, roleerrors.ErrIdempotencyConflict
-		}
-		if err != nil {
-			return nil, nil, err
-		}
-		if result != nil {
-			if result.Role == nil || c.target != 0 && result.RoleID != c.target || c.code != "" && result.Role.Code != c.code {
-				return nil, nil, common.ErrDependencyUnavailable
-			}
-			if err = owner.Commit(); err != nil {
-				return nil, nil, featurecommon.DependencyError(err)
-			}
-			return result, nil, nil
-		}
-	}
-	out, err := apply(ctx, r, p, now)
+	result, err = replayRole(r, c, scope, hash, now)
 	if err != nil {
 		return nil, nil, err
 	}
-	if out.Validate() != nil {
-		return nil, nil, common.ErrInternalServerError
-	}
-	if c.key != "" {
-		if err = r.Idempotency.Save(scope, hash, out, now); err != nil {
-			return nil, nil, featurecommon.DependencyError(err)
+	if result == nil {
+		result, err = executeRole(ctx, r, p, c, scope, hash, now, apply)
+		if err != nil {
+			return nil, nil, err
 		}
 	}
 	if err = owner.Commit(); err != nil {
 		return nil, nil, featurecommon.DependencyError(err)
 	}
-	return &out, nil, nil
+	return result, nil, nil
+}
+
+func replayRole(r ManagementRepositories, c roleCommand, scope domain.IdempotencyScope, hash []byte, now time.Time) (*domain.SafeCommandResult, error) {
+	if c.key == "" {
+		return nil, nil
+	}
+	record, err := r.Idempotency.Lookup(scope)
+	if err != nil {
+		return nil, featurecommon.DependencyError(err)
+	}
+	result, err := featurecommon.Replay(record, hash, now)
+	if errors.Is(err, usererrors.ErrIdempotencyConflict) {
+		return nil, roleerrors.ErrIdempotencyConflict
+	}
+	if err != nil {
+		return nil, err
+	}
+	if result == nil {
+		return nil, nil
+	}
+	if result.Role == nil {
+		return nil, common.ErrDependencyUnavailable
+	}
+	if c.target != 0 && result.RoleID != c.target {
+		return nil, common.ErrDependencyUnavailable
+	}
+	if c.code != "" && result.Role.Code != c.code {
+		return nil, common.ErrDependencyUnavailable
+	}
+	return result, nil
+}
+
+func executeRole(ctx context.Context, r ManagementRepositories, p sessions.Principal, c roleCommand, scope domain.IdempotencyScope, hash []byte, now time.Time, apply roleApply) (*domain.SafeCommandResult, error) {
+	out, err := apply(ctx, r, p, now)
+	if err != nil {
+		return nil, err
+	}
+	if out.Validate() != nil {
+		return nil, common.ErrInternalServerError
+	}
+	if c.key != "" {
+		if err = r.Idempotency.Save(scope, hash, out, now); err != nil {
+			return nil, featurecommon.DependencyError(err)
+		}
+	}
+	return &out, nil
 }
 
 func roleLocks(owner *featurecommon.TransactionOwner, keys ...string) error {

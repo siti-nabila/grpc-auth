@@ -1,0 +1,18 @@
+{
+  "label": "expanded-full",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./..."
+  ],
+  "started_at": "2026-10-13T08:12:49.106964+00:00",
+  "seconds": 14.348,
+  "exit_code": 0,
+  "log": "/tmp/aap-expanded-full.log",
+  "source_identity": "771b4d201c70240f5232b2f1fede052ebedada5fcf3bd1800cd6dc751fedd08a",
+  "passed_tests": 3096,
+  "failed_tests": [],
+  "skipped_tests": []
+}

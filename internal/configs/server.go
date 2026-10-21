@@ -55,6 +55,14 @@ func NewGRPCServer(cfg *AppConfig, pipeline ServerPipeline) (*GRPCServerClient, 
 	mappings = append(mappings, mapping.RoleCodeMappings()...)
 	mappings = append(mappings, mapping.ApplicationCodeMappings()...)
 	errorEncoder := grpcerror.NewEncoder(mappings...)
+	observe, err := interceptors.NewMetricsInterceptor(pipeline.Metrics, pipeline.Now)
+	if err != nil {
+		return nil, err
+	}
+	admit, err := interceptors.NewServiceAdmission(pipeline.Limiter, errorEncoder)
+	if err != nil {
+		return nil, err
+	}
 	opts := []grpc.ServerOption{
 		grpc.Creds(credentials.NewTLS(tlsConfig)),
 		grpc.ConnectionTimeout(cfg.Timeout),
@@ -65,9 +73,11 @@ func NewGRPCServer(cfg *AppConfig, pipeline ServerPipeline) (*GRPCServerClient, 
 		}),
 
 		grpc.ChainUnaryInterceptor(
+			observe,
 			interceptors.LanguageInterceptor,
 			interceptors.NewErrorInterceptor(errorEncoder),
 			interceptors.ServiceInterceptor(verifier),
+			admit,
 			pipeline.Attempt,
 			pipeline.Session,
 			pipeline.Rate,
@@ -98,7 +108,11 @@ func NewGRPCServer(cfg *AppConfig, pipeline ServerPipeline) (*GRPCServerClient, 
 
 	ctx, cancel := context.WithCancel(context.Background())
 	svr.cancel, svr.done = cancel, make(chan struct{})
-	go func() { defer close(svr.done); pipeline.Cleanup(ctx) }()
+	var workers sync.WaitGroup
+	workers.Add(2)
+	go func() { defer workers.Done(); pipeline.Cleanup(ctx) }()
+	go func() { defer workers.Done(); pipeline.Telemetry(ctx) }()
+	go func() { workers.Wait(); close(svr.done) }()
 	return svr, nil
 
 }

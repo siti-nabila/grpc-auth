@@ -11,3 +11,7 @@ func TestManagementInputs(t *testing.T) { testutils.Run(t, test_scenarios.Manage
 func TestManagement(t *testing.T)       { testutils.Run(t, test_scenarios.Management()) }
 
 func TestManagementReplay(t *testing.T) { testutils.Run(t, test_scenarios.ManagementReplay()) }
+
+func TestAssignments(t *testing.T) { testutils.Run(t, test_scenarios.Assignments()) }
+
+func TestEffectivePermissions(t *testing.T) { testutils.Run(t, test_scenarios.EffectivePermissions()) }

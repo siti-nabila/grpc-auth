@@ -61,13 +61,14 @@ type RoleManagementReader interface {
 	Role(context.Context, uint64) (RoleSummary, error)
 	Application(context.Context, string) (ApplicationItem, error)
 	RolePermissions(context.Context, uint64) ([]PermissionItem, error)
+	RolePermissionPairs(context.Context, uint64) ([]RolePermissionPair, error)
 	PermissionSet(context.Context, uint64, []string) ([]PermissionItem, error)
 }
 
 type RoleManagementWriter interface {
 	CreateRole(context.Context, RoleSummary) (RoleSummary, error)
 	UpdateRole(context.Context, RoleSummary, int64) (bool, error)
-	ReplacePermissions(context.Context, uint64, []uint64) error
+	ReplacePermissions(context.Context, uint64, RolePermissionChanges, time.Time) error
 }
 
 func (r RoleSummary) Protect() error {

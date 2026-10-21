@@ -1,0 +1,2918 @@
+{
+  "application/v1/application.payload.proto": {
+    "name": "application/v1/application.payload.proto",
+    "package": "application.v1",
+    "dependency": [
+      "paginator/v1/paginator.payload.proto"
+    ],
+    "messageType": [
+      {
+        "name": "ApplicationItem",
+        "field": [
+          {
+            "name": "id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "id"
+          },
+          {
+            "name": "code",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "code"
+          },
+          {
+            "name": "name",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "name"
+          },
+          {
+            "name": "status",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "status"
+          },
+          {
+            "name": "is_system",
+            "number": 5,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "isSystem"
+          }
+        ]
+      },
+      {
+        "name": "ApplicationFilter",
+        "field": [
+          {
+            "name": "statuses",
+            "number": 1,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_STRING",
+            "jsonName": "statuses"
+          }
+        ]
+      },
+      {
+        "name": "ListApplicationsRequest",
+        "field": [
+          {
+            "name": "query",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".paginator.v1.PageQuery",
+            "jsonName": "query"
+          },
+          {
+            "name": "filter",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".application.v1.ApplicationFilter",
+            "jsonName": "filter"
+          }
+        ]
+      },
+      {
+        "name": "ListApplicationsResponse",
+        "field": [
+          {
+            "name": "items",
+            "number": 1,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".application.v1.ApplicationItem",
+            "jsonName": "items"
+          },
+          {
+            "name": "meta",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".paginator.v1.PageMeta",
+            "jsonName": "meta"
+          },
+          {
+            "name": "next_cursor",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "nextCursor"
+          }
+        ]
+      }
+    ],
+    "options": {
+      "goPackage": "github.com/siti-nabila/api-contracts/pb/application/v1;applicationv1"
+    },
+    "syntax": "proto3"
+  },
+  "application/v1/application.service.proto": {
+    "name": "application/v1/application.service.proto",
+    "package": "application.v1",
+    "dependency": [
+      "application/v1/application.payload.proto"
+    ],
+    "service": [
+      {
+        "name": "ApplicationService",
+        "method": [
+          {
+            "name": "ListApplications",
+            "inputType": ".application.v1.ListApplicationsRequest",
+            "outputType": ".application.v1.ListApplicationsResponse"
+          }
+        ]
+      }
+    ],
+    "options": {
+      "goPackage": "github.com/siti-nabila/api-contracts/pb/application/v1;applicationv1"
+    },
+    "syntax": "proto3"
+  },
+  "auth/v1/auth.payload.proto": {
+    "name": "auth/v1/auth.payload.proto",
+    "package": "auth.v1",
+    "messageType": [
+      {
+        "name": "RefreshSessionRequest",
+        "field": [
+          {
+            "name": "refresh_token",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "refreshToken"
+          }
+        ]
+      },
+      {
+        "name": "LogoutRequest",
+        "field": [
+          {
+            "name": "refresh_token",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "oneofIndex": 0,
+            "jsonName": "refreshToken",
+            "proto3Optional": true
+          }
+        ],
+        "oneofDecl": [
+          {
+            "name": "_refresh_token"
+          }
+        ]
+      },
+      {
+        "name": "LogoutResponse",
+        "field": [
+          {
+            "name": "changed",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "changed"
+          }
+        ]
+      },
+      {
+        "name": "ChangePasswordRequest",
+        "field": [
+          {
+            "name": "current_password",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "currentPassword"
+          },
+          {
+            "name": "new_password",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "newPassword"
+          }
+        ]
+      },
+      {
+        "name": "ChangePasswordResponse",
+        "field": [
+          {
+            "name": "changed",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "changed"
+          },
+          {
+            "name": "login_required",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "loginRequired"
+          }
+        ]
+      }
+    ],
+    "options": {
+      "goPackage": "github.com/siti-nabila/api-contracts/pb/auth/v1;authv1"
+    },
+    "syntax": "proto3"
+  },
+  "auth/v1/auth.service.proto": {
+    "name": "auth/v1/auth.service.proto",
+    "package": "auth.v1",
+    "dependency": [
+      "auth/v1/auth.payload.proto",
+      "user/v1/user.payload.proto"
+    ],
+    "service": [
+      {
+        "name": "AuthService",
+        "method": [
+          {
+            "name": "RefreshSession",
+            "inputType": ".auth.v1.RefreshSessionRequest",
+            "outputType": ".user.v1.UserTokenResponse"
+          },
+          {
+            "name": "Logout",
+            "inputType": ".auth.v1.LogoutRequest",
+            "outputType": ".auth.v1.LogoutResponse"
+          },
+          {
+            "name": "ChangePassword",
+            "inputType": ".auth.v1.ChangePasswordRequest",
+            "outputType": ".auth.v1.ChangePasswordResponse"
+          }
+        ]
+      }
+    ],
+    "options": {
+      "goPackage": "github.com/siti-nabila/api-contracts/pb/auth/v1;authv1"
+    },
+    "syntax": "proto3"
+  },
+  "grpc/binlog/v1/binarylog.proto": {
+    "name": "grpc/binlog/v1/binarylog.proto",
+    "package": "grpc.binarylog.v1",
+    "dependency": [
+      "google/protobuf/duration.proto",
+      "google/protobuf/timestamp.proto"
+    ],
+    "messageType": [
+      {
+        "name": "GrpcLogEntry",
+        "field": [
+          {
+            "name": "timestamp",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".google.protobuf.Timestamp",
+            "jsonName": "timestamp"
+          },
+          {
+            "name": "call_id",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "callId"
+          },
+          {
+            "name": "sequence_id_within_call",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "sequenceIdWithinCall"
+          },
+          {
+            "name": "type",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_ENUM",
+            "typeName": ".grpc.binarylog.v1.GrpcLogEntry.EventType",
+            "jsonName": "type"
+          },
+          {
+            "name": "logger",
+            "number": 5,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_ENUM",
+            "typeName": ".grpc.binarylog.v1.GrpcLogEntry.Logger",
+            "jsonName": "logger"
+          },
+          {
+            "name": "client_header",
+            "number": 6,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".grpc.binarylog.v1.ClientHeader",
+            "oneofIndex": 0,
+            "jsonName": "clientHeader"
+          },
+          {
+            "name": "server_header",
+            "number": 7,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".grpc.binarylog.v1.ServerHeader",
+            "oneofIndex": 0,
+            "jsonName": "serverHeader"
+          },
+          {
+            "name": "message",
+            "number": 8,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".grpc.binarylog.v1.Message",
+            "oneofIndex": 0,
+            "jsonName": "message"
+          },
+          {
+            "name": "trailer",
+            "number": 9,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".grpc.binarylog.v1.Trailer",
+            "oneofIndex": 0,
+            "jsonName": "trailer"
+          },
+          {
+            "name": "payload_truncated",
+            "number": 10,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "payloadTruncated"
+          },
+          {
+            "name": "peer",
+            "number": 11,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".grpc.binarylog.v1.Address",
+            "jsonName": "peer"
+          }
+        ],
+        "enumType": [
+          {
+            "name": "EventType",
+            "value": [
+              {
+                "name": "EVENT_TYPE_UNKNOWN",
+                "number": 0
+              },
+              {
+                "name": "EVENT_TYPE_CLIENT_HEADER",
+                "number": 1
+              },
+              {
+                "name": "EVENT_TYPE_SERVER_HEADER",
+                "number": 2
+              },
+              {
+                "name": "EVENT_TYPE_CLIENT_MESSAGE",
+                "number": 3
+              },
+              {
+                "name": "EVENT_TYPE_SERVER_MESSAGE",
+                "number": 4
+              },
+              {
+                "name": "EVENT_TYPE_CLIENT_HALF_CLOSE",
+                "number": 5
+              },
+              {
+                "name": "EVENT_TYPE_SERVER_TRAILER",
+                "number": 6
+              },
+              {
+                "name": "EVENT_TYPE_CANCEL",
+                "number": 7
+              }
+            ]
+          },
+          {
+            "name": "Logger",
+            "value": [
+              {
+                "name": "LOGGER_UNKNOWN",
+                "number": 0
+              },
+              {
+                "name": "LOGGER_CLIENT",
+                "number": 1
+              },
+              {
+                "name": "LOGGER_SERVER",
+                "number": 2
+              }
+            ]
+          }
+        ],
+        "oneofDecl": [
+          {
+            "name": "payload"
+          }
+        ]
+      },
+      {
+        "name": "ClientHeader",
+        "field": [
+          {
+            "name": "metadata",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".grpc.binarylog.v1.Metadata",
+            "jsonName": "metadata"
+          },
+          {
+            "name": "method_name",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "methodName"
+          },
+          {
+            "name": "authority",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "authority"
+          },
+          {
+            "name": "timeout",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".google.protobuf.Duration",
+            "jsonName": "timeout"
+          }
+        ]
+      },
+      {
+        "name": "ServerHeader",
+        "field": [
+          {
+            "name": "metadata",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".grpc.binarylog.v1.Metadata",
+            "jsonName": "metadata"
+          }
+        ]
+      },
+      {
+        "name": "Trailer",
+        "field": [
+          {
+            "name": "metadata",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".grpc.binarylog.v1.Metadata",
+            "jsonName": "metadata"
+          },
+          {
+            "name": "status_code",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT32",
+            "jsonName": "statusCode"
+          },
+          {
+            "name": "status_message",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "statusMessage"
+          },
+          {
+            "name": "status_details",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BYTES",
+            "jsonName": "statusDetails"
+          }
+        ]
+      },
+      {
+        "name": "Message",
+        "field": [
+          {
+            "name": "length",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT32",
+            "jsonName": "length"
+          },
+          {
+            "name": "data",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BYTES",
+            "jsonName": "data"
+          }
+        ]
+      },
+      {
+        "name": "Metadata",
+        "field": [
+          {
+            "name": "entry",
+            "number": 1,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".grpc.binarylog.v1.MetadataEntry",
+            "jsonName": "entry"
+          }
+        ]
+      },
+      {
+        "name": "MetadataEntry",
+        "field": [
+          {
+            "name": "key",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "key"
+          },
+          {
+            "name": "value",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BYTES",
+            "jsonName": "value"
+          }
+        ]
+      },
+      {
+        "name": "Address",
+        "field": [
+          {
+            "name": "type",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_ENUM",
+            "typeName": ".grpc.binarylog.v1.Address.Type",
+            "jsonName": "type"
+          },
+          {
+            "name": "address",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "address"
+          },
+          {
+            "name": "ip_port",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT32",
+            "jsonName": "ipPort"
+          }
+        ],
+        "enumType": [
+          {
+            "name": "Type",
+            "value": [
+              {
+                "name": "TYPE_UNKNOWN",
+                "number": 0
+              },
+              {
+                "name": "TYPE_IPV4",
+                "number": 1
+              },
+              {
+                "name": "TYPE_IPV6",
+                "number": 2
+              },
+              {
+                "name": "TYPE_UNIX",
+                "number": 3
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "options": {
+      "javaPackage": "io.grpc.binarylog.v1",
+      "javaOuterClassname": "BinaryLogProto",
+      "javaMultipleFiles": true,
+      "goPackage": "google.golang.org/grpc/binarylog/grpc_binarylog_v1"
+    },
+    "syntax": "proto3"
+  },
+  "paginator/v1/paginator.payload.proto": {
+    "name": "paginator/v1/paginator.payload.proto",
+    "package": "paginator.v1",
+    "messageType": [
+      {
+        "name": "PageQuery",
+        "field": [
+          {
+            "name": "page",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_INT32",
+            "jsonName": "page"
+          },
+          {
+            "name": "limit",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_INT32",
+            "jsonName": "limit"
+          },
+          {
+            "name": "fields",
+            "number": 3,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_STRING",
+            "jsonName": "fields"
+          },
+          {
+            "name": "sort",
+            "number": 4,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".paginator.v1.Sort",
+            "jsonName": "sort"
+          },
+          {
+            "name": "search",
+            "number": 5,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".paginator.v1.Search",
+            "jsonName": "search"
+          },
+          {
+            "name": "last_id",
+            "number": 6,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "lastId"
+          }
+        ]
+      },
+      {
+        "name": "PageMeta",
+        "field": [
+          {
+            "name": "page",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_INT32",
+            "jsonName": "page"
+          },
+          {
+            "name": "limit",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_INT32",
+            "jsonName": "limit"
+          },
+          {
+            "name": "total",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_INT64",
+            "jsonName": "total"
+          },
+          {
+            "name": "total_pages",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_INT32",
+            "jsonName": "totalPages"
+          },
+          {
+            "name": "has_next",
+            "number": 5,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "hasNext"
+          },
+          {
+            "name": "has_prev",
+            "number": 6,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "hasPrev"
+          }
+        ]
+      },
+      {
+        "name": "Sort",
+        "field": [
+          {
+            "name": "field",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "field"
+          },
+          {
+            "name": "desc",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "desc"
+          }
+        ]
+      },
+      {
+        "name": "Search",
+        "field": [
+          {
+            "name": "fields",
+            "number": 1,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_STRING",
+            "jsonName": "fields"
+          },
+          {
+            "name": "keyword",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "keyword"
+          },
+          {
+            "name": "mode",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_ENUM",
+            "typeName": ".paginator.v1.SearchMode",
+            "jsonName": "mode"
+          }
+        ]
+      }
+    ],
+    "enumType": [
+      {
+        "name": "SearchMode",
+        "value": [
+          {
+            "name": "SEARCH_MODE_UNSPECIFIED",
+            "number": 0
+          },
+          {
+            "name": "SEARCH_MODE_CONTAINS",
+            "number": 1
+          },
+          {
+            "name": "SEARCH_MODE_PREFIX",
+            "number": 2
+          },
+          {
+            "name": "SEARCH_MODE_FULL_TEXT",
+            "number": 3
+          },
+          {
+            "name": "SEARCH_MODE_TRIGRAM",
+            "number": 4
+          },
+          {
+            "name": "SEARCH_MODE_FULL_TEXT_TRIGRAM",
+            "number": 5
+          }
+        ]
+      }
+    ],
+    "options": {
+      "goPackage": "github.com/siti-nabila/api-contracts/pb/paginator/v1;paginatorv1"
+    },
+    "syntax": "proto3"
+  },
+  "permission/v1/permission.payload.proto": {
+    "name": "permission/v1/permission.payload.proto",
+    "package": "permission.v1",
+    "dependency": [
+      "paginator/v1/paginator.payload.proto"
+    ],
+    "messageType": [
+      {
+        "name": "PermissionItem",
+        "field": [
+          {
+            "name": "id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "id"
+          },
+          {
+            "name": "application_id",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "applicationId"
+          },
+          {
+            "name": "application_code",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "applicationCode"
+          },
+          {
+            "name": "code",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "code"
+          },
+          {
+            "name": "description",
+            "number": 5,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "description"
+          }
+        ]
+      },
+      {
+        "name": "ListPermissionsRequest",
+        "field": [
+          {
+            "name": "query",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".paginator.v1.PageQuery",
+            "jsonName": "query"
+          },
+          {
+            "name": "application_code",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "applicationCode"
+          }
+        ]
+      },
+      {
+        "name": "ListPermissionsResponse",
+        "field": [
+          {
+            "name": "items",
+            "number": 1,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".permission.v1.PermissionItem",
+            "jsonName": "items"
+          },
+          {
+            "name": "meta",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".paginator.v1.PageMeta",
+            "jsonName": "meta"
+          },
+          {
+            "name": "next_cursor",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "nextCursor"
+          }
+        ]
+      }
+    ],
+    "options": {
+      "goPackage": "github.com/siti-nabila/api-contracts/pb/permission/v1;permissionv1"
+    },
+    "syntax": "proto3"
+  },
+  "permission/v1/permission.service.proto": {
+    "name": "permission/v1/permission.service.proto",
+    "package": "permission.v1",
+    "dependency": [
+      "permission/v1/permission.payload.proto"
+    ],
+    "service": [
+      {
+        "name": "PermissionService",
+        "method": [
+          {
+            "name": "ListPermissions",
+            "inputType": ".permission.v1.ListPermissionsRequest",
+            "outputType": ".permission.v1.ListPermissionsResponse"
+          }
+        ]
+      }
+    ],
+    "options": {
+      "goPackage": "github.com/siti-nabila/api-contracts/pb/permission/v1;permissionv1"
+    },
+    "syntax": "proto3"
+  },
+  "profile/v1/profile.payload.proto": {
+    "name": "profile/v1/profile.payload.proto",
+    "package": "profile.v1",
+    "dependency": [
+      "google/protobuf/field_mask.proto"
+    ],
+    "messageType": [
+      {
+        "name": "Profile",
+        "field": [
+          {
+            "name": "id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "id"
+          },
+          {
+            "name": "user_id",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "userId"
+          },
+          {
+            "name": "name",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "name"
+          },
+          {
+            "name": "address",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "address"
+          },
+          {
+            "name": "phone",
+            "number": 5,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "phone"
+          }
+        ]
+      },
+      {
+        "name": "ProfileRequest",
+        "field": [
+          {
+            "name": "name",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "name"
+          },
+          {
+            "name": "address",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "address"
+          },
+          {
+            "name": "phone",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "phone"
+          },
+          {
+            "name": "field_mask",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".google.protobuf.FieldMask",
+            "jsonName": "fieldMask"
+          }
+        ]
+      },
+      {
+        "name": "ProfileResponse",
+        "field": [
+          {
+            "name": "profile",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".profile.v1.Profile",
+            "jsonName": "profile"
+          },
+          {
+            "name": "version",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "version"
+          },
+          {
+            "name": "changed",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "changed"
+          }
+        ]
+      }
+    ],
+    "options": {
+      "goPackage": "github.com/siti-nabila/api-contracts/pb/profile/v1;profilev1"
+    },
+    "syntax": "proto3"
+  },
+  "profile/v1/profile.service.proto": {
+    "name": "profile/v1/profile.service.proto",
+    "package": "profile.v1",
+    "dependency": [
+      "profile/v1/profile.payload.proto"
+    ],
+    "service": [
+      {
+        "name": "ProfileService",
+        "method": [
+          {
+            "name": "UpdateProfile",
+            "inputType": ".profile.v1.ProfileRequest",
+            "outputType": ".profile.v1.ProfileResponse"
+          }
+        ]
+      }
+    ],
+    "options": {
+      "goPackage": "github.com/siti-nabila/api-contracts/pb/profile/v1;profilev1"
+    },
+    "syntax": "proto3"
+  },
+  "role/v1/role.payload.proto": {
+    "name": "role/v1/role.payload.proto",
+    "package": "role.v1",
+    "dependency": [
+      "paginator/v1/paginator.payload.proto",
+      "permission/v1/permission.payload.proto",
+      "google/protobuf/timestamp.proto",
+      "google/protobuf/field_mask.proto"
+    ],
+    "messageType": [
+      {
+        "name": "RoleSummary",
+        "field": [
+          {
+            "name": "id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "id"
+          },
+          {
+            "name": "code",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "code"
+          },
+          {
+            "name": "name",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "name"
+          },
+          {
+            "name": "description",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "oneofIndex": 0,
+            "jsonName": "description",
+            "proto3Optional": true
+          },
+          {
+            "name": "application_id",
+            "number": 5,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "applicationId"
+          },
+          {
+            "name": "application_code",
+            "number": 6,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "applicationCode"
+          },
+          {
+            "name": "status",
+            "number": 7,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "status"
+          },
+          {
+            "name": "is_system",
+            "number": 8,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "isSystem"
+          },
+          {
+            "name": "version",
+            "number": 9,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "version"
+          },
+          {
+            "name": "role_code",
+            "number": 10,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_INT32",
+            "jsonName": "roleCode"
+          },
+          {
+            "name": "created_at",
+            "number": 11,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".google.protobuf.Timestamp",
+            "jsonName": "createdAt"
+          },
+          {
+            "name": "updated_at",
+            "number": 12,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".google.protobuf.Timestamp",
+            "jsonName": "updatedAt"
+          },
+          {
+            "name": "affected_user_count",
+            "number": 13,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "affectedUserCount"
+          }
+        ],
+        "oneofDecl": [
+          {
+            "name": "_description"
+          }
+        ]
+      },
+      {
+        "name": "RoleFilter",
+        "field": [
+          {
+            "name": "application_code",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "applicationCode"
+          },
+          {
+            "name": "statuses",
+            "number": 2,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_STRING",
+            "jsonName": "statuses"
+          }
+        ]
+      },
+      {
+        "name": "ListRolesRequest",
+        "field": [
+          {
+            "name": "query",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".paginator.v1.PageQuery",
+            "jsonName": "query"
+          },
+          {
+            "name": "filter",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".role.v1.RoleFilter",
+            "jsonName": "filter"
+          }
+        ]
+      },
+      {
+        "name": "ListRolesResponse",
+        "field": [
+          {
+            "name": "items",
+            "number": 1,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".role.v1.RoleSummary",
+            "jsonName": "items"
+          },
+          {
+            "name": "meta",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".paginator.v1.PageMeta",
+            "jsonName": "meta"
+          },
+          {
+            "name": "next_cursor",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "nextCursor"
+          }
+        ]
+      },
+      {
+        "name": "GetRoleRequest",
+        "field": [
+          {
+            "name": "role_id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "roleId"
+          }
+        ]
+      },
+      {
+        "name": "GetRoleResponse",
+        "field": [
+          {
+            "name": "role",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".role.v1.RoleSummary",
+            "jsonName": "role"
+          },
+          {
+            "name": "permissions",
+            "number": 2,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".permission.v1.PermissionItem",
+            "jsonName": "permissions"
+          }
+        ]
+      },
+      {
+        "name": "CreateRoleRequest",
+        "field": [
+          {
+            "name": "application_code",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "applicationCode"
+          },
+          {
+            "name": "code",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "code"
+          },
+          {
+            "name": "name",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "name"
+          },
+          {
+            "name": "description",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "oneofIndex": 0,
+            "jsonName": "description",
+            "proto3Optional": true
+          },
+          {
+            "name": "permission_codes",
+            "number": 5,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_STRING",
+            "jsonName": "permissionCodes"
+          }
+        ],
+        "oneofDecl": [
+          {
+            "name": "_description"
+          }
+        ]
+      },
+      {
+        "name": "CreateRoleResponse",
+        "field": [
+          {
+            "name": "role",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".role.v1.RoleSummary",
+            "jsonName": "role"
+          },
+          {
+            "name": "permissions",
+            "number": 2,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".permission.v1.PermissionItem",
+            "jsonName": "permissions"
+          }
+        ]
+      },
+      {
+        "name": "UpdateRoleRequest",
+        "field": [
+          {
+            "name": "role_id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "roleId"
+          },
+          {
+            "name": "expected_role_version",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "oneofIndex": 0,
+            "jsonName": "expectedRoleVersion",
+            "proto3Optional": true
+          },
+          {
+            "name": "name",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "oneofIndex": 1,
+            "jsonName": "name",
+            "proto3Optional": true
+          },
+          {
+            "name": "description",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "oneofIndex": 2,
+            "jsonName": "description",
+            "proto3Optional": true
+          },
+          {
+            "name": "field_mask",
+            "number": 5,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".google.protobuf.FieldMask",
+            "jsonName": "fieldMask"
+          }
+        ],
+        "oneofDecl": [
+          {
+            "name": "_expected_role_version"
+          },
+          {
+            "name": "_name"
+          },
+          {
+            "name": "_description"
+          }
+        ]
+      },
+      {
+        "name": "UpdateRoleResponse",
+        "field": [
+          {
+            "name": "role",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".role.v1.RoleSummary",
+            "jsonName": "role"
+          },
+          {
+            "name": "changed",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "changed"
+          }
+        ]
+      },
+      {
+        "name": "ChangeRoleStatusRequest",
+        "field": [
+          {
+            "name": "role_id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "roleId"
+          },
+          {
+            "name": "status",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "oneofIndex": 0,
+            "jsonName": "status",
+            "proto3Optional": true
+          },
+          {
+            "name": "reason",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "reason"
+          },
+          {
+            "name": "expected_role_version",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "oneofIndex": 1,
+            "jsonName": "expectedRoleVersion",
+            "proto3Optional": true
+          }
+        ],
+        "oneofDecl": [
+          {
+            "name": "_status"
+          },
+          {
+            "name": "_expected_role_version"
+          }
+        ]
+      },
+      {
+        "name": "ChangeRoleStatusResponse",
+        "field": [
+          {
+            "name": "role_id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "roleId"
+          },
+          {
+            "name": "status",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "status"
+          },
+          {
+            "name": "version",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "version"
+          },
+          {
+            "name": "changed",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "changed"
+          }
+        ]
+      },
+      {
+        "name": "PermissionSet",
+        "field": [
+          {
+            "name": "codes",
+            "number": 1,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_STRING",
+            "jsonName": "codes"
+          }
+        ]
+      },
+      {
+        "name": "ReplaceRolePermissionsRequest",
+        "field": [
+          {
+            "name": "role_id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "roleId"
+          },
+          {
+            "name": "permissions",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".role.v1.PermissionSet",
+            "jsonName": "permissions"
+          },
+          {
+            "name": "reason",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "reason"
+          },
+          {
+            "name": "expected_role_version",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "oneofIndex": 0,
+            "jsonName": "expectedRoleVersion",
+            "proto3Optional": true
+          }
+        ],
+        "oneofDecl": [
+          {
+            "name": "_expected_role_version"
+          }
+        ]
+      },
+      {
+        "name": "ReplaceRolePermissionsResponse",
+        "field": [
+          {
+            "name": "role",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".role.v1.RoleSummary",
+            "jsonName": "role"
+          },
+          {
+            "name": "permissions",
+            "number": 2,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".permission.v1.PermissionItem",
+            "jsonName": "permissions"
+          },
+          {
+            "name": "changed",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "changed"
+          }
+        ]
+      }
+    ],
+    "options": {
+      "goPackage": "github.com/siti-nabila/api-contracts/pb/role/v1;rolev1"
+    },
+    "syntax": "proto3"
+  },
+  "role/v1/role.service.proto": {
+    "name": "role/v1/role.service.proto",
+    "package": "role.v1",
+    "dependency": [
+      "role/v1/role.payload.proto"
+    ],
+    "service": [
+      {
+        "name": "RoleService",
+        "method": [
+          {
+            "name": "ListRoles",
+            "inputType": ".role.v1.ListRolesRequest",
+            "outputType": ".role.v1.ListRolesResponse"
+          },
+          {
+            "name": "GetRole",
+            "inputType": ".role.v1.GetRoleRequest",
+            "outputType": ".role.v1.GetRoleResponse"
+          },
+          {
+            "name": "CreateRole",
+            "inputType": ".role.v1.CreateRoleRequest",
+            "outputType": ".role.v1.CreateRoleResponse"
+          },
+          {
+            "name": "UpdateRole",
+            "inputType": ".role.v1.UpdateRoleRequest",
+            "outputType": ".role.v1.UpdateRoleResponse"
+          },
+          {
+            "name": "ChangeRoleStatus",
+            "inputType": ".role.v1.ChangeRoleStatusRequest",
+            "outputType": ".role.v1.ChangeRoleStatusResponse"
+          },
+          {
+            "name": "ReplaceRolePermissions",
+            "inputType": ".role.v1.ReplaceRolePermissionsRequest",
+            "outputType": ".role.v1.ReplaceRolePermissionsResponse"
+          }
+        ]
+      }
+    ],
+    "options": {
+      "goPackage": "github.com/siti-nabila/api-contracts/pb/role/v1;rolev1"
+    },
+    "syntax": "proto3"
+  },
+  "session/v1/session.payload.proto": {
+    "name": "session/v1/session.payload.proto",
+    "package": "session.v1",
+    "dependency": [
+      "paginator/v1/paginator.payload.proto",
+      "google/protobuf/timestamp.proto"
+    ],
+    "messageType": [
+      {
+        "name": "Session",
+        "field": [
+          {
+            "name": "id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "id"
+          },
+          {
+            "name": "user_id",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "userId"
+          },
+          {
+            "name": "status",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "status"
+          },
+          {
+            "name": "created_at",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".google.protobuf.Timestamp",
+            "jsonName": "createdAt"
+          },
+          {
+            "name": "last_seen_at",
+            "number": 5,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".google.protobuf.Timestamp",
+            "jsonName": "lastSeenAt"
+          },
+          {
+            "name": "expires_at",
+            "number": 6,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".google.protobuf.Timestamp",
+            "jsonName": "expiresAt"
+          },
+          {
+            "name": "revoked_at",
+            "number": 7,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".google.protobuf.Timestamp",
+            "jsonName": "revokedAt"
+          },
+          {
+            "name": "device_label",
+            "number": 8,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "deviceLabel"
+          },
+          {
+            "name": "user_agent",
+            "number": 9,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "userAgent"
+          },
+          {
+            "name": "ip_address",
+            "number": 10,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "ipAddress"
+          },
+          {
+            "name": "is_current",
+            "number": 11,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "isCurrent"
+          }
+        ]
+      },
+      {
+        "name": "ListMySessionsRequest",
+        "field": [
+          {
+            "name": "query",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".paginator.v1.PageQuery",
+            "jsonName": "query"
+          }
+        ]
+      },
+      {
+        "name": "ListUserSessionsRequest",
+        "field": [
+          {
+            "name": "user_id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "userId"
+          },
+          {
+            "name": "query",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".paginator.v1.PageQuery",
+            "jsonName": "query"
+          }
+        ]
+      },
+      {
+        "name": "ListSessionsResponse",
+        "field": [
+          {
+            "name": "items",
+            "number": 1,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".session.v1.Session",
+            "jsonName": "items"
+          },
+          {
+            "name": "meta",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".paginator.v1.PageMeta",
+            "jsonName": "meta"
+          },
+          {
+            "name": "next_cursor",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "nextCursor"
+          }
+        ]
+      },
+      {
+        "name": "RevokeMySessionRequest",
+        "field": [
+          {
+            "name": "session_id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "sessionId"
+          }
+        ]
+      },
+      {
+        "name": "RevokeUserSessionRequest",
+        "field": [
+          {
+            "name": "user_id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "userId"
+          },
+          {
+            "name": "session_id",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "sessionId"
+          }
+        ]
+      },
+      {
+        "name": "RevokeSessionResponse",
+        "field": [
+          {
+            "name": "changed",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "changed"
+          }
+        ]
+      },
+      {
+        "name": "RevokeAllMySessionsResponse",
+        "field": [
+          {
+            "name": "changed",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "changed"
+          },
+          {
+            "name": "login_required",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "loginRequired"
+          }
+        ]
+      },
+      {
+        "name": "RevokeAllUserSessionsRequest",
+        "field": [
+          {
+            "name": "user_id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "userId"
+          },
+          {
+            "name": "expected_user_version",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "oneofIndex": 0,
+            "jsonName": "expectedUserVersion",
+            "proto3Optional": true
+          }
+        ],
+        "oneofDecl": [
+          {
+            "name": "_expected_user_version"
+          }
+        ]
+      },
+      {
+        "name": "RevokeAllUserSessionsResponse",
+        "field": [
+          {
+            "name": "changed",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "changed"
+          },
+          {
+            "name": "version",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "version"
+          }
+        ]
+      }
+    ],
+    "options": {
+      "goPackage": "github.com/siti-nabila/api-contracts/pb/session/v1;sessionv1"
+    },
+    "syntax": "proto3"
+  },
+  "session/v1/session.service.proto": {
+    "name": "session/v1/session.service.proto",
+    "package": "session.v1",
+    "dependency": [
+      "session/v1/session.payload.proto",
+      "google/protobuf/empty.proto"
+    ],
+    "service": [
+      {
+        "name": "SessionService",
+        "method": [
+          {
+            "name": "ListMySessions",
+            "inputType": ".session.v1.ListMySessionsRequest",
+            "outputType": ".session.v1.ListSessionsResponse"
+          },
+          {
+            "name": "RevokeMySession",
+            "inputType": ".session.v1.RevokeMySessionRequest",
+            "outputType": ".session.v1.RevokeSessionResponse"
+          },
+          {
+            "name": "RevokeAllMySessions",
+            "inputType": ".google.protobuf.Empty",
+            "outputType": ".session.v1.RevokeAllMySessionsResponse"
+          },
+          {
+            "name": "ListUserSessions",
+            "inputType": ".session.v1.ListUserSessionsRequest",
+            "outputType": ".session.v1.ListSessionsResponse"
+          },
+          {
+            "name": "RevokeUserSession",
+            "inputType": ".session.v1.RevokeUserSessionRequest",
+            "outputType": ".session.v1.RevokeSessionResponse"
+          },
+          {
+            "name": "RevokeAllUserSessions",
+            "inputType": ".session.v1.RevokeAllUserSessionsRequest",
+            "outputType": ".session.v1.RevokeAllUserSessionsResponse"
+          }
+        ]
+      }
+    ],
+    "options": {
+      "goPackage": "github.com/siti-nabila/api-contracts/pb/session/v1;sessionv1"
+    },
+    "syntax": "proto3"
+  },
+  "user/v1/user.payload.proto": {
+    "name": "user/v1/user.payload.proto",
+    "package": "user.v1",
+    "dependency": [
+      "profile/v1/profile.payload.proto",
+      "paginator/v1/paginator.payload.proto",
+      "google/protobuf/timestamp.proto",
+      "google/protobuf/field_mask.proto"
+    ],
+    "messageType": [
+      {
+        "name": "User",
+        "field": [
+          {
+            "name": "id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "id"
+          },
+          {
+            "name": "name",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "name"
+          },
+          {
+            "name": "email",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "email"
+          },
+          {
+            "name": "password",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "password"
+          },
+          {
+            "name": "dob",
+            "number": 5,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "dob"
+          },
+          {
+            "name": "phone_no",
+            "number": 6,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "phoneNo"
+          },
+          {
+            "name": "address",
+            "number": 7,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "address"
+          },
+          {
+            "name": "status",
+            "number": 8,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "status"
+          },
+          {
+            "name": "version",
+            "number": 9,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "version"
+          },
+          {
+            "name": "created_at",
+            "number": 10,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".google.protobuf.Timestamp",
+            "jsonName": "createdAt"
+          },
+          {
+            "name": "must_change_password",
+            "number": 11,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "mustChangePassword"
+          },
+          {
+            "name": "roles",
+            "number": 12,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".user.v1.UserRoleAssignment",
+            "jsonName": "roles"
+          },
+          {
+            "name": "application_access",
+            "number": 13,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".user.v1.UserApplicationAccess",
+            "jsonName": "applicationAccess"
+          }
+        ]
+      },
+      {
+        "name": "UserResponse",
+        "field": [
+          {
+            "name": "id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "id"
+          },
+          {
+            "name": "email",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "email"
+          },
+          {
+            "name": "created_at",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".google.protobuf.Timestamp",
+            "jsonName": "createdAt"
+          }
+        ]
+      },
+      {
+        "name": "UserData",
+        "field": [
+          {
+            "name": "id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "id"
+          },
+          {
+            "name": "email",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "email"
+          },
+          {
+            "name": "fullname",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "fullname"
+          },
+          {
+            "name": "address",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "address"
+          },
+          {
+            "name": "phone",
+            "number": 5,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "phone"
+          },
+          {
+            "name": "role_codes",
+            "number": 6,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_INT32",
+            "jsonName": "roleCodes"
+          },
+          {
+            "name": "role_names",
+            "number": 7,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_STRING",
+            "jsonName": "roleNames"
+          },
+          {
+            "name": "created_at",
+            "number": 8,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".google.protobuf.Timestamp",
+            "jsonName": "createdAt"
+          },
+          {
+            "name": "status",
+            "number": 9,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "status"
+          },
+          {
+            "name": "version",
+            "number": 10,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "version"
+          },
+          {
+            "name": "roles",
+            "number": 11,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".user.v1.UserRoleAssignment",
+            "jsonName": "roles"
+          },
+          {
+            "name": "application_access",
+            "number": 12,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".user.v1.UserApplicationAccess",
+            "jsonName": "applicationAccess"
+          },
+          {
+            "name": "must_change_password",
+            "number": 13,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "mustChangePassword"
+          }
+        ]
+      },
+      {
+        "name": "UserRoleAssignment",
+        "field": [
+          {
+            "name": "role_id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "roleId"
+          },
+          {
+            "name": "code",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "code"
+          },
+          {
+            "name": "name",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "name"
+          },
+          {
+            "name": "status",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "status"
+          },
+          {
+            "name": "role_status",
+            "number": 5,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "roleStatus"
+          }
+        ]
+      },
+      {
+        "name": "UserApplicationAccess",
+        "field": [
+          {
+            "name": "application_id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "applicationId"
+          },
+          {
+            "name": "code",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "code"
+          },
+          {
+            "name": "name",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "name"
+          },
+          {
+            "name": "status",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "status"
+          },
+          {
+            "name": "application_status",
+            "number": 5,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "applicationStatus"
+          }
+        ]
+      },
+      {
+        "name": "UserDataOld",
+        "field": [
+          {
+            "name": "user",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".user.v1.UserResponse",
+            "jsonName": "user"
+          },
+          {
+            "name": "profile",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".profile.v1.Profile",
+            "jsonName": "profile"
+          }
+        ]
+      },
+      {
+        "name": "AuthRequest",
+        "field": [
+          {
+            "name": "email",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "email"
+          },
+          {
+            "name": "password",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "password"
+          }
+        ]
+      },
+      {
+        "name": "UserTokenResponse",
+        "field": [
+          {
+            "name": "token",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "token"
+          },
+          {
+            "name": "registration_id",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "registrationId"
+          },
+          {
+            "name": "registration_status",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "registrationStatus"
+          },
+          {
+            "name": "refresh_token",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "refreshToken"
+          },
+          {
+            "name": "session_id",
+            "number": 5,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "sessionId"
+          },
+          {
+            "name": "access_expires_at",
+            "number": 6,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".google.protobuf.Timestamp",
+            "jsonName": "accessExpiresAt"
+          },
+          {
+            "name": "session_expires_at",
+            "number": 7,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".google.protobuf.Timestamp",
+            "jsonName": "sessionExpiresAt"
+          },
+          {
+            "name": "must_change_password",
+            "number": 8,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "mustChangePassword"
+          }
+        ]
+      },
+      {
+        "name": "CreateUserRequest",
+        "field": [
+          {
+            "name": "name",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "name"
+          },
+          {
+            "name": "email",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "email"
+          },
+          {
+            "name": "password",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "password"
+          },
+          {
+            "name": "status",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "oneofIndex": 0,
+            "jsonName": "status",
+            "proto3Optional": true
+          },
+          {
+            "name": "address",
+            "number": 5,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "address"
+          },
+          {
+            "name": "phone",
+            "number": 6,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "phone"
+          }
+        ],
+        "oneofDecl": [
+          {
+            "name": "_status"
+          }
+        ]
+      },
+      {
+        "name": "CreateUserResponse",
+        "field": [
+          {
+            "name": "user",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".user.v1.User",
+            "jsonName": "user"
+          }
+        ]
+      },
+      {
+        "name": "GetUserRequest",
+        "field": [
+          {
+            "name": "id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "id"
+          }
+        ]
+      },
+      {
+        "name": "GetUserResponse",
+        "field": [
+          {
+            "name": "user",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".user.v1.User",
+            "jsonName": "user"
+          }
+        ]
+      },
+      {
+        "name": "TestRPC",
+        "field": [
+          {
+            "name": "res",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "res"
+          }
+        ]
+      },
+      {
+        "name": "ListUsersRequest",
+        "field": [
+          {
+            "name": "query",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".paginator.v1.PageQuery",
+            "jsonName": "query"
+          },
+          {
+            "name": "filter",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".user.v1.UserFilter",
+            "jsonName": "filter"
+          }
+        ]
+      },
+      {
+        "name": "UserListItem",
+        "field": [
+          {
+            "name": "id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_INT32",
+            "jsonName": "id"
+          },
+          {
+            "name": "email",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "email"
+          },
+          {
+            "name": "name",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "name"
+          },
+          {
+            "name": "address",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "address"
+          },
+          {
+            "name": "phone",
+            "number": 5,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "phone"
+          },
+          {
+            "name": "status",
+            "number": 6,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "status"
+          },
+          {
+            "name": "version",
+            "number": 7,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "version"
+          },
+          {
+            "name": "roles",
+            "number": 8,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".user.v1.UserRoleAssignment",
+            "jsonName": "roles"
+          },
+          {
+            "name": "application_access",
+            "number": 9,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".user.v1.UserApplicationAccess",
+            "jsonName": "applicationAccess"
+          },
+          {
+            "name": "created_at",
+            "number": 10,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".google.protobuf.Timestamp",
+            "jsonName": "createdAt"
+          }
+        ]
+      },
+      {
+        "name": "ListUsersResponse",
+        "field": [
+          {
+            "name": "items",
+            "number": 1,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".user.v1.UserListItem",
+            "jsonName": "items"
+          },
+          {
+            "name": "total",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_INT32",
+            "jsonName": "total"
+          },
+          {
+            "name": "page",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_INT32",
+            "jsonName": "page"
+          },
+          {
+            "name": "limit",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_INT32",
+            "jsonName": "limit"
+          },
+          {
+            "name": "total_pages",
+            "number": 5,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_INT32",
+            "jsonName": "totalPages"
+          },
+          {
+            "name": "has_next",
+            "number": 6,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "hasNext"
+          },
+          {
+            "name": "has_prev",
+            "number": 7,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "hasPrev"
+          },
+          {
+            "name": "next_cursor",
+            "number": 8,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "nextCursor"
+          }
+        ]
+      },
+      {
+        "name": "UserFilter",
+        "field": [
+          {
+            "name": "created_from",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".google.protobuf.Timestamp",
+            "jsonName": "createdFrom"
+          },
+          {
+            "name": "created_to",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".google.protobuf.Timestamp",
+            "jsonName": "createdTo"
+          },
+          {
+            "name": "role_codes",
+            "number": 3,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_UINT64",
+            "jsonName": "roleCodes"
+          },
+          {
+            "name": "statuses",
+            "number": 4,
+            "label": "LABEL_REPEATED",
+            "type": "TYPE_STRING",
+            "jsonName": "statuses"
+          },
+          {
+            "name": "application_code",
+            "number": 5,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "applicationCode"
+          }
+        ]
+      },
+      {
+        "name": "UpdateUserRequest",
+        "field": [
+          {
+            "name": "user_id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "userId"
+          },
+          {
+            "name": "expected_user_version",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "oneofIndex": 0,
+            "jsonName": "expectedUserVersion",
+            "proto3Optional": true
+          },
+          {
+            "name": "name",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "oneofIndex": 1,
+            "jsonName": "name",
+            "proto3Optional": true
+          },
+          {
+            "name": "address",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "oneofIndex": 2,
+            "jsonName": "address",
+            "proto3Optional": true
+          },
+          {
+            "name": "phone",
+            "number": 5,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "oneofIndex": 3,
+            "jsonName": "phone",
+            "proto3Optional": true
+          },
+          {
+            "name": "field_mask",
+            "number": 6,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".google.protobuf.FieldMask",
+            "jsonName": "fieldMask"
+          }
+        ],
+        "oneofDecl": [
+          {
+            "name": "_expected_user_version"
+          },
+          {
+            "name": "_name"
+          },
+          {
+            "name": "_address"
+          },
+          {
+            "name": "_phone"
+          }
+        ]
+      },
+      {
+        "name": "UpdateUserResponse",
+        "field": [
+          {
+            "name": "user",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_MESSAGE",
+            "typeName": ".user.v1.User",
+            "jsonName": "user"
+          },
+          {
+            "name": "changed",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "changed"
+          }
+        ]
+      },
+      {
+        "name": "ChangeUserStatusRequest",
+        "field": [
+          {
+            "name": "user_id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "userId"
+          },
+          {
+            "name": "status",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "oneofIndex": 0,
+            "jsonName": "status",
+            "proto3Optional": true
+          },
+          {
+            "name": "reason",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "reason"
+          },
+          {
+            "name": "expected_user_version",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "oneofIndex": 1,
+            "jsonName": "expectedUserVersion",
+            "proto3Optional": true
+          }
+        ],
+        "oneofDecl": [
+          {
+            "name": "_status"
+          },
+          {
+            "name": "_expected_user_version"
+          }
+        ]
+      },
+      {
+        "name": "ChangeUserStatusResponse",
+        "field": [
+          {
+            "name": "user_id",
+            "number": 1,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "userId"
+          },
+          {
+            "name": "status",
+            "number": 2,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_STRING",
+            "jsonName": "status"
+          },
+          {
+            "name": "version",
+            "number": 3,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_UINT64",
+            "jsonName": "version"
+          },
+          {
+            "name": "changed",
+            "number": 4,
+            "label": "LABEL_OPTIONAL",
+            "type": "TYPE_BOOL",
+            "jsonName": "changed"
+          }
+        ]
+      }
+    ],
+    "options": {
+      "goPackage": "github.com/siti-nabila/api-contracts/pb/user/v1;userv1"
+    },
+    "syntax": "proto3"
+  },
+  "user/v1/user.service.proto": {
+    "name": "user/v1/user.service.proto",
+    "package": "user.v1",
+    "dependency": [
+      "user/v1/user.payload.proto",
+      "google/protobuf/empty.proto"
+    ],
+    "service": [
+      {
+        "name": "UserService",
+        "method": [
+          {
+            "name": "Register",
+            "inputType": ".user.v1.AuthRequest",
+            "outputType": ".user.v1.UserTokenResponse"
+          },
+          {
+            "name": "Login",
+            "inputType": ".user.v1.AuthRequest",
+            "outputType": ".user.v1.UserTokenResponse"
+          },
+          {
+            "name": "Me",
+            "inputType": ".google.protobuf.Empty",
+            "outputType": ".user.v1.UserData"
+          },
+          {
+            "name": "ListUsers",
+            "inputType": ".user.v1.ListUsersRequest",
+            "outputType": ".user.v1.ListUsersResponse"
+          },
+          {
+            "name": "GetUser",
+            "inputType": ".user.v1.GetUserRequest",
+            "outputType": ".user.v1.GetUserResponse"
+          },
+          {
+            "name": "CreateUser",
+            "inputType": ".user.v1.CreateUserRequest",
+            "outputType": ".user.v1.CreateUserResponse"
+          },
+          {
+            "name": "UpdateUser",
+            "inputType": ".user.v1.UpdateUserRequest",
+            "outputType": ".user.v1.UpdateUserResponse"
+          },
+          {
+            "name": "ChangeUserStatus",
+            "inputType": ".user.v1.ChangeUserStatusRequest",
+            "outputType": ".user.v1.ChangeUserStatusResponse"
+          },
+          {
+            "name": "TesRPC",
+            "inputType": ".google.protobuf.Empty",
+            "outputType": ".user.v1.TestRPC"
+          }
+        ]
+      }
+    ],
+    "options": {
+      "goPackage": "github.com/siti-nabila/api-contracts/pb/user/v1;userv1"
+    },
+    "syntax": "proto3"
+  }
+}

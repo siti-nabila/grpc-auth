@@ -25,6 +25,8 @@ import (
 
 func RolePersistence() []testutils.Scenario {
 	return []testutils.Scenario{
+		{Name: "mapping history retains pair identity through removal restore empty no-op and replay", Run: postgresMappingHistory},
+		{Name: "default member ignores retained deleted mappings", Run: postgresDeletedDefaultMember},
 		{Name: "real role sequence conditional version mapping replacement and rollback", Run: postgresRoleWrites},
 		{Name: "all catalog scalar directions mixed null keysets counts and literal filters", Run: postgresCatalogQueries},
 	}
@@ -46,7 +48,7 @@ func postgresRoleWrites(t *testing.T) {
 	if err != nil || role.ID != 2 || role.NumericCode != 2 || role.CreatedAt == nil || role.Description != nil || role.Version != 1 {
 		t.Fatalf("sequence create %+v %v", role, err)
 	}
-	if err = w.ReplacePermissions(ctx, role.ID, []uint64{2, 1}); err != nil {
+	if err = w.ReplacePermissions(ctx, role.ID, domain.RolePermissionChanges{Inserted: []uint64{1, 2}}, time.Date(2026, 10, 12, 0, 0, 0, 0, time.UTC)); err != nil {
 		t.Fatal(err)
 	}
 	permissions, err := reader.NewRoleManagementReader(tx).RolePermissions(ctx, role.ID)
@@ -63,7 +65,7 @@ func postgresRoleWrites(t *testing.T) {
 	if ok, err := w.UpdateRole(ctx, role, 1); err != nil || ok {
 		t.Fatalf("stale update %v %v", ok, err)
 	}
-	if err = w.ReplacePermissions(ctx, role.ID, nil); err != nil {
+	if err = w.ReplacePermissions(ctx, role.ID, domain.RolePermissionChanges{Removed: []uint64{1, 2}}, at); err != nil {
 		t.Fatal(err)
 	}
 	permissions, err = reader.NewRoleManagementReader(tx).RolePermissions(ctx, role.ID)
@@ -96,7 +98,7 @@ func postgresRoleWrites(t *testing.T) {
 	if err != nil || created.NumericCode <= role.NumericCode {
 		t.Fatal("sequence after gap", err)
 	}
-	if err = w.ReplacePermissions(ctx, created.ID, []uint64{1, 2147483647}); err == nil {
+	if err = w.ReplacePermissions(ctx, created.ID, domain.RolePermissionChanges{Inserted: []uint64{1, 2147483647}}, at); err == nil {
 		t.Fatal("foreign key accepted")
 	}
 	if err = tx.Rollback(); err != nil {
@@ -139,9 +141,13 @@ func compareCatalogValue(a, b domain.CatalogValue) int {
 	return strings.Compare(*a.Value, *b.Value)
 }
 
-func checkCatalogSorts[T catalogTestRow](t *testing.T, ctx context.Context, c domain.Catalog, read func(context.Context, domain.CatalogQuery) (orm.PageData[T], error)) {
+func checkCatalogSorts[T catalogTestRow](t *testing.T, ctx context.Context, c domain.Catalog, read func(context.Context, domain.CatalogQuery) (orm.PageData[T], error), base ...domain.CatalogQuery) {
 	t.Helper()
-	all, err := read(ctx, domain.CatalogQuery{Limit: 100})
+	initial := domain.CatalogQuery{Limit: 100}
+	if len(base) > 0 {
+		initial.TargetUserID = base[0].TargetUserID
+	}
+	all, err := read(ctx, initial)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -154,8 +160,17 @@ func checkCatalogSorts[T catalogTestRow](t *testing.T, ctx context.Context, c do
 	if c == domain.RoleCatalog {
 		sorts = append(sorts, []orm.SortField{{Field: "description", Desc: true}, {Field: "status"}, {Field: "name", Desc: true}}, []orm.SortField{{Field: "updated_at"}, {Field: "is_system", Desc: true}, {Field: "id", Desc: true}})
 	}
+	if c == domain.UserRoleAssignmentCatalog {
+		sorts = append(sorts, []orm.SortField{{Field: "revoked_at", Desc: true}, {Field: "granted_by"}, {Field: "name", Desc: true}}, []orm.SortField{{Field: "application_access_status", Desc: true}, {Field: "is_system", Desc: true}, {Field: "id", Desc: true}})
+	}
+	if c == domain.UserApplicationAccessCatalog {
+		sorts = append(sorts, []orm.SortField{{Field: "revoked_at", Desc: true}, {Field: "granted_by"}, {Field: "name", Desc: true}})
+	}
 	for _, s := range sorts {
-		q, _ := c.Normalize(domain.CatalogQuery{Limit: 2, Sort: s, Fields: []string{"id"}})
+		q, e := c.Normalize(domain.CatalogQuery{TargetUserID: initial.TargetUserID, Limit: 2, Sort: s, Fields: []string{c.IdentityField()}})
+		if e != nil {
+			t.Fatal(e)
+		}
 		expected := append([]T(nil), all.Items...)
 		sort.Slice(expected, func(i, j int) bool {
 			for _, s := range q.Sort {
@@ -184,7 +199,7 @@ func checkCatalogSorts[T catalogTestRow](t *testing.T, ctx context.Context, c do
 				t.Fatal("unique pre-cursor total")
 			}
 			for _, row := range page.Items {
-				ids = append(ids, *row.CatalogValue("id").Value)
+				ids = append(ids, *row.CatalogValue(c.IdentityField()).Value)
 			}
 			if !page.HasNext {
 				if page.NextCursor != "" {
@@ -200,7 +215,7 @@ func checkCatalogSorts[T catalogTestRow](t *testing.T, ctx context.Context, c do
 		}
 		want := []string{}
 		for _, row := range expected {
-			want = append(want, *row.CatalogValue("id").Value)
+			want = append(want, *row.CatalogValue(c.IdentityField()).Value)
 		}
 		if !reflect.DeepEqual(ids, want) {
 			t.Fatalf("%s %v got %v want %v", c, s, ids, want)
@@ -218,12 +233,12 @@ INSERT INTO role(role_name,role_description,application_id,code,status,version,c
 ('Zulu',NULL,2,'sales.zero','ACTIVE',1,'2026-01-02',NULL),
 ('Alpha','',3,'other.viewer','ACTIVE',2,'2026-01-01','2026-01-01');
 INSERT INTO permissions(application_id,code,description) VALUES(2,'sales.order.read','literal %_\ value'),(2,'sales.order.update','Equal'),(3,'other.order.read','Equal');
-INSERT INTO role_permissions VALUES(2,1),(2,2),(3,1);
+INSERT INTO role_permissions(role_id,permission_id) VALUES(2,1),(2,2),(3,1);
 INSERT INTO auth(email,password,status,deleted_at) VALUES
 ('pending@catalog.test','fixture','PENDING',NULL),('suspended@catalog.test','fixture','SUSPENDED',NULL),('deactivated@catalog.test','fixture','DEACTIVATED',NULL),('deleted@catalog.test','fixture','ACTIVE',CURRENT_TIMESTAMP),('revoked@catalog.test','fixture','ACTIVE',NULL);
 INSERT INTO user_role(user_id,role_id) VALUES(1,2),(2,2),(3,2),(4,2),(5,2);
 INSERT INTO user_role(user_id,role_id,status,revoked_at,revoke_reason) VALUES(6,2,'REVOKED',CURRENT_TIMESTAMP,'fixture revoked');
-INSERT INTO user_application_access(user_id,application_id,status) VALUES(1,2,'REVOKED');`)
+INSERT INTO user_application_access(user_id,application_id,status,revoked_at,revoke_reason) VALUES(1,2,'REVOKED',CURRENT_TIMESTAMP,'Controlled fixture revocation');`)
 	if err != nil {
 		t.Fatal("catalog fixture", err)
 	}

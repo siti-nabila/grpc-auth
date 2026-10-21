@@ -49,10 +49,10 @@ func postgresCatalogSnapshots(t *testing.T) {
 			_, err = f.DB.ExecContext(ctx, `
 INSERT INTO permissions(application_id,code,description) VALUES(1,'iam.role.read','Role read'),(1,'iam.permission.read','Permission read');
 INSERT INTO role(role_name,role_code,application_id,code) VALUES('Reader',2,1,'iam.reader');
-INSERT INTO role_permissions VALUES(2,1),(2,2);INSERT INTO user_role(user_id,role_id) VALUES(1,2);
+INSERT INTO role_permissions(role_id,permission_id) VALUES(2,1),(2,2);INSERT INTO user_role(user_id,role_id) VALUES(1,2);
 INSERT INTO applications(code,name) VALUES('sales','Sales before');
 INSERT INTO role(role_name,role_description,role_code,application_id,code,created_at) VALUES('Before',NULL,3,2,'sales.editor',NULL),('Unassigned','',4,2,'sales.viewer',NULL);
-INSERT INTO permissions(application_id,code,description) VALUES(2,'sales.order.read','Before read');INSERT INTO role_permissions VALUES(3,3);`)
+INSERT INTO permissions(application_id,code,description) VALUES(2,'sales.order.read','Before read');INSERT INTO role_permissions(role_id,permission_id) VALUES(3,3);`)
 			if err != nil {
 				t.Fatal("catalog snapshot fixture", err)
 			}
@@ -118,7 +118,7 @@ INSERT INTO permissions(application_id,code,description) VALUES(2,'sales.order.r
 				t.Fatal(err)
 			}
 			defer tx.Rollback()
-			_, err = tx.ExecContext(ctx, `DELETE FROM role_permissions WHERE role_id=2; UPDATE role SET role_name='After' WHERE id=3; UPDATE applications SET name='Sales after' WHERE id=2; UPDATE permissions SET description='After read' WHERE id=3; INSERT INTO applications(code,name) VALUES('later','Later'); INSERT INTO role(role_name,role_code,application_id,code) VALUES('Later',5,2,'sales.later'); INSERT INTO permissions(application_id,code,description) VALUES(2,'sales.order.update','Later')`)
+			_, err = tx.ExecContext(ctx, `UPDATE role_permissions SET deleted_at=CURRENT_TIMESTAMP WHERE role_id=2; UPDATE role SET role_name='After' WHERE id=3; UPDATE applications SET name='Sales after' WHERE id=2; UPDATE permissions SET description='After read' WHERE id=3; INSERT INTO applications(code,name) VALUES('later','Later'); INSERT INTO role(role_name,role_code,application_id,code) VALUES('Later',5,2,'sales.later'); INSERT INTO permissions(application_id,code,description) VALUES(2,'sales.order.update','Later')`)
 			if err != nil {
 				t.Fatal(err)
 			}

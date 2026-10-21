@@ -21,7 +21,11 @@ func prepareLifecycle(security *LoginSecurity, login *LoginProducer, provider do
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	refresh, err := authfeature.NewRefreshService(authfeature.RefreshDependencies{Transactions: provider, Tokens: reader.NewRefreshReader(primary), State: reader.NewSessionStateReader(primary), Bind: authfeature.BindRefreshRepositories, Admit: admit, Credentials: func() (authfeature.RotatedCredentials, error) { return authfeature.GenerateRotatedCredentials(entropy) }, Issue: security.Issuer.Issue, EventID: eventID, Now: now})
+	refresh, err := authfeature.NewRefreshService(authfeature.RefreshDependencies{Transactions: provider, Tokens: reader.NewRefreshReader(primary), State: reader.NewSessionStateReader(primary), Bind: func(tx domain.Transaction) authfeature.RefreshRepositories {
+		r := authfeature.BindRefreshRepositories(tx)
+		r.Audit = observeRequiredAudit(r.Audit, login.Metrics)
+		return r
+	}, Admit: admit, Credentials: func() (authfeature.RotatedCredentials, error) { return authfeature.GenerateRotatedCredentials(entropy) }, Issue: security.Issuer.Issue, EventID: eventID, Now: now})
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -29,7 +33,11 @@ func prepareLifecycle(security *LoginSecurity, login *LoginProducer, provider do
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	logout, err := authfeature.NewLogoutService(authfeature.LogoutDependencies{Transactions: provider, Tokens: reader.NewRefreshReader(primary), State: reader.NewSessionStateReader(primary), Bind: authfeature.BindLogoutRepositories, Now: now, EventID: eventID})
+	logout, err := authfeature.NewLogoutService(authfeature.LogoutDependencies{Transactions: provider, Tokens: reader.NewRefreshReader(primary), State: reader.NewSessionStateReader(primary), Bind: func(tx domain.Transaction) authfeature.LogoutRepositories {
+		r := authfeature.BindLogoutRepositories(tx)
+		r.Audit = observeRequiredAudit(r.Audit, login.Metrics)
+		return r
+	}, Now: now, EventID: eventID})
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -37,7 +45,11 @@ func prepareLifecycle(security *LoginSecurity, login *LoginProducer, provider do
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	password, err := authfeature.NewChangePasswordService(authfeature.PasswordDependencies{Transactions: provider, Candidate: reader.NewLoginAccountReader(primary), Bind: authfeature.BindPasswordRepositories, VerifyPassword: authfeature.VerifyLoginPassword, HashPassword: authfeature.DefaultArgon2Config().HashPassword, Now: now, EventID: eventID})
+	password, err := authfeature.NewChangePasswordService(authfeature.PasswordDependencies{Transactions: provider, Candidate: reader.NewLoginAccountReader(primary), Bind: func(tx domain.Transaction) authfeature.PasswordRepositories {
+		r := authfeature.BindPasswordRepositories(tx)
+		r.Audit = observeRequiredAudit(r.Audit, login.Metrics)
+		return r
+	}, VerifyPassword: authfeature.VerifyLoginPassword, HashPassword: authfeature.DefaultArgon2Config().HashPassword, Now: now, EventID: eventID})
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -45,7 +57,11 @@ func prepareLifecycle(security *LoginSecurity, login *LoginProducer, provider do
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	self, err := session.NewSelfService(session.SelfDependencies{Transactions: provider, Bind: session.BindSelfRepositories, Now: now, EventID: eventID})
+	self, err := session.NewSelfService(session.SelfDependencies{Transactions: provider, Bind: func(tx domain.Transaction) session.SelfRepositories {
+		r := session.BindSelfRepositories(tx)
+		r.Audit = observeRequiredAudit(r.Audit, login.Metrics)
+		return r
+	}, Now: now, EventID: eventID})
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -61,7 +77,11 @@ func prepareLifecycle(security *LoginSecurity, login *LoginProducer, provider do
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	admin, err := session.NewAdminService(session.AdminDependencies{Transactions: provider, Bind: session.BindAdminRepositories, Now: now, EventID: eventID})
+	admin, err := session.NewAdminService(session.AdminDependencies{Transactions: provider, Bind: func(tx domain.Transaction) session.AdminRepositories {
+		r := session.BindAdminRepositories(tx)
+		r.Audit = observeRequiredAudit(r.Audit, login.Metrics)
+		return r
+	}, Now: now, EventID: eventID})
 	if err != nil {
 		return nil, nil, nil, err
 	}

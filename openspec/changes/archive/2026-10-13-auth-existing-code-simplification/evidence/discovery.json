@@ -1,0 +1,17 @@
+{
+  "label": "discovery",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./tests/features/common/..."
+  ],
+  "started_at": "2026-10-13T02:55:15.520218+00:00",
+  "seconds": 3.077,
+  "exit_code": 0,
+  "log": "/tmp/ecs-discovery.log",
+  "passed_tests": 36,
+  "failed_tests": [],
+  "skipped_tests": []
+}

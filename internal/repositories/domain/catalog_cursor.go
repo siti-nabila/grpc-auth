@@ -28,12 +28,13 @@ type CatalogCursor struct {
 
 func (c Catalog) QueryHash(q CatalogQuery) string {
 	b, _ := json.Marshal(struct {
-		Method      Catalog
-		Sort        []orm.SortField
-		Application string
-		Statuses    []string
-		Search      *orm.SearchQuery
-	}{c, q.Sort, q.ApplicationCode, q.Statuses, q.Search})
+		Method       Catalog
+		Sort         []orm.SortField
+		Application  string
+		Statuses     []string
+		Search       *orm.SearchQuery
+		TargetUserID uint64 `json:"target_user_id,omitempty"`
+	}{c, q.Sort, q.ApplicationCode, q.Statuses, q.Search, q.TargetUserID})
 	sum := sha256.Sum256(b)
 	return hex.EncodeToString(sum[:])
 }
@@ -43,7 +44,7 @@ func (c Catalog) ParseCursor(q CatalogQuery) ([]CatalogValue, error) {
 		return nil, nil
 	}
 	if n, err := strconv.ParseInt(q.LastID, 10, 64); err == nil {
-		if n < 1 || n > math.MaxInt32 || len(q.Sort) != 1 || q.Sort[0].Field != "id" || strconv.FormatInt(n, 10) != q.LastID {
+		if n < 1 || n > math.MaxInt32 || len(q.Sort) != 1 || q.Sort[0].Field != c.IdentityField() || strconv.FormatInt(n, 10) != q.LastID {
 			return nil, common.ErrBadRequest
 		}
 		value := q.LastID
@@ -81,7 +82,7 @@ func (c Catalog) ParseCursor(q CatalogQuery) ([]CatalogValue, error) {
 			if err != nil || n < 0 || n == 0 && f.Name != "affected_user_count" || strconv.FormatInt(n, 10) != text {
 				return nil, common.ErrBadRequest
 			}
-			if (f.Name == "id" || f.Name == "application_id" || f.Name == "role_code") && n > math.MaxInt32 {
+			if (f.Name == "id" || f.Name == "application_id" || f.Name == "role_code" || f.Name == "role_id" || f.Name == "granted_by" || f.Name == "revoked_by") && n > math.MaxInt32 {
 				return nil, common.ErrBadRequest
 			}
 		case "bool":

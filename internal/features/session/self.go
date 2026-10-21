@@ -79,31 +79,9 @@ func (s *selfService) RevokeMySession(ctx context.Context, id string) (res *Revo
 	if err != nil {
 		return nil, err
 	}
-	target, err := r.Targets.GetByID(ctx, id)
+	changed, err := s.revokeOwnedSession(ctx, r, p, id, now)
 	if err != nil {
-		if errors.Is(err, auth.ErrNotFound) {
-			return nil, err
-		}
-		return nil, featurecommon.DependencyError(err)
-	}
-	if target.ID != id || target.UserID != p.UserID() {
-		return nil, common.ErrForbidden
-	}
-	if target.Status != types.SessionActive && target.Status != types.SessionRevoked {
-		return nil, common.ErrInternalServerError
-	}
-	changed := target.Status == types.SessionActive
-	if changed {
-		changed, err = r.Sessions.RevokeSession(ctx, domain.SessionRevocation{UserID: p.UserID(), ActorID: p.UserID(), SessionID: id, At: now, Reason: types.AuditSelfSessionRevoked})
-		if err != nil {
-			return nil, featurecommon.DependencyError(err)
-		}
-		if !changed {
-			return nil, auth.ErrInvalidSession
-		}
-		if err = s.persistSingle(ctx, r, p.UserID(), id, now); err != nil {
-			return nil, err
-		}
+		return nil, err
 	}
 	if err = owner.Commit(); err != nil {
 		return nil, featurecommon.DependencyError(err)
@@ -127,4 +105,34 @@ func (s *selfService) persistSingle(ctx context.Context, r SelfRepositories, use
 		return featurecommon.DependencyError(err)
 	}
 	return featurecommon.DependencyError(r.Outbox.Create(featurecommon.SessionRevokedEvent(ctx, eventID, userID, userID, id, types.AuditSelfSessionRevoked, now)))
+}
+
+func (s *selfService) revokeOwnedSession(ctx context.Context, r SelfRepositories, p sessions.Principal, id string, now time.Time) (bool, error) {
+	target, err := r.Targets.GetByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, auth.ErrNotFound) {
+			return false, err
+		}
+		return false, featurecommon.DependencyError(err)
+	}
+	if target.ID != id || target.UserID != p.UserID() {
+		return false, common.ErrForbidden
+	}
+	if target.Status != types.SessionActive && target.Status != types.SessionRevoked {
+		return false, common.ErrInternalServerError
+	}
+	changed := target.Status == types.SessionActive
+	if changed {
+		changed, err = r.Sessions.RevokeSession(ctx, domain.SessionRevocation{UserID: p.UserID(), ActorID: p.UserID(), SessionID: id, At: now, Reason: types.AuditSelfSessionRevoked})
+		if err != nil {
+			return false, featurecommon.DependencyError(err)
+		}
+		if !changed {
+			return false, auth.ErrInvalidSession
+		}
+		if err = s.persistSingle(ctx, r, p.UserID(), id, now); err != nil {
+			return false, err
+		}
+	}
+	return changed, nil
 }

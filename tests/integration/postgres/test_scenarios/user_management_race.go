@@ -345,7 +345,7 @@ func postgresManagementLastAdmin(t *testing.T) {
 	h := newManagementHarness(t)
 	// Both administrators have a shared non-admin management actor. Removing one
 	// must serialize with a request for the other administrator's distinct ID.
-	_, e := h.f.DB.ExecContext(h.ctx, `INSERT INTO user_role(user_id,role_id) VALUES(2,2);INSERT INTO auth(email,password,status) SELECT 'manager@example.test',password,'ACTIVE' FROM auth WHERE id=1;INSERT INTO profile(user_id,name) VALUES(3,'Manager');INSERT INTO role(role_name,role_code,application_id,code) VALUES('Manager',3,1,'iam.manager');INSERT INTO role_permissions SELECT 3,id FROM permissions;INSERT INTO user_role(user_id,role_id) VALUES(3,3)`)
+	_, e := h.f.DB.ExecContext(h.ctx, `INSERT INTO user_role(user_id,role_id) VALUES(2,2);INSERT INTO auth(email,password,status) SELECT 'manager@example.test',password,'ACTIVE' FROM auth WHERE id=1;INSERT INTO profile(user_id,name) VALUES(3,'Manager');INSERT INTO role(role_name,role_code,application_id,code) VALUES('Manager',3,1,'iam.manager');INSERT INTO role_permissions(role_id,permission_id) SELECT 3,id FROM permissions;INSERT INTO user_role(user_id,role_id) VALUES(3,3)`)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -421,7 +421,7 @@ func postgresManagementRecheck(t *testing.T) {
 			}
 			query := "UPDATE auth SET auth_version=auth_version+1 WHERE id=1"
 			if change == "permission" {
-				query = "DELETE FROM role_permissions WHERE role_id=2"
+				query = "UPDATE role_permissions SET deleted_at=CURRENT_TIMESTAMP WHERE role_id=2"
 			}
 			if change == "session" {
 				query = "UPDATE sessions SET status='REVOKED',revoked_at=created_at,revoke_reason='Fixture revocation' WHERE user_id=1"
@@ -470,7 +470,7 @@ func postgresManagementSnapshot(t *testing.T) {
 	case <-actor.Done():
 		t.Fatal("snapshot deadline")
 	}
-	if _, e = h.f.DB.ExecContext(h.ctx, `DELETE FROM role_permissions WHERE role_id=2;UPDATE profile SET name='New committed name' WHERE user_id=2;UPDATE user_application_access SET status='REVOKED' WHERE user_id=2`); e != nil {
+	if _, e = h.f.DB.ExecContext(h.ctx, `UPDATE role_permissions SET deleted_at=CURRENT_TIMESTAMP WHERE role_id=2;UPDATE profile SET name='New committed name' WHERE user_id=2;UPDATE user_application_access SET status='REVOKED',revoked_at=CURRENT_TIMESTAMP,revoke_reason='Controlled fixture revocation' WHERE user_id=2`); e != nil {
 		t.Fatal(e)
 	}
 	unblock()

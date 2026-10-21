@@ -37,26 +37,9 @@ func (s *sessionLoginService) Login(ctx context.Context, req domain.AuthRequest)
 	if _, err = serviceauth.CallerFromContext(ctx); err != nil {
 		return nil, err
 	}
-	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
-	if err = req.Validate(); err != nil {
+	candidate, err := s.prepareLogin(ctx, req)
+	if err != nil {
 		return nil, err
-	}
-	candidate, err := s.deps.Candidate.GetByEmail(ctx, req.Email)
-	if errors.Is(err, auth.ErrNotFound) {
-		return nil, auth.ErrLoginFailed
-	}
-	if err != nil {
-		return nil, featurecommon.DependencyError(err)
-	}
-	if !loginEligible(candidate) {
-		return nil, auth.ErrLoginFailed
-	}
-	valid, err := s.deps.VerifyPassword(candidate.Password, req.Password)
-	if err != nil {
-		return nil, featurecommon.DependencyError(err)
-	}
-	if !valid {
-		return nil, auth.ErrLoginFailed
 	}
 	credentials, err := s.deps.Credentials()
 	if err != nil {
@@ -78,15 +61,9 @@ func (s *sessionLoginService) Login(ctx context.Context, req domain.AuthRequest)
 	if repos.Account == nil || repos.Session == nil || repos.Refresh == nil || repos.Audit == nil {
 		return nil, common.ErrInternalServerError
 	}
-	current, err := repos.Account.GetByID(ctx, candidate.ID)
-	if errors.Is(err, auth.ErrNotFound) {
-		return nil, auth.ErrLoginFailed
-	}
+	current, err := lockedLoginAccount(ctx, repos, candidate)
 	if err != nil {
-		return nil, featurecommon.DependencyError(err)
-	}
-	if !loginEligible(current) || !sameLoginProof(candidate, current) {
-		return nil, auth.ErrLoginFailed
+		return nil, err
 	}
 	res, err = s.persistLogin(ctx, repos, current, credentials)
 	if err != nil {
@@ -135,4 +112,43 @@ func (s *sessionLoginService) persistLogin(ctx context.Context, repos LoginRepos
 		return nil, common.ErrInternalServerError
 	}
 	return &LoginResult{AccessToken: access.Token, RefreshToken: c.RefreshToken, SessionID: c.SessionID, AccessExpiresAt: access.ExpiresAt, SessionExpiresAt: expires, MustChangePassword: account.MustChangePassword}, nil
+}
+
+func (s *sessionLoginService) prepareLogin(ctx context.Context, req domain.AuthRequest) (domain.LoginAccount, error) {
+	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
+	if err := req.Validate(); err != nil {
+		return domain.LoginAccount{}, err
+	}
+	candidate, err := s.deps.Candidate.GetByEmail(ctx, req.Email)
+	if errors.Is(err, auth.ErrNotFound) {
+		return domain.LoginAccount{}, auth.ErrLoginFailed
+	}
+	if err != nil {
+		return domain.LoginAccount{}, featurecommon.DependencyError(err)
+	}
+	if !loginEligible(candidate) {
+		return domain.LoginAccount{}, auth.ErrLoginFailed
+	}
+	valid, err := s.deps.VerifyPassword(candidate.Password, req.Password)
+	if err != nil {
+		return domain.LoginAccount{}, featurecommon.DependencyError(err)
+	}
+	if !valid {
+		return domain.LoginAccount{}, auth.ErrLoginFailed
+	}
+	return candidate, nil
+}
+
+func lockedLoginAccount(ctx context.Context, repos LoginRepositories, candidate domain.LoginAccount) (domain.LoginAccount, error) {
+	current, err := repos.Account.GetByID(ctx, candidate.ID)
+	if errors.Is(err, auth.ErrNotFound) {
+		return domain.LoginAccount{}, auth.ErrLoginFailed
+	}
+	if err != nil {
+		return domain.LoginAccount{}, featurecommon.DependencyError(err)
+	}
+	if !loginEligible(current) || !sameLoginProof(candidate, current) {
+		return domain.LoginAccount{}, auth.ErrLoginFailed
+	}
+	return current, nil
 }

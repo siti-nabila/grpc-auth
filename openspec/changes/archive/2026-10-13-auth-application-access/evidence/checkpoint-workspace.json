@@ -1,0 +1,23 @@
+{
+  "label": "checkpoint-workspace",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "-count=1",
+    "./..."
+  ],
+  "started_at": "2026-10-13T06:00:16.021465+00:00",
+  "seconds": 11.187,
+  "exit_code": 1,
+  "log": "/tmp/aap-checkpoint-workspace.log",
+  "source_identity": "758193b041bdd801dbbe51ea6c8c6aedd5f56a7b4e092c45a4d5ce57d7163307",
+  "passed_tests": 2804,
+  "failed_tests": [
+    "TestRegisteredLifecycle/all_thirty_registered_RPCs_enforce_TLS_service_caller_and_exact_allowlists_before_persistence",
+    "TestRegisteredLifecycle",
+    "github.com/siti-nabila/grpc-auth/tests/integration/auth_reads"
+  ],
+  "skipped_tests": []
+}

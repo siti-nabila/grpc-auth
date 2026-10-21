@@ -1,0 +1,181 @@
+{
+  "managementLocks": [
+    {
+      "source": "internal/features/user/assignment_transaction.go",
+      "line": 93,
+      "call": "if err = managementLocks(owner, keys...); err != nil {"
+    },
+    {
+      "source": "internal/features/user/management_transaction.go",
+      "line": 105,
+      "call": "if err = managementLocks(owner, keys...); err != nil {"
+    }
+  ],
+  "roleLocks": [
+    {
+      "source": "internal/features/role/transaction.go",
+      "line": 101,
+      "call": "if err = roleLocks(owner, keys...); err != nil {"
+    }
+  ],
+  "UserEvent": [
+    {
+      "source": "internal/features/user/create.go",
+      "line": 82,
+      "call": "envelope := featurecommon.UserEvent(ctx, id, event, target, version, &actor, status, now)"
+    },
+    {
+      "source": "internal/features/user/assignment_mutation.go",
+      "line": 107,
+      "call": "envelope := featurecommon.UserEvent(ctx, id, event, input.UserID, result.Version, &actorID, \"\", now)"
+    },
+    {
+      "source": "internal/features/common/session_event.go",
+      "line": 12,
+      "call": "e := UserEvent(ctx, id, types.EventSessionRevoked, userID, 2, &actorID, types.UserActive, now)"
+    },
+    {
+      "source": "internal/features/profile/update_session.go",
+      "line": 101,
+      "call": "return featurecommon.DependencyError(repos.Outbox.Create(featurecommon.UserEvent(ctx, id, types.EventUserProfileUpdated, userID, result.Version, &userID, types.UserActive, now)))"
+    },
+    {
+      "source": "internal/features/auth_feature/change_password.go",
+      "line": 133,
+      "call": "e := featurecommon.UserEvent(ctx, id, types.EventUserSessionsRevoked, c.UserID, c.ExpectedVersion+1, &c.UserID, types.UserActive, c.At)"
+    },
+    {
+      "source": "internal/features/auth_feature/register_pending.go",
+      "line": 137,
+      "call": "if err = repos.Outbox.Create(featurecommon.UserEvent(ctx, id, types.EventUserCreated, accountID, 1, nil, types.UserPending, now)); err != nil {"
+    },
+    {
+      "source": "internal/features/application/mutation.go",
+      "line": 104,
+      "call": "envelope := featurecommon.UserEvent(ctx, id, event, input.UserID, result.Version, &actorID, \"\", now)"
+    },
+    {
+      "source": "internal/features/session/global.go",
+      "line": 82,
+      "call": "e := featurecommon.UserEvent(ctx, id, types.EventUserSessionsRevoked, c.UserID, c.ExpectedVersion+1, &c.UserID, types.UserActive, now)"
+    },
+    {
+      "source": "internal/features/session/admin_revocation.go",
+      "line": 101,
+      "call": "e := featurecommon.UserEvent(ctx, id, types.EventUserSessionsRevoked, target.ID, result.Version, &actorID, target.Status, now)"
+    }
+  ],
+  "RoleEvent": [
+    {
+      "source": "internal/features/role/outcome.go",
+      "line": 120,
+      "call": "envelope := featurecommon.RoleEvent(ctx, id, event, after.Role, p.UserID(), permissionCodes(after.Permissions), now)"
+    }
+  ],
+  "SessionRevokedEvent": [
+    {
+      "source": "internal/features/auth_feature/logout.go",
+      "line": 123,
+      "call": "return featurecommon.DependencyError(r.Outbox.Create(featurecommon.SessionRevokedEvent(ctx, id, state.UserID, state.UserID, state.SessionID, types.AuditLogout, now)))"
+    },
+    {
+      "source": "internal/features/auth_feature/refresh_reuse.go",
+      "line": 40,
+      "call": "event := featurecommon.SessionRevokedEvent(ctx, id, state.UserID, state.UserID, state.SessionID, types.AuditRefreshReuse, now)"
+    },
+    {
+      "source": "internal/features/session/self.go",
+      "line": 107,
+      "call": "return featurecommon.DependencyError(r.Outbox.Create(featurecommon.SessionRevokedEvent(ctx, eventID, userID, userID, id, types.AuditSelfSessionRevoked, now)))"
+    },
+    {
+      "source": "internal/features/session/admin_revocation.go",
+      "line": 60,
+      "call": "err = r.Outbox.Create(featurecommon.SessionRevokedEvent(ctx, idEvent, target.ID, actorID, id, types.AuditAdminSessionRevoked, now))"
+    }
+  ],
+  "AcquireLocks": [
+    {
+      "source": "internal/features/role/transaction.go",
+      "line": 179,
+      "call": "err := featurecommon.AcquireLocks(owner, roleerrors.ErrResourceBusy, keys...)"
+    },
+    {
+      "source": "internal/features/user/management_transaction.go",
+      "line": 175,
+      "call": "err := featurecommon.AcquireLocks(owner, usererrors.ErrResourceBusy, keys...)"
+    },
+    {
+      "source": "internal/features/common/discovery.go",
+      "line": 28,
+      "call": "if err = AcquireLocks(owner, busy, missing...); err != nil {"
+    },
+    {
+      "source": "internal/features/profile/update_session.go",
+      "line": 49,
+      "call": "if err = featurecommon.AcquireLocks(owner, auth.ErrResourceBusy, featurecommon.UserLockKey(principal.UserID()), \"auth:session:\"+principal.SessionID()); err != nil {"
+    },
+    {
+      "source": "internal/features/auth_feature/change_password.go",
+      "line": 55,
+      "call": "if err = featurecommon.AcquireLocks(owner, auth.ErrResourceBusy, featurecommon.UserLockKey(p.UserID())); err != nil {"
+    },
+    {
+      "source": "internal/features/auth_feature/change_password.go",
+      "line": 152,
+      "call": "if err = featurecommon.AcquireLocks(owner, auth.ErrResourceBusy, keys...); err != nil {"
+    },
+    {
+      "source": "internal/features/auth_feature/logout.go",
+      "line": 43,
+      "call": "if err = featurecommon.AcquireLocks(owner, auth.ErrResourceBusy, featurecommon.UserLockKey(state.UserID), \"auth:session:\"+state.SessionID); err != nil {"
+    },
+    {
+      "source": "internal/features/auth_feature/login_session.go",
+      "line": 54,
+      "call": "if err = featurecommon.AcquireLocks(owner, auth.ErrResourceBusy, featurecommon.UserLockKey(candidate.ID), \"auth:session:\"+credentials.SessionID); err != nil {"
+    },
+    {
+      "source": "internal/features/auth_feature/refresh.go",
+      "line": 69,
+      "call": "if err = featurecommon.AcquireLocks(owner, auth.ErrResourceBusy, featurecommon.UserLockKey(state.UserID), \"auth:session:\"+state.SessionID); err != nil {"
+    },
+    {
+      "source": "internal/features/auth_feature/register_pending.go",
+      "line": 43,
+      "call": "if err = featurecommon.AcquireLocks(owner, auth.ErrResourceBusy, featurecommon.RegisterLockKeys(req.Email)...); err != nil {"
+    },
+    {
+      "source": "internal/features/application/transaction.go",
+      "line": 97,
+      "call": "if err = featurecommon.AcquireLocks(owner, usererrors.ErrResourceBusy, keys...); err != nil {"
+    },
+    {
+      "source": "internal/features/session/global.go",
+      "line": 38,
+      "call": "if err = featurecommon.AcquireLocks(owner, auth.ErrResourceBusy, featurecommon.UserLockKey(p.UserID())); err != nil {"
+    },
+    {
+      "source": "internal/features/session/global.go",
+      "line": 103,
+      "call": "if err = featurecommon.AcquireLocks(owner, auth.ErrResourceBusy, keys...); err != nil {"
+    },
+    {
+      "source": "internal/features/session/admin.go",
+      "line": 169,
+      "call": "err := featurecommon.AcquireLocks(owner, auth.ErrResourceBusy, keys...)"
+    },
+    {
+      "source": "internal/features/session/self.go",
+      "line": 67,
+      "call": "if err = featurecommon.AcquireLocks(owner, auth.ErrResourceBusy, featurecommon.UserLockKey(p.UserID()), \"auth:session:\"+p.SessionID(), \"auth:session:\"+id); err != nil {"
+    }
+  ],
+  "ReplayPassword": [
+    {
+      "source": "internal/features/user/management_transaction.go",
+      "line": 156,
+      "call": "return s.deps.Fingerprinter.ReplayPassword(record, scope, c.payload, c.password, now)"
+    }
+  ]
+}

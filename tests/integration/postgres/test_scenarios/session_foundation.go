@@ -109,7 +109,7 @@ func postgresSnapshots(t *testing.T) {
 				method = userv1.UserService_Me_FullMethodName
 			}
 			ctx = foundationActor(t, ctx, fixture, method)
-			if _, err := fixture.DB.ExecContext(ctx, `INSERT INTO permissions(application_id,code,description) VALUES(1,'iam.user.read','fixture'); INSERT INTO role(role_name,role_code,application_id,code) VALUES('Reader',2,1,'iam.reader'); INSERT INTO role_permissions VALUES(2,1); INSERT INTO user_role(user_id,role_id) VALUES(1,2)`); err != nil {
+			if _, err := fixture.DB.ExecContext(ctx, `INSERT INTO permissions(application_id,code,description) VALUES(1,'iam.user.read','fixture'); INSERT INTO role(role_name,role_code,application_id,code) VALUES('Reader',2,1,'iam.reader'); INSERT INTO role_permissions(role_id,permission_id) VALUES(2,1); INSERT INTO user_role(user_id,role_id) VALUES(1,2)`); err != nil {
 				t.Fatal("read grant fixture setup failed")
 			}
 			provider := database.NewTransactionProvider(fixture.DB, dialect.NewPostgres(), database.GetORMConfig())
@@ -174,7 +174,7 @@ func postgresSnapshots(t *testing.T) {
 				query = `UPDATE applications SET status='DISABLED' WHERE id=1`
 			}
 			if kind == "empty List permission" {
-				query = `DELETE FROM role_permissions WHERE role_id=2`
+				query = `UPDATE role_permissions SET deleted_at=CURRENT_TIMESTAMP WHERE role_id=2`
 			}
 			if _, err = tx.ExecContext(ctx, query); err != nil {
 				t.Fatal("privilege change failed")
@@ -335,7 +335,7 @@ func postgresRegisterMemberPolicy(t *testing.T) {
 				query = `UPDATE role SET code='iam.platform_admin' WHERE id=1`
 			}
 			if kind == "privileged" {
-				query = `INSERT INTO permissions(application_id,code,description) VALUES(1,'iam.user.read','fixture'); INSERT INTO role_permissions VALUES(1,1)`
+				query = `INSERT INTO permissions(application_id,code,description) VALUES(1,'iam.user.read','fixture'); INSERT INTO role_permissions(role_id,permission_id) VALUES(1,1)`
 			}
 			if _, err := fixture.DB.ExecContext(ctx, query); err != nil {
 				t.Fatal("member policy fixture failed")

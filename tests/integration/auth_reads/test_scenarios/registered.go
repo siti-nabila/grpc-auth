@@ -91,8 +91,8 @@ func registeredReads(t *testing.T) {
 			if _, err := users.Login(ctx, &userv1.AuthRequest{}); err == nil {
 				t.Fatal("anonymous Login accepted")
 			}
-			if _, err := users.TesRPC(fixtures.RPCContext(ctx, ""), &emptypb.Empty{}); err != nil {
-				t.Fatal(err)
+			if response, err := users.TesRPC(fixtures.RPCContext(ctx, ""), &emptypb.Empty{}); err != nil || response.GetRes() != "WELCOME ANJING !!!!!!!" {
+				t.Fatal("TesRPC response changed", response, err)
 			}
 			issued, err := users.Login(fixtures.RPCContext(ctx, ""), &userv1.AuthRequest{Email: " MEMBER@example.com ", Password: "secret12"})
 			if err != nil || issued.SessionId != credentials.SessionID || issued.RefreshToken != credentials.RefreshToken {

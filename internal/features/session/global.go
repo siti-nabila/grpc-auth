@@ -12,6 +12,7 @@ import (
 	"github.com/siti-nabila/api-contracts/pkg/dictionary/user"
 	featurecommon "github.com/siti-nabila/grpc-auth/internal/features/common"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
+	"github.com/siti-nabila/grpc-auth/internal/sessions"
 	"github.com/siti-nabila/grpc-auth/pkg/types"
 )
 
@@ -44,24 +45,8 @@ func (s *selfService) RevokeAllMySessions(ctx context.Context) (res *RevokeAllRe
 	if !r.complete() {
 		return nil, common.ErrInternalServerError
 	}
-	ids, err := r.Targets.ListIDs(ctx, p.UserID())
-	if err != nil {
-		return nil, featurecommon.DependencyError(err)
-	}
-	// Login and all revocation paths share the user lock. No new owned session
-	// can appear while this command discovers and locks the complete set.
-	keys := []string{"auth:session:" + p.SessionID()}
-	for _, id := range ids {
-		if domain.ValidateSessionID(id) != nil {
-			return nil, common.ErrInternalServerError
-		}
-		keys = append(keys, "auth:session:"+id)
-	}
-	if err = featurecommon.AcquireLocks(owner, auth.ErrResourceBusy, keys...); err != nil {
-		if errors.Is(err, auth.ErrResourceBusy) {
-			return nil, err
-		}
-		return nil, featurecommon.DependencyError(err)
+	if err = lockSelfSessions(ctx, owner, r, p); err != nil {
+		return nil, err
 	}
 	now := s.deps.Now().UTC()
 	p, err = lockedPrincipal(ctx, r, p, now, sessionv1.SessionService_RevokeAllMySessions_FullMethodName)
@@ -69,25 +54,8 @@ func (s *selfService) RevokeAllMySessions(ctx context.Context) (res *RevokeAllRe
 		return nil, err
 	}
 	change := domain.CredentialInvalidation{UserID: p.UserID(), ExpectedVersion: p.UserVersion(), ExpectedAuthVersion: p.AuthVersion(), At: now}
-	if err = change.Validate(); err != nil {
+	if err = invalidateSelfSessions(ctx, r, change); err != nil {
 		return nil, err
-	}
-	changed, err := r.Counters.Invalidate(ctx, change)
-	if err != nil {
-		return nil, featurecommon.DependencyError(err)
-	}
-	if !changed {
-		return nil, user.ErrVersionConflict
-	}
-	count, err := r.Sessions.RevokeUserSessions(ctx, domain.SessionRevocation{UserID: p.UserID(), ActorID: p.UserID(), At: now, Reason: types.AuditSelfSessionsRevoked})
-	if err != nil {
-		return nil, featurecommon.DependencyError(err)
-	}
-	if count < 1 {
-		return nil, auth.ErrInvalidSession
-	}
-	if _, err = r.Refresh.RevokeUserRefresh(ctx, p.UserID(), now); err != nil {
-		return nil, featurecommon.DependencyError(err)
 	}
 	if err = s.persistGlobal(ctx, r, change, now); err != nil {
 		return nil, err
@@ -116,4 +84,51 @@ func (s *selfService) persistGlobal(ctx context.Context, r SelfRepositories, c d
 	revoked := true
 	e.Data.SessionsRevoked = &revoked
 	return featurecommon.DependencyError(r.Outbox.Create(e))
+}
+
+func lockSelfSessions(ctx context.Context, owner *featurecommon.TransactionOwner, r SelfRepositories, p sessions.Principal) error {
+	ids, err := r.Targets.ListIDs(ctx, p.UserID())
+	if err != nil {
+		return featurecommon.DependencyError(err)
+	}
+	// Login and all revocation paths share the user lock. No new owned session
+	// can appear while this command discovers and locks the complete set.
+	keys := []string{"auth:session:" + p.SessionID()}
+	for _, id := range ids {
+		if domain.ValidateSessionID(id) != nil {
+			return common.ErrInternalServerError
+		}
+		keys = append(keys, "auth:session:"+id)
+	}
+	if err = featurecommon.AcquireLocks(owner, auth.ErrResourceBusy, keys...); err != nil {
+		if errors.Is(err, auth.ErrResourceBusy) {
+			return err
+		}
+		return featurecommon.DependencyError(err)
+	}
+	return nil
+}
+
+func invalidateSelfSessions(ctx context.Context, r SelfRepositories, change domain.CredentialInvalidation) error {
+	if err := change.Validate(); err != nil {
+		return err
+	}
+	changed, err := r.Counters.Invalidate(ctx, change)
+	if err != nil {
+		return featurecommon.DependencyError(err)
+	}
+	if !changed {
+		return user.ErrVersionConflict
+	}
+	count, err := r.Sessions.RevokeUserSessions(ctx, domain.SessionRevocation{UserID: change.UserID, ActorID: change.UserID, At: change.At, Reason: types.AuditSelfSessionsRevoked})
+	if err != nil {
+		return featurecommon.DependencyError(err)
+	}
+	if count < 1 {
+		return auth.ErrInvalidSession
+	}
+	if _, err = r.Refresh.RevokeUserRefresh(ctx, change.UserID, change.At); err != nil {
+		return featurecommon.DependencyError(err)
+	}
+	return nil
 }

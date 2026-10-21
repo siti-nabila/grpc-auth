@@ -1,0 +1,22 @@
+{
+  "label": "stage3-targeted",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./tests/features/auth_feature/...",
+    "./tests/features/profile/...",
+    "./tests/features/session/...",
+    "./tests/handler/...",
+    "./tests/interceptors/...",
+    "./tests/integration/auth_reads/..."
+  ],
+  "started_at": "2026-10-13T03:03:32.499356+00:00",
+  "seconds": 3.843,
+  "exit_code": 0,
+  "log": "/tmp/ecs-stage3-targeted.log",
+  "passed_tests": 1448,
+  "failed_tests": [],
+  "skipped_tests": []
+}

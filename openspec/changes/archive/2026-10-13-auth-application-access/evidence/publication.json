@@ -1,0 +1,16 @@
+{
+  "repository": "github.com/siti-nabila/api-contracts",
+  "branch": "feat/role-management",
+  "commit": "21082d7a243da2b400579db7d1fd40ebdcbeb37f",
+  "module": "v0.0.0-20261013075041-21082d7a243d",
+  "sum": "h1:dHqPSgCREn0pX8nK/rEvICxnQbLlAyHrK9OnQCn8LrI=",
+  "go_mod_sum": "h1:Jb5bNxnX/aW6YWghT/pXorXlmIDRRxXltY8gL7Udzg4=",
+  "push": "origin feat/role-management PASS",
+  "standalone_download": "PASS",
+  "contract_tests": "contract-error-final.json",
+  "contract_vet": "contract-vet-final.json",
+  "baseline_methods": 30,
+  "current_methods": 33,
+  "new_error": "application.application_access_system_protected/AASP",
+  "old_error_preserved": true
+}

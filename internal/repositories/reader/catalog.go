@@ -42,6 +42,10 @@ func (r *catalogReader) Applications(ctx context.Context, q domain.CatalogQuery)
 
 func catalogExpressions(c domain.Catalog) map[string]string {
 	switch c {
+	case domain.UserApplicationAccessCatalog:
+		return accessExpressions()
+	case domain.UserRoleAssignmentCatalog:
+		return assignmentExpressions()
 	case domain.RoleCatalog:
 		return map[string]string{"id": "r.id", "code": "r.code", "name": "r.role_name", "description": "r.role_description", "application_id": "r.application_id", "application_code": "a.code", "status": "r.status", "is_system": "r.is_system", "version": "r.version", "role_code": "r.role_code", "created_at": "r.created_at", "updated_at": "r.updated_at", "affected_user_count": affectedRoleUsers}
 	case domain.PermissionCatalog:
@@ -56,8 +60,12 @@ func catalogExpressions(c domain.Catalog) map[string]string {
 func catalogBase(handle domain.QueryReader, c domain.Catalog, q domain.CatalogQuery) *query.QueryBuilder {
 	var b *query.QueryBuilder
 	switch c {
+	case domain.UserApplicationAccessCatalog:
+		b = handle.UseModel(domain.ApplicationAccessItem{}).Join("applications a", "a.id = access.application_id").Where("access.user_id = ?", q.TargetUserID)
+	case domain.UserRoleAssignmentCatalog:
+		b = handle.UseModel(domain.UserRoleAssignmentItem{}).Join("role r", "r.id = ur.role_id").Join("applications a", "a.id = r.application_id").LeftJoin("user_application_access access", "access.user_id = ur.user_id AND access.application_id = a.id").Where("ur.user_id = ?", q.TargetUserID)
 	case domain.RoleCatalog:
-		b = handle.UseModel(domain.RoleSummary{}).Join("applications a", "a.id = r.application_id")
+		b = roleSummaryBase(handle)
 	case domain.PermissionCatalog:
 		b = handle.UseModel(domain.PermissionItem{}).Join("applications a", "a.id = p.application_id")
 	case domain.ApplicationCatalog:
@@ -89,7 +97,7 @@ func catalogBase(handle domain.QueryReader, c domain.Catalog, q domain.CatalogQu
 func catalogOrderExpression(c domain.Catalog, field string) string {
 	expression := catalogExpressions(c)[field]
 	f, _ := c.Field(field)
-	if f.Kind == "text" {
+	if f.Kind == "text" && c != domain.UserRoleAssignmentCatalog {
 		return expression + ` COLLATE "C"`
 	}
 	return expression
@@ -173,16 +181,33 @@ func readCatalog[T catalogRow](ctx context.Context, handle domain.QueryReader, c
 	if len(values) == 0 && int64(q.Page-1) > math.MaxInt64/int64(q.Limit) {
 		return page, common.ErrBadRequest
 	}
+	total, err := countCatalog(ctx, handle, c, q)
+	if err != nil {
+		return page, err
+	}
+	b := catalogPageQuery(ctx, handle, c, q, values)
+	rows := make([]T, 0, q.Limit+1)
+	if err = b.Limit(q.Limit + 1).Scan(&rows); err != nil {
+		return page, helpers.HandleDBError(err)
+	}
+	return catalogPage(c, q, values, rows, total), nil
+}
+
+func countCatalog(ctx context.Context, handle domain.QueryReader, c domain.Catalog, q domain.CatalogQuery) (int64, error) {
 	var count struct {
 		Total int64 `sql:"column:total"`
 	}
-	err = catalogBase(handle, c, q).WithContext(ctx).Select("COUNT(DISTINCT " + catalogExpressions(c)["id"] + ") AS total").Scan(&count)
+	err := catalogBase(handle, c, q).WithContext(ctx).Select("COUNT(DISTINCT " + catalogExpressions(c)[c.IdentityField()] + ") AS total").Scan(&count)
 	if err != nil {
-		return page, helpers.HandleDBError(err)
+		return 0, helpers.HandleDBError(err)
 	}
 	if count.Total < 0 {
-		return page, common.ErrDependencyUnavailable
+		return 0, common.ErrDependencyUnavailable
 	}
+	return count.Total, nil
+}
+
+func catalogPageQuery(ctx context.Context, handle domain.QueryReader, c domain.Catalog, q domain.CatalogQuery, values []domain.CatalogValue) *query.QueryBuilder {
 	b := catalogAfter(catalogBase(handle, c, q), c, q, values).WithContext(ctx)
 	projection := make([]string, 0, len(c.Fields()))
 	for _, field := range c.Fields() {
@@ -199,21 +224,22 @@ func readCatalog[T catalogRow](ctx context.Context, handle domain.QueryReader, c
 	if len(values) == 0 {
 		b = b.Offset((q.Page - 1) * q.Limit)
 	}
-	rows := make([]T, 0, q.Limit+1)
-	if err = b.Limit(q.Limit + 1).Scan(&rows); err != nil {
-		return page, helpers.HandleDBError(err)
-	}
+	return b
+}
+
+func catalogPage[T catalogRow](c domain.Catalog, q domain.CatalogQuery, values []domain.CatalogValue, rows []T, total int64) orm.PageData[T] {
+	var page orm.PageData[T]
 	page.HasNext = len(rows) > q.Limit
 	if page.HasNext {
 		rows = rows[:q.Limit]
 	}
 	page.Items = rows
-	page.Total = count.Total
+	page.Total = total
 	page.Page = q.Page
 	page.Limit = q.Limit
 	page.HasPrev = len(values) > 0 || q.Page > 1
-	page.TotalPages = int(count.Total / int64(q.Limit))
-	if count.Total%int64(q.Limit) > 0 {
+	page.TotalPages = int(total / int64(q.Limit))
+	if total%int64(q.Limit) > 0 {
 		page.TotalPages++
 	}
 	if page.HasNext && len(rows) > 0 {
@@ -224,5 +250,5 @@ func readCatalog[T catalogRow](ctx context.Context, handle domain.QueryReader, c
 		}
 		page.NextCursor = c.NextCursor(q, keys)
 	}
-	return page, nil
+	return page
 }

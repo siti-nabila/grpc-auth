@@ -1,0 +1,145 @@
+[
+  {
+    "name": "eva-workspace-race",
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "-race",
+      "./..."
+    ],
+    "mode": "workspace",
+    "started_at_utc": "2026-10-18T05:32:13.607471+00:00",
+    "finished_at_utc": "2026-10-18T05:32:48.346371+00:00",
+    "exit": 0,
+    "counts": {
+      "passed": 3384,
+      "failed": 0,
+      "skipped": 0
+    },
+    "log": "/private/tmp/eva-workspace-race.log",
+    "log_sha256": "ee6003046d067930b57e1beade0a608cbbc86617896c98b1654b7ca9786346a9"
+  },
+  {
+    "name": "eva-standalone-normal",
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./..."
+    ],
+    "mode": "standalone",
+    "started_at_utc": "2026-10-18T05:32:13.607323+00:00",
+    "finished_at_utc": "2026-10-18T05:32:48.807545+00:00",
+    "exit": 0,
+    "counts": {
+      "passed": 3384,
+      "failed": 0,
+      "skipped": 0
+    },
+    "log": "/private/tmp/eva-standalone-normal.log",
+    "log_sha256": "02e4c71a9aadcc64e60b673cd3f85302a6fbffe2bcb781cb12bd6e15ca327d27"
+  },
+  {
+    "name": "eva-standalone-vet",
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "mode": "standalone",
+    "started_at_utc": "2026-10-18T05:32:13.607353+00:00",
+    "finished_at_utc": "2026-10-18T05:32:20.848925+00:00",
+    "exit": 0,
+    "counts": {
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0
+    },
+    "log": "/private/tmp/eva-standalone-vet.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "eva-workspace-build",
+    "command": [
+      "make",
+      "build",
+      "BIN_DIR=/private/tmp/eva-workspace-build"
+    ],
+    "mode": "workspace",
+    "started_at_utc": "2026-10-18T05:32:13.607520+00:00",
+    "finished_at_utc": "2026-10-18T05:32:23.172842+00:00",
+    "exit": 0,
+    "counts": {
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0
+    },
+    "log": "/private/tmp/eva-workspace-build.log",
+    "log_sha256": "0102234338f9e72cd2cc34eb6f18b75fd1eabd5d9635995d7dd4620fc6ea7813"
+  },
+  {
+    "name": "eva-standalone-race",
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "-race",
+      "./..."
+    ],
+    "mode": "standalone",
+    "started_at_utc": "2026-10-18T05:33:17.850283+00:00",
+    "finished_at_utc": "2026-10-18T05:33:39.480675+00:00",
+    "exit": 0,
+    "counts": {
+      "passed": 3384,
+      "failed": 0,
+      "skipped": 0
+    },
+    "log": "/private/tmp/eva-standalone-race.log",
+    "log_sha256": "647b4bb63af04cf4e15ed86d83521f36e682a1bd5a87d13ef2cba00c4b502929"
+  },
+  {
+    "name": "eva-standalone-build",
+    "command": [
+      "make",
+      "build",
+      "BIN_DIR=/private/tmp/eva-standalone-build"
+    ],
+    "mode": "standalone",
+    "started_at_utc": "2026-10-18T05:33:17.850281+00:00",
+    "finished_at_utc": "2026-10-18T05:33:21.109611+00:00",
+    "exit": 0,
+    "counts": {
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0
+    },
+    "log": "/private/tmp/eva-standalone-build.log",
+    "log_sha256": "8274e94ab1d0c9da1c1468b2889f13dc71743969ef8d3fe336704666b625d5d7"
+  },
+  {
+    "name": "eva-workspace-normal",
+    "command": [
+      "go",
+      "test",
+      "./..."
+    ],
+    "mode": "workspace",
+    "checked_on": "2026-10-18",
+    "exit": 0,
+    "evidence": "completed tool output; all default packages passed"
+  },
+  {
+    "name": "eva-workspace-vet",
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "mode": "workspace",
+    "checked_on": "2026-10-18",
+    "exit": 0,
+    "evidence": "completed tool output; no diagnostics"
+  }
+]

@@ -9,3 +9,4 @@ import (
 func TestConfigs(t *testing.T)            { testutils.Run(t, test_scenarios.All()) }
 func TestLoginSecurity(t *testing.T)      { testutils.Run(t, test_scenarios.Login()) }
 func TestCommandFingerprint(t *testing.T) { testutils.Run(t, test_scenarios.CommandFingerprint()) }
+func TestTelemetryLifecycle(t *testing.T) { testutils.Run(t, test_scenarios.TelemetryLifecycle()) }

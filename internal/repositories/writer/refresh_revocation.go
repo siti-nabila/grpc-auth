@@ -5,6 +5,7 @@ import (
 	"github.com/siti-nabila/api-contracts/pkg/dictionary/common"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/pkg/helpers"
+	"github.com/siti-nabila/orm/query"
 	"time"
 )
 
@@ -26,19 +27,37 @@ func (w *initialRefreshWriter) RevokeUserRefresh(ctx context.Context, userID uin
 	if userID == 0 || userID > 2147483647 || at.IsZero() {
 		return 0, common.ErrBadRequest
 	}
-	return w.revokeRefresh(ctx, at, "session_id IN (SELECT id FROM sessions WHERE user_id = ?)", userID)
-}
-func (w *initialRefreshWriter) revokeRefresh(ctx context.Context, at time.Time, condition string, args ...any) (int64, error) {
-	if err := ctx.Err(); err != nil {
+	q, err := w.refreshRevocationQuery(ctx, at)
+	if err != nil {
 		return 0, err
 	}
-	if w.tx == nil {
-		return 0, common.ErrInternalServerError
+	sessions := w.tx.UseModel(domain.SessionSummary{}).Select("id").Where("user_id = ?", userID)
+	return refreshRevocationResult(q.WhereInQuery("session_id", sessions).Where("revoked_at IS NULL"))
+}
+func (w *initialRefreshWriter) revokeRefresh(ctx context.Context, at time.Time, condition string, args ...any) (int64, error) {
+	q, err := w.refreshRevocationQuery(ctx, at)
+	if err != nil {
+		return 0, err
 	}
-	patch := refreshRevocation{RevokedAt: at.UTC()}
-	result, err := w.tx.UseModel(&patch).WithContext(ctx).Where(condition, args...).Where("revoked_at IS NULL").Updates()
+	return refreshRevocationResult(q.Where(condition, args...).Where("revoked_at IS NULL"))
+}
+func (w *initialRefreshWriter) refreshRevocationQuery(ctx context.Context, at time.Time) (*query.QueryBuilder, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	if w.tx == nil {
+		return nil, common.ErrInternalServerError
+	}
+	patch := &refreshRevocation{RevokedAt: at.UTC()}
+	return w.tx.UseModel(patch).WithContext(ctx), nil
+}
+func refreshRevocationResult(q *query.QueryBuilder) (int64, error) {
+	result, err := q.Updates()
 	if err != nil {
 		return 0, helpers.HandleDBError(err)
+	}
+	if result == nil {
+		return 0, common.ErrDependencyUnavailable
 	}
 	count, err := result.RowsAffected()
 	if err != nil {

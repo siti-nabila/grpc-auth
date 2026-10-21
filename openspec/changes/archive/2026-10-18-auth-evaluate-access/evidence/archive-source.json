@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-18",
+  "schema": "spec-driven",
+  "tasks_completed": 24,
+  "tasks_total": 24,
+  "requirements_synced": 9,
+  "scenarios_synced": 26,
+  "main_spec": "openspec/specs/access-evaluation/spec.md",
+  "main_spec_sha256": "2b83189f71a49dceb8d98ea8ee7de6e4e23c90405d9e6ebcb3b9340863619f06",
+  "archived_markdown_updates": {
+    "design.md": {
+      "before_sha256": "27fc11c86a43eb55ea8f2642f8ae87954ae9cba90da94c29f8a5cd6e41507da9",
+      "after_sha256": "6b46da19e73f235a1cac8697775df2381add3d29638475b2e965f764152f17c4"
+    },
+    "proposal.md": {
+      "before_sha256": "f85c943a8fbfd46c8ee0f20f17f2a293ad95b59807ff1e8db87f2f69f9813fac",
+      "after_sha256": "30b069d9f4d945d7493d2dac5d1a92274ecf9ee35d98576a5ba58e2ee3504814"
+    },
+    "evidence/progress.md": {
+      "before_sha256": "4c9ffbb02481463a4d415f3a6e076b8e5e0341c572556fd48f5081435e7df239",
+      "after_sha256": "60f3a9cb3e74d0fca5a3915619db480f257646bf4e3f110d79dd519ec0f0931a"
+    },
+    "specs/access-evaluation/spec.md": {
+      "before_sha256": "34fef0b3915945cc794c296cc2df6be82e18e414550e6439f83cc32e252ee4f6",
+      "after_sha256": "171903ab5048819dfaff374fcf388a489b33127b702c6a83c417477fd6f94bf4"
+    }
+  },
+  "api_document_link_update": {
+    "path": "docs/evaluate-access-api.md",
+    "before_sha256": "cdb787141ec8a51626e0ad57bd6a370239294a3ef08e76b40a6354406280dd52",
+    "after_sha256": "8009f2f509fc8d751437b7981233dc598a93af1e9980d50179b82fd6985fda7f"
+  },
+  "retained_evidence_sha256": {
+    "evidence/postgres-checks.json": "b340bb5832dfa3852bf99b04fa8c156740130f7d69aa20352efab1306ef64a30",
+    "evidence/contract-source.json": "2395f067dce95b71847dc537c709fc41a20ad21a99a267cbc10b4ec40b332a52",
+    "evidence/baseline.json": "8ce32653035ff10480ea3c5d7c5815b7d75dfc730f710f20e6d417d5736eb85b",
+    "evidence/backend-checks.json": "6219542444f47882ebd2a84f3630d8de9dae6e8e332eea5ab55ef3892bb51866",
+    "evidence/implementation-source.json": "b012abdd3edbc4063098e9c98333a108b79620a779e0c2bcc0580690aa966043"
+  },
+  "implementation_change": "Documentation links and archive status only; executable source is unchanged."
+}

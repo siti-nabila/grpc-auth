@@ -1,0 +1,16 @@
+{
+  "applied_at": "2026-10-15T14:00:44Z",
+  "column": "deleted_at timestamptz NULL without default",
+  "column_added": true,
+  "committed": true,
+  "config_source": "env.yaml:Database.user",
+  "database": "user",
+  "migration": "docs/sql/role-permission-soft-delete/01_add_deleted_at.sql",
+  "migration_sha256": "50a8dbe9044b3e2b2365ce4d1cbb04688de01ad70cf735d1de2e197ec9b52583",
+  "post_commit_verified": true,
+  "primary_key_preserved": true,
+  "rows_after": 30,
+  "rows_before": 30,
+  "schema": "public",
+  "table": "role_permissions"
+}

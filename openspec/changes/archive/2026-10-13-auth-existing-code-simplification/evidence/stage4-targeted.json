@@ -1,0 +1,26 @@
+{
+  "label": "stage4-targeted",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./tests/repositories/domain/...",
+    "./tests/repositories/reader/...",
+    "./tests/repositories/assignment/...",
+    "./tests/features/catalog/...",
+    "./tests/features/user/...",
+    "./tests/features/session/...",
+    "./tests/handler/...",
+    "./tests/configs/...",
+    "./tests/integration/auth_reads/...",
+    "./internal/features/user"
+  ],
+  "started_at": "2026-10-13T03:08:32.925587+00:00",
+  "seconds": 7.818,
+  "exit_code": 0,
+  "log": "/tmp/ecs-stage4-targeted.log",
+  "passed_tests": 1424,
+  "failed_tests": [],
+  "skipped_tests": []
+}

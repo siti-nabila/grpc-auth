@@ -1,0 +1,19 @@
+{
+  "label": "contract-full",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "-count=1",
+    "./..."
+  ],
+  "started_at": "2026-10-13T05:47:43.357349+00:00",
+  "seconds": 1.797,
+  "exit_code": 0,
+  "log": "/tmp/aap-contract-full.log",
+  "source_identity": "1f17169e539bc44c201a483174fe74231c3a0a303dea6ff570ba0c56b2265124",
+  "passed_tests": 124,
+  "failed_tests": [],
+  "skipped_tests": []
+}

@@ -18,6 +18,7 @@ const (
 	RefreshSession  Group = "refresh-session"
 	ChangePassword  Group = "change-password"
 	AdminMutation   Group = "admin-mutation"
+	ServiceIngress  Group = "service-ingress"
 	IdleTTL               = 15 * time.Minute
 	CleanupInterval       = time.Minute
 	MaxEntries            = 10000
@@ -47,8 +48,10 @@ type bucket struct {
 	refilledAt, checkedAt time.Time
 }
 type Counts struct {
-	QuotaRejected, CapacityRejected uint64
-	Entries                         int
+	QuotaRejected, CapacityRejected                 uint64
+	ServiceQuotaRejected, ServiceCapacityRejected   uint64
+	IdentityQuotaRejected, IdentityCapacityRejected uint64
+	Entries                                         int
 }
 type Store struct {
 	mu      sync.Mutex
@@ -66,6 +69,8 @@ func NewStore(now func() time.Time) (*Store, error) {
 
 func policy(group Group) (int64, int64) {
 	switch group {
+	case ServiceIngress:
+		return 600, 100
 	case LoginIP:
 		return 30, 10
 	case LoginAccount:
@@ -137,11 +142,21 @@ func (s *Store) Admit(keys ...Key) (Decision, error) {
 		}
 	}
 	if len(s.entries)+newCount > MaxEntries {
-		s.counts.CapacityRejected++
+		increment(&s.counts.CapacityRejected)
+		if keys[0].Group == ServiceIngress {
+			increment(&s.counts.ServiceCapacityRejected)
+		} else {
+			increment(&s.counts.IdentityCapacityRejected)
+		}
 		return Decision{Reason: Capacity, RetryAfter: CleanupInterval}, nil
 	}
 	if wait > 0 {
-		s.counts.QuotaRejected++
+		increment(&s.counts.QuotaRejected)
+		if keys[0].Group == ServiceIngress {
+			increment(&s.counts.ServiceQuotaRejected)
+		} else {
+			increment(&s.counts.IdentityQuotaRejected)
+		}
 		return Decision{Reason: Quota, RetryAfter: wait}, nil
 	}
 	for key, b := range pending {
@@ -149,6 +164,12 @@ func (s *Store) Admit(keys ...Key) (Decision, error) {
 		s.entries[key] = b
 	}
 	return Decision{Allowed: true}, nil
+}
+
+func increment(n *uint64) {
+	if *n < ^uint64(0) {
+		(*n)++
+	}
 }
 
 func (s *Store) Cleanup() {

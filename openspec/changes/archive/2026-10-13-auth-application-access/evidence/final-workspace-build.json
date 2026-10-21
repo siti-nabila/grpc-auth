@@ -1,0 +1,14 @@
+{
+  "label": "final-workspace-build",
+  "mode": "workspace",
+  "command": [
+    "make",
+    "build",
+    "BIN_DIR=/tmp/aap-build-workspace"
+  ],
+  "started_at": "2026-10-13T08:18:57.895141+00:00",
+  "seconds": 0.497,
+  "exit_code": 0,
+  "log": "/tmp/aap-final-workspace-build.log",
+  "source_identity": "8746bf2c3914799fb83934466574feb0bb83bd270888ea320db35585d910dc5f"
+}

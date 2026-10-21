@@ -3,7 +3,6 @@ package user
 import (
 	"context"
 	"errors"
-	"slices"
 	"strconv"
 	"time"
 
@@ -120,89 +119,56 @@ func (s *managementService) managementTransaction(ctx context.Context, c managem
 			return nil, nil, common.ErrDependencyUnavailable
 		}
 	}
-	held := featurecommon.CanonicalLockKeys(keys...)
-	for check := 0; check < 3; check++ {
-		discovered, e := managementAuthorityKeys(ctx, r, p, c.target, member)
-		if e != nil {
-			return nil, nil, e
-		}
-		missing := []string{}
-		for _, key := range discovered {
-			if !slices.Contains(held, key) {
-				missing = append(missing, key)
-			}
-		}
-		if featurecommon.RequiresLockRestart(held, missing) {
-			return nil, append(held, missing...), nil
-		}
-		if err = managementLocks(owner, missing...); err != nil {
-			return nil, nil, err
-		}
-		held = featurecommon.CanonicalLockKeys(append(held, missing...)...)
-		next, e := managementAuthorityKeys(ctx, r, p, c.target, member)
-		if e != nil {
-			return nil, nil, e
-		}
-		if !slices.Equal(featurecommon.CanonicalLockKeys(discovered...), featurecommon.CanonicalLockKeys(next...)) {
-			if check == 2 {
-				return nil, append(held, next...), nil
-			}
-			continue
-		}
-		break
+	restart, err = featurecommon.LockDiscoveredAuthority(owner, keys, func() ([]string, error) { return managementAuthorityKeys(ctx, r, p, c.target, member) }, usererrors.ErrResourceBusy)
+	if err != nil || len(restart) > 0 {
+		return nil, restart, err
 	}
 	now := s.deps.Now().UTC()
-	verified, err := authfeature.AuthenticateSession(ctx, p.Claims(), r.State, now)
+	p, err = authfeature.AuthorizeCurrentPermission(ctx, p.Claims(), c.method, c.permission, r.State, r.Permissions, now)
 	if err != nil {
 		return nil, nil, err
 	}
-	p, err = sessions.PrincipalFromContext(verified)
+	result, err = s.replayManagement(r, c, scope, hash, now)
 	if err != nil {
 		return nil, nil, err
 	}
-	if err = p.AuthorizeMethod(c.method); err != nil {
-		return nil, nil, err
-	}
-	rows, err := r.Permissions.Permissions(ctx, p.UserID())
-	if err != nil {
-		return nil, nil, featurecommon.DependencyError(err)
-	}
-	if !featurecommon.HasPermission(featurecommon.ResolvePermissions(rows), string(c.permission)) {
-		return nil, nil, common.ErrForbidden
-	}
-	if c.key != "" {
-		record, e := r.Idempotency.Lookup(scope)
-		if e != nil {
-			return nil, nil, featurecommon.DependencyError(e)
-		}
-		if len(c.password) > 0 {
-			result, err = s.deps.Fingerprinter.ReplayPassword(record, scope, c.payload, c.password, now)
-		} else {
-			result, err = featurecommon.Replay(record, hash, now)
-		}
+	if result == nil {
+		result, err = s.executeManagement(ctx, r, p, c, member, scope, hash, now, apply)
 		if err != nil {
 			return nil, nil, err
-		}
-		if result != nil {
-			if err = owner.Commit(); err != nil {
-				return nil, nil, featurecommon.DependencyError(err)
-			}
-			return result, nil, nil
-		}
-	}
-	out, err := apply(ctx, r, p, member, now)
-	if err != nil {
-		return nil, nil, err
-	}
-	if c.key != "" {
-		if err = r.Idempotency.Save(scope, hash, out, now); err != nil {
-			return nil, nil, featurecommon.DependencyError(err)
 		}
 	}
 	if err = owner.Commit(); err != nil {
 		return nil, nil, featurecommon.DependencyError(err)
 	}
-	return &out, nil, nil
+	return result, nil, nil
+}
+
+func (s *managementService) replayManagement(r ManagementRepositories, c managementCommand, scope domain.IdempotencyScope, hash []byte, now time.Time) (*domain.SafeCommandResult, error) {
+	if c.key == "" {
+		return nil, nil
+	}
+	record, err := r.Idempotency.Lookup(scope)
+	if err != nil {
+		return nil, featurecommon.DependencyError(err)
+	}
+	if len(c.password) > 0 {
+		return s.deps.Fingerprinter.ReplayPassword(record, scope, c.payload, c.password, now)
+	}
+	return featurecommon.Replay(record, hash, now)
+}
+
+func (s *managementService) executeManagement(ctx context.Context, r ManagementRepositories, p sessions.Principal, c managementCommand, member uint64, scope domain.IdempotencyScope, hash []byte, now time.Time, apply managementApply) (*domain.SafeCommandResult, error) {
+	out, err := apply(ctx, r, p, member, now)
+	if err != nil {
+		return nil, err
+	}
+	if c.key != "" {
+		if err = r.Idempotency.Save(scope, hash, out, now); err != nil {
+			return nil, featurecommon.DependencyError(err)
+		}
+	}
+	return &out, nil
 }
 
 func managementLocks(owner *featurecommon.TransactionOwner, keys ...string) error {

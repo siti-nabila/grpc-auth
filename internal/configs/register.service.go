@@ -12,10 +12,24 @@ import (
 
 type sessionUserServer struct {
 	userv1.UnimplementedUserServiceServer
-	login      *handler.SessionLoginHandler
-	register   *handler.PendingRegistrationHandler
-	reads      *handler.SessionReadHandler
-	management *handler.UserManagementHandler
+	login       *handler.SessionLoginHandler
+	register    *handler.PendingRegistrationHandler
+	reads       *handler.SessionReadHandler
+	management  *handler.UserManagementHandler
+	assignments *handler.UserRoleAssignmentHandler
+	access      *handler.ApplicationAccessHandler
+}
+
+func (s *sessionUserServer) GetMyEffectivePermissions(ctx context.Context, r *userv1.GetMyEffectivePermissionsRequest) (*userv1.GetEffectivePermissionsResponse, error) {
+	return s.reads.GetMyEffectivePermissions(ctx, r)
+}
+
+func (s *sessionUserServer) GetUserEffectivePermissions(ctx context.Context, r *userv1.GetUserEffectivePermissionsRequest) (*userv1.GetEffectivePermissionsResponse, error) {
+	return s.reads.GetUserEffectivePermissions(ctx, r)
+}
+
+func (s *sessionUserServer) ListUserApplicationAccess(ctx context.Context, r *userv1.ListUserApplicationAccessRequest) (*userv1.ListUserApplicationAccessResponse, error) {
+	return s.access.ListUserApplicationAccess(ctx, r)
 }
 
 func (s *sessionUserServer) Login(ctx context.Context, req *userv1.AuthRequest) (*userv1.UserTokenResponse, error) {
@@ -36,7 +50,7 @@ func (s *sessionUserServer) GetUser(ctx context.Context, req *userv1.GetUserRequ
 }
 
 func (s *sessionUserServer) TesRPC(ctx context.Context, req *emptypb.Empty) (*userv1.TestRPC, error) {
-	return (&handler.UserHandler{}).TesRPC(ctx, req)
+	return (&handler.TestRPCHandler{}).TesRPC(ctx, req)
 }
 
 type sessionProfileServer struct {
@@ -61,4 +75,14 @@ func (s *sessionUserServer) UpdateUser(ctx context.Context, r *userv1.UpdateUser
 }
 func (s *sessionUserServer) ChangeUserStatus(ctx context.Context, r *userv1.ChangeUserStatusRequest) (*userv1.ChangeUserStatusResponse, error) {
 	return s.management.ChangeUserStatus(ctx, r)
+}
+
+func (s *sessionUserServer) ListUserRoles(ctx context.Context, r *userv1.ListUserRolesRequest) (*userv1.ListUserRolesResponse, error) {
+	return s.assignments.ListUserRoles(ctx, r)
+}
+func (s *sessionUserServer) GrantUserRoles(ctx context.Context, r *userv1.GrantUserRolesRequest) (*userv1.GrantUserRolesResponse, error) {
+	return s.assignments.GrantUserRoles(ctx, r)
+}
+func (s *sessionUserServer) RevokeUserRoles(ctx context.Context, r *userv1.RevokeUserRolesRequest) (*userv1.RevokeUserRolesResponse, error) {
+	return s.assignments.RevokeUserRoles(ctx, r)
 }

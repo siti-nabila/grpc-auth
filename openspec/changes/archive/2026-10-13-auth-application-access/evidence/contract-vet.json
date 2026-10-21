@@ -1,0 +1,14 @@
+{
+  "label": "contract-vet",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "vet",
+    "./..."
+  ],
+  "started_at": "2026-10-13T05:47:43.357339+00:00",
+  "seconds": 0.62,
+  "exit_code": 0,
+  "log": "/tmp/aap-contract-vet.log",
+  "source_identity": "1f17169e539bc44c201a483174fe74231c3a0a303dea6ff570ba0c56b2265124"
+}

@@ -1,0 +1,244 @@
+{
+  "status": "PASS",
+  "source_identity": "8746bf2c3914799fb83934466574feb0bb83bd270888ea320db35585d910dc5f",
+  "contract": {
+    "repository": "github.com/siti-nabila/api-contracts",
+    "branch": "feat/role-management",
+    "commit": "21082d7a243da2b400579db7d1fd40ebdcbeb37f",
+    "module": "v0.0.0-20261013075041-21082d7a243d",
+    "sum": "h1:dHqPSgCREn0pX8nK/rEvICxnQbLlAyHrK9OnQCn8LrI=",
+    "go_mod_sum": "h1:Jb5bNxnX/aW6YWghT/pXorXlmIDRRxXltY8gL7Udzg4=",
+    "push": "origin feat/role-management PASS",
+    "standalone_download": "PASS",
+    "contract_tests": "contract-error-final.json",
+    "contract_vet": "contract-vet-final.json",
+    "baseline_methods": 30,
+    "current_methods": 33,
+    "new_error": "application.application_access_system_protected/AASP",
+    "old_error_preserved": true
+  },
+  "gates": [
+    {
+      "label": "final-workspace-test",
+      "mode": "workspace",
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "./..."
+      ],
+      "started_at": "2026-10-13T08:18:57.876639+00:00",
+      "seconds": 3.688,
+      "exit_code": 0,
+      "log": "/tmp/aap-final-workspace-test.log",
+      "source_identity": "8746bf2c3914799fb83934466574feb0bb83bd270888ea320db35585d910dc5f",
+      "passed_tests": 3096,
+      "failed_tests": [],
+      "skipped_tests": []
+    },
+    {
+      "label": "final-standalone-test",
+      "mode": "standalone",
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "./..."
+      ],
+      "started_at": "2026-10-13T08:18:57.885108+00:00",
+      "seconds": 4.461,
+      "exit_code": 0,
+      "log": "/tmp/aap-final-standalone-test.log",
+      "source_identity": "8746bf2c3914799fb83934466574feb0bb83bd270888ea320db35585d910dc5f",
+      "passed_tests": 3096,
+      "failed_tests": [],
+      "skipped_tests": []
+    },
+    {
+      "label": "final-workspace-vet",
+      "mode": "workspace",
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "started_at": "2026-10-13T08:18:57.870967+00:00",
+      "seconds": 1.49,
+      "exit_code": 0,
+      "log": "/tmp/aap-final-workspace-vet.log",
+      "source_identity": "8746bf2c3914799fb83934466574feb0bb83bd270888ea320db35585d910dc5f"
+    },
+    {
+      "label": "final-standalone-vet",
+      "mode": "standalone",
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "started_at": "2026-10-13T08:18:57.883909+00:00",
+      "seconds": 1.488,
+      "exit_code": 0,
+      "log": "/tmp/aap-final-standalone-vet.log",
+      "source_identity": "8746bf2c3914799fb83934466574feb0bb83bd270888ea320db35585d910dc5f"
+    },
+    {
+      "label": "final-workspace-race",
+      "mode": "workspace",
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "-race",
+        "./..."
+      ],
+      "started_at": "2026-10-13T08:18:57.871900+00:00",
+      "seconds": 1.685,
+      "exit_code": 0,
+      "log": "/tmp/aap-final-workspace-race.log",
+      "source_identity": "8746bf2c3914799fb83934466574feb0bb83bd270888ea320db35585d910dc5f",
+      "passed_tests": 3096,
+      "failed_tests": [],
+      "skipped_tests": []
+    },
+    {
+      "label": "final-standalone-race",
+      "mode": "standalone",
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "-race",
+        "./..."
+      ],
+      "started_at": "2026-10-13T08:18:57.879230+00:00",
+      "seconds": 1.671,
+      "exit_code": 0,
+      "log": "/tmp/aap-final-standalone-race.log",
+      "source_identity": "8746bf2c3914799fb83934466574feb0bb83bd270888ea320db35585d910dc5f",
+      "passed_tests": 3096,
+      "failed_tests": [],
+      "skipped_tests": []
+    },
+    {
+      "label": "final-workspace-build",
+      "mode": "workspace",
+      "command": [
+        "make",
+        "build",
+        "BIN_DIR=/tmp/aap-build-workspace"
+      ],
+      "started_at": "2026-10-13T08:18:57.895141+00:00",
+      "seconds": 0.497,
+      "exit_code": 0,
+      "log": "/tmp/aap-final-workspace-build.log",
+      "source_identity": "8746bf2c3914799fb83934466574feb0bb83bd270888ea320db35585d910dc5f"
+    },
+    {
+      "label": "final-standalone-build",
+      "mode": "standalone",
+      "command": [
+        "make",
+        "build",
+        "BIN_DIR=/tmp/aap-build-standalone"
+      ],
+      "started_at": "2026-10-13T08:18:57.885245+00:00",
+      "seconds": 0.518,
+      "exit_code": 0,
+      "log": "/tmp/aap-final-standalone-build.log",
+      "source_identity": "8746bf2c3914799fb83934466574feb0bb83bd270888ea320db35585d910dc5f"
+    },
+    {
+      "label": "final-pg-workspace",
+      "mode": "workspace",
+      "command": [
+        "/tmp/auth-assignment-postgres",
+        "test",
+        "test",
+        "-json",
+        "-tags",
+        "postgres",
+        "-count=1",
+        "./tests/integration/postgres/..."
+      ],
+      "started_at": "2026-10-13T08:22:01.837830+00:00",
+      "seconds": 34.881,
+      "exit_code": 0,
+      "log": "/tmp/aap-final-pg-workspace.log",
+      "source_identity": "8746bf2c3914799fb83934466574feb0bb83bd270888ea320db35585d910dc5f",
+      "passed_tests": 513,
+      "failed_tests": [],
+      "skipped_tests": []
+    },
+    {
+      "label": "final-pg-workspace-race",
+      "mode": "workspace",
+      "command": [
+        "/tmp/auth-assignment-postgres",
+        "test",
+        "test",
+        "-json",
+        "-race",
+        "-tags",
+        "postgres",
+        "-count=1",
+        "./tests/integration/postgres/..."
+      ],
+      "started_at": "2026-10-13T08:22:36.836657+00:00",
+      "seconds": 139.234,
+      "exit_code": 0,
+      "log": "/tmp/aap-final-pg-workspace-race.log",
+      "source_identity": "8746bf2c3914799fb83934466574feb0bb83bd270888ea320db35585d910dc5f",
+      "passed_tests": 513,
+      "failed_tests": [],
+      "skipped_tests": []
+    },
+    {
+      "label": "final-pg-standalone",
+      "mode": "standalone",
+      "command": [
+        "/tmp/auth-assignment-postgres",
+        "test",
+        "test",
+        "-json",
+        "-tags",
+        "postgres",
+        "-count=1",
+        "./tests/integration/postgres/..."
+      ],
+      "started_at": "2026-10-13T08:24:56.173909+00:00",
+      "seconds": 34.349,
+      "exit_code": 0,
+      "log": "/tmp/aap-final-pg-standalone.log",
+      "source_identity": "8746bf2c3914799fb83934466574feb0bb83bd270888ea320db35585d910dc5f",
+      "passed_tests": 513,
+      "failed_tests": [],
+      "skipped_tests": []
+    },
+    {
+      "label": "final-pg-standalone-race",
+      "mode": "standalone",
+      "command": [
+        "/tmp/auth-assignment-postgres",
+        "test",
+        "test",
+        "-json",
+        "-race",
+        "-tags",
+        "postgres",
+        "-count=1",
+        "./tests/integration/postgres/..."
+      ],
+      "started_at": "2026-10-13T08:25:30.648222+00:00",
+      "seconds": 143.59,
+      "exit_code": 0,
+      "log": "/tmp/aap-final-pg-standalone-race.log",
+      "source_identity": "8746bf2c3914799fb83934466574feb0bb83bd270888ea320db35585d910dc5f",
+      "passed_tests": 513,
+      "failed_tests": [],
+      "skipped_tests": []
+    }
+  ],
+  "readability_review": "scoped-review.json",
+  "deployment_DEP_01": "OPEN, outside backend completion"
+}

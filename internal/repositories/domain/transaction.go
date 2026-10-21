@@ -2,7 +2,7 @@ package domain
 
 import (
 	"context"
-	"database/sql"
+	"github.com/siti-nabila/orm/orm"
 	"github.com/siti-nabila/orm/query"
 )
 
@@ -26,9 +26,8 @@ type ReadSnapshotProvider interface {
 	BeginSnapshot(context.Context) (Transaction, error)
 }
 
-// StatementWriter is a capability of the supplied primary transaction. The ORM
-// has no delete builder; mapping replacement needs a parameterized DELETE on
-// this same handle, without creating another pool or owning its lifecycle.
-type StatementWriter interface {
-	ExecContext(context.Context, string, ...any) (sql.Result, error)
+// InsertWriter exposes the ORM insert builder on the supplied transaction.
+// Context, connection and finalization remain owned by that transaction.
+type InsertWriter interface {
+	CreateWith(any) *orm.CreateCommand
 }

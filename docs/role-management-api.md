@@ -142,3 +142,25 @@ Implementation/test traceability and actual gates:
 [evidence](../openspec/changes/archive/2026-10-12-auth-role-management/evidence.md),
 [acceptance ledger](../openspec/changes/archive/2026-10-12-auth-role-management/design.md#acceptance-ledger),
 [Phase2 plan](phase-2-management-plan.md#5-increment-b--role-dan-catalog).
+
+## Retained permission mappings
+
+ReplaceRolePermissions persists a feature-decided sorted diff on the supplied
+ORM transaction: removed active pairs receive the command UTC timestamp in
+`deleted_at`, retained deleted pairs are restored to NULL, and previously absent
+pairs are inserted. Unchanged pairs and old tombstone timestamps are preserved.
+The composite pair key covers deleted rows too. An identical active set remains
+a no-op; keyed replay performs no mapping write. CreateRole inserts only the
+initial nondeleted pairs. No hard DELETE is used.
+
+Role detail, default Member selection, current authorization and effective
+permission reads ignore deleted mappings. Role enable does not restore them.
+Effective replacement still increments role version once and atomically commits
+ROLE_PERMISSIONS_CHANGED, iam.role.permissions_changed.v1 and the safe keyed
+result; user/auth/session state stays unchanged. Soft-delete/restore/insert or
+later persistence failures roll back together. NO_OP emits no event or version
+increment; replay emits no additional audit/event.
+
+Before activation, review the [schema expansion and rollback guide](sql/role-permission-soft-delete/README.md).
+Repository calls use the GitHub ORM transaction builders; the legacy pkg DBLogger
+is unused. Begin/TryLock/Commit/Rollback remain owned by features.

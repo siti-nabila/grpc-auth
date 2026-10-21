@@ -24,7 +24,7 @@ func (r *registrationRoleReader) DefaultMember() (uint64, error) {
 		Where("role.role_code = ?", domain.MemberRole).Where("role.code = ?", memberRoleCode).
 		Where("role.status = ?", types.RoleActive).Where("role.is_system = ?", true).
 		Where("app.code = ?", types.ApplicationIAM).Where("app.status = ?", types.ApplicationActive).
-		Where("NOT EXISTS (SELECT 1 FROM role_permissions rp WHERE rp.role_id = role.id)").Limit(1).Scan(&role)
+		WhereNotExists(r.tx.UseModel(domain.RolePermissionPair{}).Select("rp.role_id").Where("rp.role_id = role.id").Where("rp.deleted_at IS NULL")).Limit(1).Scan(&role)
 	if err != nil {
 		return 0, helpers.HandleDBError(err)
 	}

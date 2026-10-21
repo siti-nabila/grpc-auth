@@ -1,0 +1,81 @@
+{
+  "required_bind_consumers": [
+    {
+      "source": "internal/configs/roles.go",
+      "repositories": "role.ManagementRepositories",
+      "binder": "role.BindManagementRepositories",
+      "observer": "required-write; common.ObserveAudit; original error/panic preserved"
+    },
+    {
+      "source": "internal/configs/login_producer.go",
+      "repositories": "authfeature.LoginRepositories",
+      "binder": "authfeature.BindLoginRepositories",
+      "observer": "required-write; common.ObserveAudit; original error/panic preserved"
+    },
+    {
+      "source": "internal/configs/lifecycle.go",
+      "repositories": "authfeature.RefreshRepositories",
+      "binder": "authfeature.BindRefreshRepositories",
+      "observer": "required-write; common.ObserveAudit; original error/panic preserved"
+    },
+    {
+      "source": "internal/configs/lifecycle.go",
+      "repositories": "authfeature.LogoutRepositories",
+      "binder": "authfeature.BindLogoutRepositories",
+      "observer": "required-write; common.ObserveAudit; original error/panic preserved"
+    },
+    {
+      "source": "internal/configs/lifecycle.go",
+      "repositories": "authfeature.PasswordRepositories",
+      "binder": "authfeature.BindPasswordRepositories",
+      "observer": "required-write; common.ObserveAudit; original error/panic preserved"
+    },
+    {
+      "source": "internal/configs/lifecycle.go",
+      "repositories": "session.SelfRepositories",
+      "binder": "session.BindSelfRepositories",
+      "observer": "required-write; common.ObserveAudit; original error/panic preserved"
+    },
+    {
+      "source": "internal/configs/lifecycle.go",
+      "repositories": "session.AdminRepositories",
+      "binder": "session.BindAdminRepositories",
+      "observer": "required-write; common.ObserveAudit; original error/panic preserved"
+    },
+    {
+      "source": "internal/configs/foundation_features.go",
+      "repositories": "application.Repositories",
+      "binder": "application.BindRepositories",
+      "observer": "required-write; common.ObserveAudit; original error/panic preserved"
+    },
+    {
+      "source": "internal/configs/foundation_features.go",
+      "repositories": "authfeature.PendingRegistrationRepositories",
+      "binder": "authfeature.BindPendingRegistrationRepositories",
+      "observer": "required-write; common.ObserveAudit; original error/panic preserved"
+    },
+    {
+      "source": "internal/configs/foundation_features.go",
+      "repositories": "profile.SessionRepositories",
+      "binder": "profile.BindSessionRepositories",
+      "observer": "required-write; common.ObserveAudit; original error/panic preserved"
+    },
+    {
+      "source": "internal/configs/foundation_features.go",
+      "repositories": "user.ManagementRepositories",
+      "binder": "user.BindManagementRepositories",
+      "observer": "required-write; common.ObserveAudit; original error/panic preserved"
+    },
+    {
+      "source": "internal/configs/foundation_features.go",
+      "repositories": "user.AssignmentRepositories",
+      "binder": "user.BindAssignmentRepositories",
+      "observer": "required-write; common.ObserveAudit; original error/panic preserved"
+    }
+  ],
+  "independent_origins": [
+    "LoginAttempt callback in login_producer.go",
+    "SecurityAttempt callback in foundation.go"
+  ],
+  "finalization_owner": "features/common.TransactionOwner.Commit; injected per-request callback"
+}

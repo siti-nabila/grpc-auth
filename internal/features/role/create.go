@@ -25,22 +25,9 @@ func (s *managementService) CreateRole(ctx context.Context, input domain.CreateR
 	}
 	c := roleCommand{method: rolev1.RoleService_CreateRole_FullMethodName, permission: types.PermissionIAMRoleCreate, code: input.Code, application: input.ApplicationCode, key: input.Key, payload: featurecommon.FingerprintPayload{Code: input.Code, Name: &input.Name, Description: input.Description, PermissionCodes: input.PermissionCodes, Presence: presence}}
 	return s.run(ctx, c, func(ctx context.Context, r ManagementRepositories, p sessions.Principal, now time.Time) (domain.SafeCommandResult, error) {
-		app, err := r.Roles.Application(ctx, input.ApplicationCode)
+		app, permissions, err := creationPolicy(ctx, r, input)
 		if err != nil {
-			if errors.Is(err, applicationerrors.ErrApplicationNotFound) {
-				return domain.SafeCommandResult{}, err
-			}
-			return domain.SafeCommandResult{}, featurecommon.DependencyError(err)
-		}
-		if err = app.AllowCustomRole(); err != nil {
 			return domain.SafeCommandResult{}, err
-		}
-		permissions, err := r.Roles.PermissionSet(ctx, app.ID, input.PermissionCodes)
-		if err != nil {
-			if errors.Is(err, roleerrors.ErrInvalidPermissionSet) {
-				return domain.SafeCommandResult{}, err
-			}
-			return domain.SafeCommandResult{}, featurecommon.DependencyError(err)
 		}
 		role, err := r.Writer.CreateRole(ctx, domain.RoleSummary{Code: input.Code, Name: input.Name, Description: clearedDescription(input.Description), ApplicationID: app.ID, ApplicationCode: app.Code, Status: types.RoleActive, Version: 1})
 		if err != nil {
@@ -49,10 +36,31 @@ func (s *managementService) CreateRole(ctx context.Context, input domain.CreateR
 			}
 			return domain.SafeCommandResult{}, featurecommon.DependencyError(err)
 		}
-		if err = r.Writer.ReplacePermissions(ctx, role.ID, permissionIDs(permissions)); err != nil {
+		if err = r.Writer.ReplacePermissions(ctx, role.ID, domain.RolePermissionChanges{Inserted: sortedPermissionIDs(permissions)}, now); err != nil {
 			return domain.SafeCommandResult{}, featurecommon.DependencyError(err)
 		}
 		detail := domain.RoleDetail{Role: role, Permissions: permissions}
 		return s.outcome(ctx, r, p, nil, detail, true, types.AuditRoleCreated, types.EventRoleCreated, "", now)
 	})
+}
+
+func creationPolicy(ctx context.Context, r ManagementRepositories, input domain.CreateRoleInput) (domain.ApplicationItem, []domain.PermissionItem, error) {
+	app, err := r.Roles.Application(ctx, input.ApplicationCode)
+	if errors.Is(err, applicationerrors.ErrApplicationNotFound) {
+		return app, nil, err
+	}
+	if err != nil {
+		return app, nil, featurecommon.DependencyError(err)
+	}
+	if err = app.AllowCustomRole(); err != nil {
+		return app, nil, err
+	}
+	permissions, err := r.Roles.PermissionSet(ctx, app.ID, input.PermissionCodes)
+	if errors.Is(err, roleerrors.ErrInvalidPermissionSet) {
+		return app, nil, err
+	}
+	if err != nil {
+		return app, nil, featurecommon.DependencyError(err)
+	}
+	return app, permissions, nil
 }

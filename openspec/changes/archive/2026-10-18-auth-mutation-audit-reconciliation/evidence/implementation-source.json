@@ -1,0 +1,17 @@
+{
+  "changed_go_files": 6,
+  "code_snapshot_sha256": "e4e69276962d8f4b19ff453976c1d5d55940e7eebf88710a3bc3d7d51b81a2ed",
+  "files": {
+    "docs/auth-mutation-audit-reconciliation-plan.md": "19b087fd9bc1443a1bed602cdd8996ad3367a0cc9ec24c35b0ec17f33de16214",
+    "tests/features/common/mocks/acknowledgement.go": "16d15572e41f7f84c2be5e759756aacc156641525220dfe7d6ded1bc21bdb406",
+    "tests/features/common/runner_test.go": "98c2c8bd65ccf248151b4b36d1ffbdd40c3a4caa59e9164ef9d90e0155102950",
+    "tests/features/common/test_scenarios/reconciliation.go": "de412bf56d6cbcf5dda959e78f8d49b07062378496a4a0856d0f0810a5a455c3",
+    "tests/integration/postgres/mocks/acknowledgement.go": "545c4bb04adf5f90d3a7f07a3b01069aa9284676cb965b7a55149c65f06e19d0",
+    "tests/integration/postgres/runner_test.go": "0391e484f57464ecc2cf520a7efcb0b2eb49b166c886805d4374ea4208afa124",
+    "tests/integration/postgres/test_scenarios/commit_acknowledgement.go": "174d0023b0a60d332c854528d7a259b6ab900459a8d82f19fbbb2397cd78efc3"
+  },
+  "preserved_baseline_files": 776,
+  "production_source_changes": 0,
+  "source_commit": "2462cb09d0f8e7eef3b17a70456451b8bd2dd6ec",
+  "source_identity": "dirty tree and exact per-file hashes; no grpc-auth commit/push"
+}

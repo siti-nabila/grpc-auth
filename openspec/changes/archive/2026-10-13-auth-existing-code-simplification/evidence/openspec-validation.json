@@ -1,0 +1,15 @@
+{
+  "label": "openspec-validation",
+  "mode": "workspace",
+  "command": [
+    "openspec",
+    "validate",
+    "auth-existing-code-simplification",
+    "--strict"
+  ],
+  "started_at": "2026-10-13T03:18:24.632729+00:00",
+  "seconds": 0.287,
+  "exit_code": 0,
+  "log": "/tmp/ecs-openspec-validation.log",
+  "source_identity": "f322bc405eea1f8773dd60220c1e233f21b91b6cd7c17ecc4dd88a085aa892cf"
+}

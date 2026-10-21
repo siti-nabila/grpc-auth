@@ -105,6 +105,23 @@ func (s *adminService) runAdmin(ctx context.Context, c adminCommand) (res *Admin
 	if err != nil {
 		return nil, err
 	}
+	result, err := replayAdminSession(r, c, scope, hash, now)
+	if err != nil {
+		return nil, err
+	}
+	if result == nil {
+		result, err = s.executeAdminSession(ctx, r, p, c, scope, hash, now)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if err = owner.Commit(); err != nil {
+		return nil, featurecommon.DependencyError(err)
+	}
+	return &AdminResult{Changed: result.Changed, Version: result.Version}, nil
+}
+
+func replayAdminSession(r AdminRepositories, c adminCommand, scope domain.IdempotencyScope, hash []byte, now time.Time) (*domain.SafeCommandResult, error) {
 	record, err := r.Idempotency.Lookup(scope)
 	if err != nil {
 		return nil, featurecommon.DependencyError(err)
@@ -113,15 +130,13 @@ func (s *adminService) runAdmin(ctx context.Context, c adminCommand) (res *Admin
 	if err != nil {
 		return nil, err
 	}
-	if saved != nil {
-		if saved.UserID != c.target || saved.SessionID != c.sessionID || saved.Version < 1 {
-			return nil, common.ErrInternalServerError
-		}
-		if err = owner.Commit(); err != nil {
-			return nil, featurecommon.DependencyError(err)
-		}
-		return &AdminResult{Changed: saved.Changed, Version: saved.Version}, nil
+	if saved != nil && (saved.UserID != c.target || saved.SessionID != c.sessionID || saved.Version < 1) {
+		return nil, common.ErrInternalServerError
 	}
+	return saved, nil
+}
+
+func (s *adminService) executeAdminSession(ctx context.Context, r AdminRepositories, p sessions.Principal, c adminCommand, scope domain.IdempotencyScope, hash []byte, now time.Time) (*domain.SafeCommandResult, error) {
 	target, err := r.Users.GetByID(ctx, c.target)
 	if errors.Is(err, auth.ErrNotFound) {
 		return nil, err
@@ -147,10 +162,7 @@ func (s *adminService) runAdmin(ctx context.Context, c adminCommand) (res *Admin
 	if err = r.Idempotency.Save(scope, hash, result, now); err != nil {
 		return nil, featurecommon.DependencyError(err)
 	}
-	if err = owner.Commit(); err != nil {
-		return nil, featurecommon.DependencyError(err)
-	}
-	return &AdminResult{Changed: result.Changed, Version: result.Version}, nil
+	return &result, nil
 }
 
 func adminLocks(owner *featurecommon.TransactionOwner, keys ...string) error {
@@ -190,23 +202,5 @@ func lockAdminAuthority(ctx context.Context, owner *featurecommon.TransactionOwn
 	if err = adminLocks(owner, keys...); err != nil {
 		return p, err
 	}
-	verified, err := authfeature.AuthenticateSession(ctx, p.Claims(), r.State, now)
-	if err != nil {
-		return p, err
-	}
-	p, err = sessions.PrincipalFromContext(verified)
-	if err != nil {
-		return p, err
-	}
-	if err = p.AuthorizeMethod(c.method); err != nil {
-		return p, err
-	}
-	rows, err = r.Permissions.Permissions(ctx, p.UserID())
-	if err != nil {
-		return p, featurecommon.DependencyError(err)
-	}
-	if !featurecommon.HasPermission(featurecommon.ResolvePermissions(rows), string(types.PermissionIAMSessionRevoke)) {
-		return p, common.ErrForbidden
-	}
-	return p, nil
+	return authfeature.AuthorizeCurrentPermission(ctx, p.Claims(), c.method, types.PermissionIAMSessionRevoke, r.State, r.Permissions, now)
 }

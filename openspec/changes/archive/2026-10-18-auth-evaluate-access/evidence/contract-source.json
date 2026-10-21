@@ -1,0 +1,22 @@
+{
+  "repository": "github.com/siti-nabila/api-contracts",
+  "head": "545701c82e2234041df1bf4d2ce4fef7665dd75d",
+  "branch": "feat/role-management",
+  "files_sha256": {
+    "tests/protobuf/runner_test.go": "d314c03ca905585afa40d05b5ec69381c8a378d946ee6010610bcad6a93b052d",
+    "docs/access-evaluation-contract.md": "d0991e347f982dfe721b5a8152d94d21f7e87fa15adda2cf1726e200a2d20fcd",
+    "tests/protobuf/fixtures/access_evaluation.go": "fc971424acef6ce3eb9a228e18aa2d98ea0c968e75d084235436ea46686e1f6a",
+    "tests/protobuf/fixtures/access_evaluation_baseline.json": "bd3bcac92bb9ea76849f3266972ddba51d145bf32090f4ec4f78be3f9775965f",
+    "tests/protobuf/test_scenarios/access_evaluation.go": "1e5057f2916da3184497cd7c94e8b049e0833cd4a1d2cadfbde29d69acb2c36f",
+    "pb/authorization/v1/authorization.payload.pb.go": "fb0682996c85202d8e350114b580d7abd635e4817813ef4073de41613d9d899c",
+    "pb/authorization/v1/authorization.service.pb.go": "5d4ce571bdbff10f3bd84dfc3475f514275425a03920cb558d41cd3a2533a431",
+    "pb/authorization/v1/authorization.service_grpc.pb.go": "5908995f147061fff8934add7fa9e4a36e565d076e1b2a751db390a37e257076",
+    "proto/authorization/v1/authorization.payload.proto": "4ebe5492e903dc6fcebb566536a44f6be69124f587ebf204cfbb0d37d53d06bd",
+    "proto/authorization/v1/authorization.service.proto": "500fe375066c706f8ab0ef1168ba3b9efe85bfc9595285ff5628dc1f63d40819"
+  },
+  "status": "published; standalone resolution verified",
+  "published_commit": "bfc60a40a858c5a2b154d7049e2a97fd2eb80ffe",
+  "published_module": "v0.0.0-20261018052225-bfc60a40a858",
+  "module_sum": "h1:uHJAzZd2N0LpmZSDvjF2RvqmSzoaJcqvEuk+mZJVP0g=",
+  "go_mod_sum": "h1:Jb5bNxnX/aW6YWghT/pXorXlmIDRRxXltY8gL7Udzg4="
+}

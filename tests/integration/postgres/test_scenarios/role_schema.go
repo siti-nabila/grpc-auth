@@ -11,7 +11,7 @@ import (
 )
 
 func RoleSchema() []testutils.Scenario {
-	return []testutils.Scenario{{Name: "role catalog metadata matches baseline bounds and constraints", Run: roleSchema}}
+	return []testutils.Scenario{{Name: "nullable expansion preserves pairs and rejects incompatible columns", Run: postgresMappingMigration}, {Name: "role catalog metadata matches baseline bounds and constraints", Run: roleSchema}}
 }
 
 func roleSchema(t *testing.T) {
@@ -33,6 +33,7 @@ func roleSchema(t *testing.T) {
 		{"permissions", "description", "text", "NO", 0},
 		{"role_permissions", "role_id", "integer", "NO", 0},
 		{"role_permissions", "permission_id", "integer", "NO", 0},
+		{"role_permissions", "deleted_at", "timestamp with time zone", "YES", 0},
 	} {
 		var typ, nullable string
 		var length sql.NullInt64

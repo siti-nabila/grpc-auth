@@ -8,9 +8,9 @@ import (
 	"github.com/lib/pq"
 	"github.com/siti-nabila/api-contracts/pkg/dictionary/auth"
 	"github.com/siti-nabila/api-contracts/pkg/dictionary/common"
-	"github.com/siti-nabila/grpc-auth/internal/features/auth_feature"
 	"github.com/siti-nabila/grpc-auth/internal/features/profile"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
+	"github.com/siti-nabila/grpc-auth/internal/repositories/reader"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/writer"
 	"github.com/siti-nabila/grpc-auth/pkg/database"
 	roleMock "github.com/siti-nabila/grpc-auth/tests/repositories/transaction/mocks"
@@ -43,7 +43,7 @@ func writeFailures(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			repos := authfeature.BindRegisterRepositories(tx)
+			repos := boundRepositories(tx)
 			switch name {
 			case "auth duplicate":
 				err = repos.AuthWriter.Create(&domain.AuthRequest{Email: "x@example.test", Password: "encoded"})
@@ -92,8 +92,8 @@ func bound(t *testing.T) {
 	if driverMock.Options.Isolation != driver.IsolationLevel(sql.LevelReadCommitted) {
 		t.Fatal("wrong isolation")
 	}
-	registration := authfeature.BindRegisterRepositories(tx)
-	ownProfile := profile.BindRepositories(tx)
+	registration := boundRepositories(tx)
+	ownProfile := profile.BindSessionRepositories(tx)
 	a, err := registration.AuthReader.GetByEmail("user@example.test")
 	if err != nil || a.Id != 42 {
 		t.Fatalf("auth %+v err %v", a, err)
@@ -135,8 +135,8 @@ func bound(t *testing.T) {
 }
 
 func failures(t *testing.T) {
-	registration := authfeature.BindRegisterRepositories(nil)
-	ownProfile := profile.BindRepositories(nil)
+	registration := boundRepositories(nil)
+	ownProfile := profile.BindSessionRepositories(nil)
 	_, err := registration.AuthReader.GetByEmail("x")
 	if !errors.Is(err, common.ErrInternalServerError) {
 		t.Fatal("nil reader fell back")
@@ -187,7 +187,7 @@ func failures(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				repos := authfeature.BindRegisterRepositories(tx)
+				repos := boundRepositories(tx)
 				_, err = repos.AuthReader.GetByEmail("missing@example.test")
 				if name == "missing" && !errors.Is(err, auth.ErrNotFound) {
 					t.Fatalf("missing mapping %v", err)
@@ -218,4 +218,16 @@ func roleBoundary(t *testing.T) {
 			t.Fatal("role delegation/cause differs")
 		}
 	}
+}
+
+type boundRepository struct {
+	AuthReader     domain.AuthReader
+	RoleReader     domain.RoleReader
+	AuthWriter     domain.AuthWriter
+	ProfileWriter  domain.ProfileWriter
+	UserRoleWriter domain.UserRoleWriter
+}
+
+func boundRepositories(tx domain.Transaction) boundRepository {
+	return boundRepository{reader.NewAuthReaderInTransaction(tx), reader.NewRoleReaderInTransaction(tx), writer.NewAuthWriterInTransaction(tx), writer.NewProfileWriterInTransaction(tx), writer.NewUserRoleWriterInTransaction(tx)}
 }

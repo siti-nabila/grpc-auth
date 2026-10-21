@@ -16,6 +16,7 @@ import (
 	"github.com/siti-nabila/grpc-auth/internal/ratelimit"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/reader"
+	"github.com/siti-nabila/grpc-auth/internal/telemetry"
 	"github.com/siti-nabila/grpc-auth/pkg/database"
 	ormconfig "github.com/siti-nabila/orm/config"
 	"github.com/siti-nabila/orm/dialect"
@@ -24,6 +25,7 @@ import (
 )
 
 type LoginProducer struct {
+	Metrics            *telemetry.Store
 	Handler            *handler.SessionLoginHandler
 	Limiter            *ratelimit.Store
 	SessionInterceptor grpc.UnaryServerInterceptor
@@ -43,14 +45,18 @@ func PrepareLoginProducer(ctx context.Context, security *LoginSecurity, db *sql.
 	}
 	cfg.EnableDebug = false // Candidate reads contain password hashes as well.
 	provider := database.NewTransactionProvider(db, d, cfg)
-	p := new(LoginProducer)
+	p := &LoginProducer{Metrics: telemetry.NewStore()}
 	service, err := authfeature.NewSessionLoginService(authfeature.SessionLoginDependencies{
-		Transactions: provider, Candidate: reader.NewLoginAccountReader(orm.NewSqlQueryAdapter(ctx, db, d, cfg)), Bind: authfeature.BindLoginRepositories,
+		Transactions: provider, Candidate: reader.NewLoginAccountReader(orm.NewSqlQueryAdapter(ctx, db, d, cfg)), Bind: func(tx domain.Transaction) authfeature.LoginRepositories {
+			r := authfeature.BindLoginRepositories(tx)
+			r.Audit = observeRequiredAudit(r.Audit, p.Metrics)
+			return r
+		},
 		VerifyPassword: authfeature.VerifyLoginPassword, Issue: security.Issuer.Issue, Now: now,
 		Credentials: func() (authfeature.InitialCredentials, error) { return authfeature.GenerateInitialCredentials(entropy) },
 		RecordFailure: func(ctx context.Context, r domain.AuditRequest) error {
 			return authfeature.RecordFailedLogin(ctx, provider, r)
-		}, ObserveAuditFailure: func() { p.auditFailures.Add(1) },
+		}, ObserveAuditFailure: func() { p.auditFailures.Add(1); p.Metrics.AuditFailure(telemetry.LoginAttempt) },
 	})
 	if err != nil {
 		return nil, err

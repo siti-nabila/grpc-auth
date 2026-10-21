@@ -1,0 +1,23 @@
+{
+  "label": "registered-access",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./tests/integration/auth_reads/...",
+    "-run",
+    "TestRegisteredApplicationAccess"
+  ],
+  "started_at": "2026-10-13T08:08:42.644213+00:00",
+  "seconds": 0.38,
+  "exit_code": 1,
+  "log": "/tmp/aap-registered-access.log",
+  "source_identity": "8e2a14aebd556ad6fe6b8ffe85a5ac6ca85599c9314d1d1b868f3be0e7380ec3",
+  "passed_tests": 0,
+  "failed_tests": [
+    "github.com/siti-nabila/grpc-auth/tests/integration/auth_reads",
+    "github.com/siti-nabila/grpc-auth/tests/integration/auth_reads/test_scenarios"
+  ],
+  "skipped_tests": []
+}

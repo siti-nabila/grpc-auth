@@ -2,6 +2,8 @@ package configs
 
 import (
 	"context"
+	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
+	"github.com/siti-nabila/grpc-auth/internal/telemetry"
 	"time"
 
 	applicationv1 "github.com/siti-nabila/api-contracts/pb/application/v1"
@@ -23,9 +25,17 @@ type catalogServer struct {
 	permissionv1.UnimplementedPermissionServiceServer
 	applicationv1.UnimplementedApplicationServiceServer
 	handler *handler.CatalogHandler
+	access  *handler.ApplicationAccessHandler
 }
 
-func prepareRoles(provider *database.TransactionProvider, now func() time.Time, eventID func() (string, error)) (*roleServer, *catalogServer, error) {
+func (s *catalogServer) GrantApplicationAccess(ctx context.Context, r *applicationv1.GrantApplicationAccessRequest) (*applicationv1.GrantApplicationAccessResponse, error) {
+	return s.access.GrantApplicationAccess(ctx, r)
+}
+func (s *catalogServer) RevokeApplicationAccess(ctx context.Context, r *applicationv1.RevokeApplicationAccessRequest) (*applicationv1.RevokeApplicationAccessResponse, error) {
+	return s.access.RevokeApplicationAccess(ctx, r)
+}
+
+func prepareRoles(provider *database.TransactionProvider, metrics *telemetry.Store, now func() time.Time, eventID func() (string, error)) (*roleServer, *catalogServer, error) {
 	reads, err := role.NewReadService(role.ReadDependencies{Snapshots: provider, Bind: role.BindReadRepositories, Now: now})
 	if err != nil {
 		return nil, nil, err
@@ -34,7 +44,11 @@ func prepareRoles(provider *database.TransactionProvider, now func() time.Time, 
 	if err != nil {
 		return nil, nil, err
 	}
-	commands, err := role.NewManagementService(role.ManagementDependencies{Transactions: provider, Bind: role.BindManagementRepositories, Now: now, EventID: eventID})
+	commands, err := role.NewManagementService(role.ManagementDependencies{Transactions: provider, Bind: func(tx domain.Transaction) role.ManagementRepositories {
+		r := role.BindManagementRepositories(tx)
+		r.Audit = observeRequiredAudit(r.Audit, metrics)
+		return r
+	}, Now: now, EventID: eventID})
 	if err != nil {
 		return nil, nil, err
 	}

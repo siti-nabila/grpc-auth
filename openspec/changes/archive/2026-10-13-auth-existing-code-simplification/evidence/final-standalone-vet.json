@@ -1,0 +1,14 @@
+{
+  "label": "final-standalone-vet",
+  "mode": "standalone",
+  "command": [
+    "go",
+    "vet",
+    "./..."
+  ],
+  "started_at": "2026-10-13T03:11:02.347114+00:00",
+  "seconds": 1.007,
+  "exit_code": 0,
+  "log": "/tmp/ecs-final-standalone-vet.log",
+  "source_identity": "f322bc405eea1f8773dd60220c1e233f21b91b6cd7c17ecc4dd88a085aa892cf"
+}

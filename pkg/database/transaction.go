@@ -50,7 +50,7 @@ func (p *TransactionProvider) begin(ctx context.Context, options sql.TxOptions) 
 		_ = conn.Close()
 		return nil, transactionBeginError(err)
 	}
-	return &leasedTransaction{Transaction: orm.NewSqlTransactionAdapter(ctx, tx, p.dialect, p.config), native: tx, conn: conn}, nil
+	return &leasedTransaction{SqlTransactionAdapter: orm.NewSqlTransactionAdapter(ctx, tx, p.dialect, p.config), native: tx, conn: conn}, nil
 }
 
 func transactionBeginError(err error) error {
@@ -63,17 +63,13 @@ func transactionBeginError(err error) error {
 // Feature ownership is unchanged: this technical adapter only completes the
 // requested finalization and returns its existing connection to the shared pool.
 type leasedTransaction struct {
-	domain.Transaction
+	*orm.SqlTransactionAdapter
 	native *sql.Tx
 	conn   *sql.Conn
 }
 
-func (t *leasedTransaction) ExecContext(ctx context.Context, statement string, args ...any) (sql.Result, error) {
-	return t.native.ExecContext(ctx, statement, args...)
-}
-
 func (t *leasedTransaction) Commit() error {
-	err := t.Transaction.Commit()
+	err := t.SqlTransactionAdapter.Commit()
 	if err != nil {
 		err = errors.Join(err, completedTransactionError(t.native.Rollback()))
 	}
@@ -81,7 +77,7 @@ func (t *leasedTransaction) Commit() error {
 }
 
 func (t *leasedTransaction) Rollback() error {
-	err := t.Transaction.Rollback()
+	err := t.SqlTransactionAdapter.Rollback()
 	// Also guarantee native cleanup if an ORM dialect's lock release failed.
 	err = errors.Join(err, completedTransactionError(t.native.Rollback()))
 	return errors.Join(err, completedConnectionError(t.conn.Close()))

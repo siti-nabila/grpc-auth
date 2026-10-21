@@ -28,6 +28,6 @@ func (r *permissionReader) Permissions(ctx context.Context, userID uint64) ([]do
 		"ur.status AS assignment_status", "app.code AS application_code", "app.status AS application_status", "access.status AS access_status",
 	).Join("role r", "r.id = ur.role_id").Join("role_permissions rp", "rp.role_id = r.id").Join("permissions p", "p.id = rp.permission_id").
 		Join("applications app", "app.id = r.application_id").LeftJoin("user_application_access access", "access.user_id = ur.user_id AND access.application_id = app.id").
-		Where("ur.user_id = ?", userID).OrderBy("p.code ASC, r.id ASC").Scan(&rows)
+		Where("rp.deleted_at IS NULL").Where("ur.user_id = ?", userID).OrderBy("p.code ASC, r.id ASC").Scan(&rows)
 	return rows, helpers.HandleDBError(err)
 }

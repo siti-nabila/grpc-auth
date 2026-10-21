@@ -1,0 +1,27 @@
+{
+  "baseline": "openspec/changes/archive/2026-10-12-auth-role-management/schema-comparison.json",
+  "baseline_sha256": "ed5090927f2ac20c85a8036f9b54512ea8eb098f4f1665d95b4b4dcdea23f68c",
+  "source": "archived application metadata collected READ ONLY during B; not reconnected to application database for C",
+  "expected": {
+    "user_role_columns": 9,
+    "user_role_constraints": 8,
+    "auth_version_positive": true,
+    "admin_guard_singleton_id": 1
+  },
+  "actual": {
+    "user_role_columns": 9,
+    "user_role_constraints": 8,
+    "auth_version_positive": true,
+    "admin_guard_singleton_id": 1
+  },
+  "definition_difference": {
+    "constraint": "user_role_status_ck",
+    "archived": "array cast to text[]",
+    "owned_test": "per-element cast to text",
+    "result": "Equivalent ACTIVE/REVOKED set; exact definitions checked for other constraints. Real invalid status and revocation/FK/unique writes rejected."
+  },
+  "application_migration": false,
+  "application_business_rows_read": false,
+  "test_source": "tests/integration/postgres/test_scenarios/assignment_schema.go",
+  "status": "PASS"
+}

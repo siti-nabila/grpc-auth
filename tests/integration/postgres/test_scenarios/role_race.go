@@ -5,7 +5,6 @@ package test_scenarios
 import (
 	"bytes"
 	"context"
-	"database/sql"
 	"encoding/json"
 	"errors"
 	rolev1 "github.com/siti-nabila/api-contracts/pb/role/v1"
@@ -17,6 +16,7 @@ import (
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/pkg/types"
 	"github.com/siti-nabila/grpc-auth/tests/shared/testutils"
+	"github.com/siti-nabila/orm/orm"
 	"reflect"
 	"sync"
 	"testing"
@@ -188,7 +188,7 @@ func postgresRoleRecheck(t *testing.T) {
 				query = "UPDATE sessions SET status='REVOKED',revoked_at=created_at,revoke_reason='Controlled revocation' WHERE user_id=1"
 			}
 			if change == "permission" {
-				query = "DELETE FROM role_permissions WHERE role_id=2 AND permission_id IN(SELECT id FROM permissions WHERE code='iam.role.create')"
+				query = "UPDATE role_permissions SET deleted_at=CURRENT_TIMESTAMP WHERE role_id=2 AND permission_id IN(SELECT id FROM permissions WHERE code='iam.role.create')"
 			}
 			if _, e = conn.ExecContext(h.ctx, query); e != nil {
 				t.Fatal(e)
@@ -253,8 +253,8 @@ type roleUncertainTransaction struct {
 	commits *int
 }
 
-func (tx roleUncertainTransaction) ExecContext(c context.Context, q string, a ...any) (sql.Result, error) {
-	return tx.Transaction.(domain.StatementWriter).ExecContext(c, q, a...)
+func (tx roleUncertainTransaction) CreateWith(v any) *orm.CreateCommand {
+	return tx.Transaction.(domain.InsertWriter).CreateWith(v)
 }
 func (tx roleUncertainTransaction) Commit() error {
 	*tx.commits++
@@ -319,6 +319,9 @@ func postgresRoleTerminal(t *testing.T) {
 		for _, terminal := range []string{"panic", "cancel"} {
 			t.Run(command+"/"+terminal, func(t *testing.T) {
 				h := newRoleHarness(t)
+				if command == "replace" {
+					prepareRoleMappingDiff(t, h)
+				}
 				before := roleBusinessState(t, h)
 				method := rolev1.RoleService_CreateRole_FullMethodName
 				if command == "update" {
@@ -354,7 +357,7 @@ func postgresRoleTerminal(t *testing.T) {
 					state := types.RoleDisabled
 					r, e = s.ChangeRoleStatus(ctx, domain.ChangeRoleStatusInput{RoleID: 3, ExpectedVersion: 7, Status: &state, Reason: "Terminal check", Key: "terminal"})
 				default:
-					r, e = s.ReplaceRolePermissions(ctx, domain.ReplaceRolePermissionsInput{RoleID: 3, ExpectedVersion: 7, Permissions: &domain.PermissionSet{}, Reason: "Terminal check", Key: "terminal"})
+					r, e = s.ReplaceRolePermissions(ctx, domain.ReplaceRolePermissionsInput{RoleID: 3, ExpectedVersion: 7, Permissions: &domain.PermissionSet{Codes: []string{"sales.order.read", "sales.order.create"}}, Reason: "Terminal check", Key: "terminal"})
 				}
 				want := error(common.ErrInternalServerError)
 				if terminal == "cancel" {

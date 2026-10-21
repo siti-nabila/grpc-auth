@@ -1,0 +1,49 @@
+{
+  "change": "auth-user-role-assignment",
+  "schema": "spec-driven",
+  "archive": "openspec/changes/archive/2026-10-12-auth-user-role-assignment",
+  "tasks": "36/36",
+  "sync": {
+    "status": "PASS",
+    "new_capability": "user-role-assignment",
+    "requirements": 8,
+    "scenarios": 30,
+    "normative_content_exact": true
+  },
+  "checks": [
+    {
+      "command": "rtk proxy openspec validate --specs --strict --json",
+      "exit_code": 0,
+      "duration_seconds": 0.37,
+      "status": "PASS",
+      "summary": {
+        "items": 19,
+        "passed": 19,
+        "failed": 0
+      },
+      "assignment_valid": true
+    },
+    {
+      "command": "rtk proxy openspec list --json",
+      "exit_code": 0,
+      "duration_seconds": 0.159,
+      "status": "PASS",
+      "remaining_active_changes": 0
+    },
+    {
+      "command": "rtk proxy git diff --check",
+      "exit_code": 0,
+      "duration_seconds": 0.041,
+      "status": "PASS"
+    }
+  ],
+  "local_links": {
+    "status": "PASS",
+    "checked": 129
+  },
+  "implementation_hashes": "UNCHANGED",
+  "metadata_preserved": true,
+  "runtime_tests": "Not rerun: this archive changes specs/documentation only; existing implementation verification retained.",
+  "deployment_DEP_01": "OPEN",
+  "git_commit_push": "Not performed"
+}

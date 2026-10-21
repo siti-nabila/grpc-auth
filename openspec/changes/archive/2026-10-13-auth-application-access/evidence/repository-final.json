@@ -1,0 +1,21 @@
+{
+  "label": "repository-final",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "-count=1",
+    "./tests/repositories/...",
+    "./tests/features/auth_feature",
+    "./tests/features/common"
+  ],
+  "started_at": "2026-10-13T05:58:15.264103+00:00",
+  "seconds": 6.678,
+  "exit_code": 0,
+  "log": "/tmp/aap-repository-final.log",
+  "source_identity": "758193b041bdd801dbbe51ea6c8c6aedd5f56a7b4e092c45a4d5ce57d7163307",
+  "passed_tests": 839,
+  "failed_tests": [],
+  "skipped_tests": []
+}

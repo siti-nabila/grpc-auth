@@ -27,7 +27,7 @@ import (
 )
 
 func RegisteredLifecycle() []testutils.Scenario {
-	return []testutils.Scenario{{Name: "all twenty seven registered RPCs enforce TLS service caller and exact allowlists before persistence", Run: registeredLifecycleBoundary}, {Name: "nine lifecycle credential failures preserve localized catalog and independent safe service audit", Run: registeredLifecycleFailure}, {Name: "all eight role catalog methods reject caller namespace before session or target reads", Run: registeredRoleNamespace}}
+	return []testutils.Scenario{{Name: "all thirty-seven registered RPCs enforce TLS service caller and exact allowlists before persistence", Run: registeredLifecycleBoundary}, {Name: "nine lifecycle credential failures preserve localized catalog and independent safe service audit", Run: registeredLifecycleFailure}, {Name: "all eight role catalog methods reject caller namespace before session or target reads", Run: registeredRoleNamespace}}
 }
 
 type lifecycleRPC struct {
@@ -60,7 +60,7 @@ func registeredLifecycleBoundary(t *testing.T) {
 	for _, service := range inventory.GetServiceInfo() {
 		methods += len(service.Methods)
 	}
-	if len(inventory.GetServiceInfo()) != 7 || methods != 27 {
+	if len(inventory.GetServiceInfo()) != 9 || methods != 37 {
 		t.Fatal("incomplete default RPC inventory", methods)
 	}
 	all := append(lifecycleRPCs(), []lifecycleRPC{
@@ -73,6 +73,14 @@ func registeredLifecycleBoundary(t *testing.T) {
 	}...)
 	all = append(all, managementRPCs()...)
 	all = append(all, roleRPCs()...)
+	all = append(all, assignmentRPCs()...)
+	all = append(all, accessRPCs()...)
+	all = append(all, effectivePermissionRPCs()...)
+	all = append(all, evaluationRPCs()...)
+	all = append(all, auditRPCs()...)
+	if len(all) != 37 {
+		t.Fatal("boundary inventory", len(all))
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	for _, call := range all {
@@ -80,7 +88,7 @@ func registeredLifecycleBoundary(t *testing.T) {
 			t.Fatal("anonymous boundary", call.method, e)
 		}
 	}
-	for _, call := range append(append(lifecycleRPCs(), managementRPCs()...), roleRPCs()...) {
+	for _, call := range append(append(append(append(lifecycleRPCs(), managementRPCs()...), roleRPCs()...), append(assignmentRPCs(), accessRPCs()...)...), append(append(effectivePermissionRPCs(), evaluationRPCs()...), auditRPCs()...)...) {
 		e := conn.Invoke(shared.RPCContext(ctx, ""), call.method, call.request, call.response)
 		if status.Code(e) != codes.PermissionDenied {
 			t.Fatal("new RPC bypassed caller allowlist", call.method, e)
@@ -91,6 +99,14 @@ func registeredLifecycleBoundary(t *testing.T) {
 	}
 	if e := mock.Verify(); e != nil {
 		t.Fatal(e)
+	}
+}
+
+func assignmentRPCs() []lifecycleRPC {
+	return []lifecycleRPC{
+		{userv1.UserService_ListUserRoles_FullMethodName, &userv1.ListUserRolesRequest{}, &userv1.ListUserRolesResponse{}},
+		{userv1.UserService_GrantUserRoles_FullMethodName, &userv1.GrantUserRolesRequest{}, &userv1.GrantUserRolesResponse{}},
+		{userv1.UserService_RevokeUserRoles_FullMethodName, &userv1.RevokeUserRolesRequest{}, &userv1.RevokeUserRolesResponse{}},
 	}
 }
 
@@ -124,7 +140,7 @@ func registeredLifecycleFailure(t *testing.T) {
 			t.Fatal("credential failure mapping", call.method, e)
 		}
 	}
-	if foundation.Login.Limiter.Counts().Entries != 1 || foundation.Login.AuditFailures() != 0 {
+	if foundation.Login.Limiter.Counts().Entries != 2 || foundation.Login.AuditFailures() != 0 {
 		t.Fatal("refresh unknown bucket/audit outcome")
 	}
 	if e := mock.Verify(); e != nil {
@@ -145,7 +161,7 @@ func registeredRoleNamespace(t *testing.T) {
 	steps := []mocks.SQLStep{}
 	service := shared.ServiceConfig()
 	service.Callers[0].Namespaces = []string{"clm"}
-	for _, call := range roleRPCs() {
+	for _, call := range append(roleRPCs(), append(assignmentRPCs(), accessRPCs()...)...) {
 		steps = append(steps, registeredAttempt(call.method, "COMMON_FORBIDDEN")...)
 		service.Callers[0].Methods = append(service.Callers[0].Methods, call.method)
 	}
@@ -155,7 +171,7 @@ func registeredRoleNamespace(t *testing.T) {
 	conn, foundation := shared.FoundationServerWithService(t, db, func() time.Time { return shared.ServiceTime }, bytes.NewReader(make([]byte, 2048)), service)
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	for _, call := range roleRPCs() {
+	for _, call := range append(roleRPCs(), append(assignmentRPCs(), accessRPCs()...)...) {
 		if e := conn.Invoke(shared.RPCContext(ctx, ""), call.method, call.request, call.response); status.Code(e) != codes.PermissionDenied {
 			t.Fatal("namespace bypass", call.method, e)
 		}
@@ -169,7 +185,22 @@ func registeredRoleNamespace(t *testing.T) {
 	if e := mock.Verify(); e != nil {
 		t.Fatal(e)
 	}
-	if foundation.Login.Limiter.Counts().Entries != 0 || foundation.Login.AuditFailures() != 0 {
-		t.Fatal("denied namespace allocated quota or failed audit")
+	if foundation.Login.Limiter.Counts().Entries != 1 || foundation.Login.AuditFailures() != 0 {
+		t.Fatal("denied namespace allocated identity quota or failed audit")
+	}
+}
+
+func accessRPCs() []lifecycleRPC {
+	return []lifecycleRPC{
+		{userv1.UserService_ListUserApplicationAccess_FullMethodName, &userv1.ListUserApplicationAccessRequest{}, &userv1.ListUserApplicationAccessResponse{}},
+		{applicationv1.ApplicationService_GrantApplicationAccess_FullMethodName, &applicationv1.GrantApplicationAccessRequest{}, &applicationv1.GrantApplicationAccessResponse{}},
+		{applicationv1.ApplicationService_RevokeApplicationAccess_FullMethodName, &applicationv1.RevokeApplicationAccessRequest{}, &applicationv1.RevokeApplicationAccessResponse{}},
+	}
+}
+
+func effectivePermissionRPCs() []lifecycleRPC {
+	return []lifecycleRPC{
+		{userv1.UserService_GetMyEffectivePermissions_FullMethodName, &userv1.GetMyEffectivePermissionsRequest{}, &userv1.GetEffectivePermissionsResponse{}},
+		{userv1.UserService_GetUserEffectivePermissions_FullMethodName, &userv1.GetUserEffectivePermissionsRequest{}, &userv1.GetEffectivePermissionsResponse{}},
 	}
 }

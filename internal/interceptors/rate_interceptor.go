@@ -6,6 +6,8 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	auditv1 "github.com/siti-nabila/api-contracts/pb/audit/v1"
+	authorizationv1 "github.com/siti-nabila/api-contracts/pb/authorization/v1"
 	"net/netip"
 	"strconv"
 	"strings"
@@ -78,7 +80,7 @@ func rateKeys(ctx context.Context, request any, method string, caller serviceaut
 		return []ratelimit.Key{{Group: ratelimit.LoginIP, Value: trustedIPKey(ctx, caller)}, {Group: ratelimit.LoginAccount, Value: hex.EncodeToString(mac.Sum(nil))}}, nil
 	case userv1.UserService_Register_FullMethodName:
 		return []ratelimit.Key{{Group: ratelimit.RegisterIP, Value: trustedIPKey(ctx, caller)}}, nil
-	case rolev1.RoleService_ListRoles_FullMethodName, rolev1.RoleService_GetRole_FullMethodName, rolev1.RoleService_CreateRole_FullMethodName, rolev1.RoleService_UpdateRole_FullMethodName, rolev1.RoleService_ChangeRoleStatus_FullMethodName, rolev1.RoleService_ReplaceRolePermissions_FullMethodName, permissionv1.PermissionService_ListPermissions_FullMethodName, applicationv1.ApplicationService_ListApplications_FullMethodName, userv1.UserService_GetUser_FullMethodName, userv1.UserService_CreateUser_FullMethodName, userv1.UserService_UpdateUser_FullMethodName, userv1.UserService_ChangeUserStatus_FullMethodName, userv1.UserService_Me_FullMethodName, userv1.UserService_ListUsers_FullMethodName, sessionv1.SessionService_ListMySessions_FullMethodName, sessionv1.SessionService_ListUserSessions_FullMethodName, authv1.AuthService_ChangePassword_FullMethodName, sessionv1.SessionService_RevokeUserSession_FullMethodName, sessionv1.SessionService_RevokeAllUserSessions_FullMethodName:
+	case auditv1.AuditService_ListAuditLogs_FullMethodName, authorizationv1.AuthorizationService_EvaluateAccess_FullMethodName, userv1.UserService_GetMyEffectivePermissions_FullMethodName, userv1.UserService_GetUserEffectivePermissions_FullMethodName, userv1.UserService_ListUserApplicationAccess_FullMethodName, applicationv1.ApplicationService_GrantApplicationAccess_FullMethodName, applicationv1.ApplicationService_RevokeApplicationAccess_FullMethodName, userv1.UserService_ListUserRoles_FullMethodName, userv1.UserService_GrantUserRoles_FullMethodName, userv1.UserService_RevokeUserRoles_FullMethodName, rolev1.RoleService_ListRoles_FullMethodName, rolev1.RoleService_GetRole_FullMethodName, rolev1.RoleService_CreateRole_FullMethodName, rolev1.RoleService_UpdateRole_FullMethodName, rolev1.RoleService_ChangeRoleStatus_FullMethodName, rolev1.RoleService_ReplaceRolePermissions_FullMethodName, permissionv1.PermissionService_ListPermissions_FullMethodName, applicationv1.ApplicationService_ListApplications_FullMethodName, userv1.UserService_GetUser_FullMethodName, userv1.UserService_CreateUser_FullMethodName, userv1.UserService_UpdateUser_FullMethodName, userv1.UserService_ChangeUserStatus_FullMethodName, userv1.UserService_Me_FullMethodName, userv1.UserService_ListUsers_FullMethodName, sessionv1.SessionService_ListMySessions_FullMethodName, sessionv1.SessionService_ListUserSessions_FullMethodName, authv1.AuthService_ChangePassword_FullMethodName, sessionv1.SessionService_RevokeUserSession_FullMethodName, sessionv1.SessionService_RevokeAllUserSessions_FullMethodName:
 		principal, err := sessions.PrincipalFromContext(ctx)
 		if err != nil {
 			return nil, err
@@ -87,7 +89,7 @@ func rateKeys(ctx context.Context, request any, method string, caller serviceaut
 		switch method {
 		case authv1.AuthService_ChangePassword_FullMethodName:
 			group = ratelimit.ChangePassword
-		case rolev1.RoleService_CreateRole_FullMethodName, rolev1.RoleService_UpdateRole_FullMethodName, rolev1.RoleService_ChangeRoleStatus_FullMethodName, rolev1.RoleService_ReplaceRolePermissions_FullMethodName, userv1.UserService_CreateUser_FullMethodName, userv1.UserService_UpdateUser_FullMethodName, userv1.UserService_ChangeUserStatus_FullMethodName, sessionv1.SessionService_RevokeUserSession_FullMethodName, sessionv1.SessionService_RevokeAllUserSessions_FullMethodName:
+		case applicationv1.ApplicationService_GrantApplicationAccess_FullMethodName, applicationv1.ApplicationService_RevokeApplicationAccess_FullMethodName, userv1.UserService_GrantUserRoles_FullMethodName, userv1.UserService_RevokeUserRoles_FullMethodName, rolev1.RoleService_CreateRole_FullMethodName, rolev1.RoleService_UpdateRole_FullMethodName, rolev1.RoleService_ChangeRoleStatus_FullMethodName, rolev1.RoleService_ReplaceRolePermissions_FullMethodName, userv1.UserService_CreateUser_FullMethodName, userv1.UserService_UpdateUser_FullMethodName, userv1.UserService_ChangeUserStatus_FullMethodName, sessionv1.SessionService_RevokeUserSession_FullMethodName, sessionv1.SessionService_RevokeAllUserSessions_FullMethodName:
 			group = ratelimit.AdminMutation
 		}
 		return []ratelimit.Key{{Group: group, Value: strconv.FormatUint(principal.UserID(), 10)}}, nil

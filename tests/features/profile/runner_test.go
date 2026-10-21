@@ -6,5 +6,4 @@ import (
 	"testing"
 )
 
-func TestProfileTransaction(t *testing.T) { testutils.Run(t, test_scenarios.All()) }
-func TestSessionProfile(t *testing.T)     { testutils.Run(t, test_scenarios.Session()) }
+func TestSessionProfile(t *testing.T) { testutils.Run(t, test_scenarios.Session()) }

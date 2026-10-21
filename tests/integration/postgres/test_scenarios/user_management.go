@@ -4,6 +4,7 @@ package test_scenarios
 
 import (
 	"context"
+	"github.com/siti-nabila/grpc-auth/internal/configs"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -87,6 +88,7 @@ func postgresManagementRetention(t *testing.T) {
 }
 
 type managementHarness struct {
+	foundation    *configs.Foundation
 	ctx           context.Context
 	f             *fixtures.Schema
 	conn          *grpc.ClientConn
@@ -107,7 +109,7 @@ func newManagementHarness(t *testing.T, extra ...string) *managementHarness {
 INSERT INTO permissions(application_id,code,description) VALUES
 (1,'iam.user.read','fixture'),(1,'iam.user.create','fixture'),(1,'iam.user.update','fixture'),(1,'iam.user.status.update','fixture');
 INSERT INTO role(role_name,role_code,application_id,code) VALUES('Administrator',2,1,'iam.platform_admin');
-INSERT INTO role_permissions SELECT 2,id FROM permissions;
+INSERT INTO role_permissions(role_id,permission_id) SELECT 2,id FROM permissions;
 INSERT INTO user_role(user_id,role_id) VALUES(1,2);
 INSERT INTO auth(email,password,status) SELECT 'target@example.test',password,'ACTIVE' FROM auth WHERE id=1;
 INSERT INTO profile(user_id,name,address,phone) VALUES(2,'Target user','Initial address','123');
@@ -125,7 +127,8 @@ UPDATE profile SET name=name;`)
 	h := &managementHarness{ctx: ctx, f: f}
 	h.clock.Store(shared.ServiceTime.UnixNano())
 	methods := append(append(shared.LifecycleMethods(), managementMethods()...), extra...)
-	conn, _ := shared.FoundationServer(t, f.DB, h.now, shared.LifecycleEntropy(), methods...)
+	conn, foundation := shared.FoundationServer(t, f.DB, h.now, shared.LifecycleEntropy(), methods...)
+	h.foundation = foundation
 	h.conn = conn
 	h.users, h.auths = userv1.NewUserServiceClient(conn), authv1.NewAuthServiceClient(conn)
 	h.admin = h.login(t, "fixture@example.test", "secret12")
@@ -410,6 +413,8 @@ func postgresManagementFailures(t *testing.T) {
 				if after := managementBusinessState(t, h); after != before {
 					t.Fatal("partial business persistence after failed command")
 				}
+				assertManagementFailureMetrics(t, h, stage)
+
 				var failures int
 				if e = h.f.DB.QueryRowContext(h.ctx, `SELECT count(*) FROM audit_logs WHERE action='SECURITY_ATTEMPT_FAILED' AND target_id=$1`, method).Scan(&failures); e != nil || failures != 1 {
 					t.Fatal("independent failure audit", failures, e)

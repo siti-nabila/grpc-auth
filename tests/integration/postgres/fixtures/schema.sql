@@ -220,6 +220,7 @@ CREATE TABLE permissions (
 CREATE TABLE role_permissions (
  role_id integer NOT NULL REFERENCES role(id) ON DELETE RESTRICT,
  permission_id integer NOT NULL REFERENCES permissions(id) ON DELETE RESTRICT,
+ deleted_at timestamptz NULL,
  PRIMARY KEY(role_id,permission_id)
 );
 CREATE TABLE user_application_access (
@@ -231,8 +232,10 @@ CREATE TABLE user_application_access (
  revoked_by integer REFERENCES auth(id) ON DELETE RESTRICT,
  revoked_at timestamptz,
  revoke_reason varchar(500),
- PRIMARY KEY(user_id,application_id)
+ PRIMARY KEY(user_id,application_id),
+ CONSTRAINT user_application_access_revocation_ck CHECK ((status='ACTIVE' AND revoked_at IS NULL) OR (status='REVOKED' AND revoked_at IS NOT NULL AND revoke_reason IS NOT NULL AND char_length(btrim(revoke_reason)) BETWEEN 3 AND 500))
 );
+CREATE INDEX user_application_access_application_status_idx ON user_application_access(application_id,status,user_id);
 
 -- Only the owned fixture's search dependency. No extension, production search
 -- trigger or index is installed by this harness.

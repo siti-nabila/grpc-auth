@@ -58,17 +58,9 @@ func (s *logoutService) Logout(ctx context.Context, credential sessions.LogoutCr
 	if locked.UserID != state.UserID || locked.SessionID != state.SessionID {
 		return nil, auth.ErrInvalidSession
 	}
-	changed, err := r.Sessions.RevokeSession(ctx, domain.SessionRevocation{UserID: locked.UserID, ActorID: locked.UserID, SessionID: locked.SessionID, At: now, Reason: types.AuditLogout})
+	changed, err := s.revokeLogout(ctx, r, locked, now)
 	if err != nil {
-		return nil, featurecommon.DependencyError(err)
-	}
-	if !changed && locked.SessionStatus == types.SessionActive {
-		return nil, auth.ErrInvalidSession
-	}
-	if changed {
-		if err = s.persistLogout(ctx, r, locked, now); err != nil {
-			return nil, err
-		}
+		return nil, err
 	}
 	if err = owner.Commit(); err != nil {
 		return nil, featurecommon.DependencyError(err)
@@ -78,24 +70,7 @@ func (s *logoutService) Logout(ctx context.Context, credential sessions.LogoutCr
 
 func logoutProof(ctx context.Context, c sessions.LogoutCredential, tokens domain.RefreshReader, states domain.SessionStateReader, now time.Time) (domain.SessionState, error) {
 	if raw, ok := c.RefreshToken(); ok {
-		digest, err := refreshDigest(raw)
-		if err != nil {
-			return domain.SessionState{}, err
-		}
-		token, state, err := readRefreshProof(ctx, tokens, states, digest)
-		if err != nil {
-			return state, err
-		}
-		if token.SessionID != state.SessionID || token.ConsumedAt.Valid || token.ReplacedBy.Valid || domain.ValidateSessionID(token.ID) != nil || domain.ValidateSessionID(token.FamilyID) != nil || token.IssuedAt.Before(state.CreatedAt) || token.IssuedAt.After(now) || !now.Before(token.ExpiresAt) || token.ExpiresAt.After(state.ExpiresAt) {
-			return state, auth.ErrInvalidSession
-		}
-		if err = terminalSessionProof(state, now); err != nil {
-			return state, err
-		}
-		if token.RevokedAt.Valid && state.SessionStatus != types.SessionRevoked {
-			return state, auth.ErrInvalidSession
-		}
-		return state, nil
+		return logoutRefreshProof(ctx, raw, tokens, states, now)
 	}
 	claims, ok := c.Access()
 	if !ok {
@@ -146,4 +121,41 @@ func (s *logoutService) persistLogout(ctx context.Context, r LogoutRepositories,
 		return featurecommon.DependencyError(err)
 	}
 	return featurecommon.DependencyError(r.Outbox.Create(featurecommon.SessionRevokedEvent(ctx, id, state.UserID, state.UserID, state.SessionID, types.AuditLogout, now)))
+}
+
+func (s *logoutService) revokeLogout(ctx context.Context, r LogoutRepositories, locked domain.SessionState, now time.Time) (bool, error) {
+	changed, err := r.Sessions.RevokeSession(ctx, domain.SessionRevocation{UserID: locked.UserID, ActorID: locked.UserID, SessionID: locked.SessionID, At: now, Reason: types.AuditLogout})
+	if err != nil {
+		return false, featurecommon.DependencyError(err)
+	}
+	if !changed && locked.SessionStatus == types.SessionActive {
+		return false, auth.ErrInvalidSession
+	}
+	if changed {
+		if err = s.persistLogout(ctx, r, locked, now); err != nil {
+			return false, err
+		}
+	}
+	return changed, nil
+}
+
+func logoutRefreshProof(ctx context.Context, raw string, tokens domain.RefreshReader, states domain.SessionStateReader, now time.Time) (domain.SessionState, error) {
+	digest, err := refreshDigest(raw)
+	if err != nil {
+		return domain.SessionState{}, err
+	}
+	token, state, err := readRefreshProof(ctx, tokens, states, digest)
+	if err != nil {
+		return state, err
+	}
+	if token.SessionID != state.SessionID || token.ConsumedAt.Valid || token.ReplacedBy.Valid || domain.ValidateSessionID(token.ID) != nil || domain.ValidateSessionID(token.FamilyID) != nil || token.IssuedAt.Before(state.CreatedAt) || token.IssuedAt.After(now) || !now.Before(token.ExpiresAt) || token.ExpiresAt.After(state.ExpiresAt) {
+		return state, auth.ErrInvalidSession
+	}
+	if err = terminalSessionProof(state, now); err != nil {
+		return state, err
+	}
+	if token.RevokedAt.Valid && state.SessionStatus != types.SessionRevoked {
+		return state, auth.ErrInvalidSession
+	}
+	return state, nil
 }

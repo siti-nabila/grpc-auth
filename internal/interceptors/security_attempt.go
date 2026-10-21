@@ -3,10 +3,12 @@ package interceptors
 import (
 	"context"
 	"errors"
+	"math"
 	"strings"
 	"time"
 
 	authv1 "github.com/siti-nabila/api-contracts/pb/auth/v1"
+	authorizationv1 "github.com/siti-nabila/api-contracts/pb/authorization/v1"
 	"github.com/siti-nabila/api-contracts/pkg/dictionary"
 	applicationerrors "github.com/siti-nabila/api-contracts/pkg/dictionary/application"
 	roleerrors "github.com/siti-nabila/api-contracts/pkg/dictionary/role"
@@ -35,7 +37,21 @@ func NewSecurityAttemptInterceptor(record func(context.Context, domain.AuditRequ
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, next grpc.UnaryHandler) (res any, err error) {
 		res, err = invokeAttempt(ctx, req, next)
 		if err == nil {
-			return res, nil
+			if info.FullMethod != authorizationv1.AuthorizationService_EvaluateAccess_FullMethodName {
+				return res, nil
+			}
+			decision, ok := res.(*authorizationv1.EvaluateAccessResponse)
+			if !ok || !validAccessDecision(decision) {
+				res, err = nil, common.ErrInternalServerError
+			} else if decision.Allowed {
+				return res, nil
+			} else {
+				caller, callerErr := serviceauth.CallerFromContext(ctx)
+				if callerErr == nil {
+					recordSafeAttempt(ctx, caller.ID(), info.FullMethod, types.AuditRequestDenied, record, observeFailure, now)
+				}
+				return res, nil
+			}
 		}
 		// Quota/capacity rejections use the limiter's bounded aggregate telemetry;
 		// do not turn attack traffic into one database transaction per rejection.
@@ -57,6 +73,16 @@ func NewSecurityAttemptInterceptor(record func(context.Context, domain.AuditRequ
 		recordSafeAttempt(ctx, caller.ID(), info.FullMethod, safeAttemptReason(err), record, observeFailure, now)
 		return res, err
 	}, nil
+}
+
+func validAccessDecision(res *authorizationv1.EvaluateAccessResponse) bool {
+	if res == nil || domain.ValidateManagementTarget(res.UserId) != nil || domain.ValidateSessionID(res.Sid) != nil || res.UserVersion == 0 || res.UserVersion > math.MaxInt64 || res.EvaluatedAt.CheckValid() != nil {
+		return false
+	}
+	if res.Allowed {
+		return res.Reason == authorizationv1.AccessDecisionReason_ACCESS_DECISION_REASON_ALLOWED
+	}
+	return res.Reason >= authorizationv1.AccessDecisionReason_ACCESS_DECISION_REASON_PERMISSION_MISSING && res.Reason <= authorizationv1.AccessDecisionReason_ACCESS_DECISION_REASON_APPLICATION_ACCESS_REQUIRED
 }
 
 func recordSafeAttempt(ctx context.Context, service, method string, reason types.AuditReason, record func(context.Context, domain.AuditRequest) error, observeFailure func(), now func() time.Time) {

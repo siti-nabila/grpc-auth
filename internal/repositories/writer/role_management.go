@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"math"
-	"sort"
 	"time"
 
 	"github.com/lib/pq"
@@ -82,61 +81,6 @@ func (w *roleManagementWriter) UpdateRole(ctx context.Context, role domain.RoleS
 	patch := rolePatch{role.Name, role.Description, role.Status, role.Version, role.UpdatedAt.UTC()}
 	result, err := w.tx.UseModel(&patch).WithContext(ctx).Where("id = ? AND version = ?", role.ID, expected).Updates()
 	return managementAffected(result, rolePersistenceError(err))
-}
-
-func (w *roleManagementWriter) ReplacePermissions(ctx context.Context, id uint64, ids []uint64) error {
-	if err := ctx.Err(); err != nil {
-		return err
-	}
-	if w.tx == nil {
-		return common.ErrDependencyUnavailable
-	}
-	if domain.ValidateManagementTarget(id) != nil {
-		return common.ErrBadRequest
-	}
-	ids = append([]uint64(nil), ids...)
-	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
-	for i, permissionID := range ids {
-		if domain.ValidateManagementTarget(permissionID) != nil || i > 0 && ids[i-1] == permissionID {
-			return common.ErrBadRequest
-		}
-	}
-	exec, ok := w.tx.(domain.StatementWriter)
-	if !ok {
-		return common.ErrDependencyUnavailable
-	}
-	result, err := exec.ExecContext(ctx, "DELETE FROM role_permissions WHERE role_id = $1", id)
-	if err != nil {
-		return err
-	}
-	if result == nil {
-		return common.ErrDependencyUnavailable
-	}
-	if n, err := result.RowsAffected(); err != nil {
-		return err
-	} else if n < 0 {
-		return common.ErrDependencyUnavailable
-	}
-	for _, permissionID := range ids {
-		if err := ctx.Err(); err != nil {
-			return err
-		}
-		result, err := exec.ExecContext(ctx, "INSERT INTO role_permissions (role_id, permission_id) VALUES ($1, $2)", id, permissionID)
-		if err != nil {
-			return err
-		}
-		if result == nil {
-			return common.ErrDependencyUnavailable
-		}
-		n, err := result.RowsAffected()
-		if err != nil {
-			return err
-		}
-		if n != 1 {
-			return common.ErrDependencyUnavailable
-		}
-	}
-	return nil
 }
 
 func rolePersistenceError(err error) error {

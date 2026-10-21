@@ -114,3 +114,7 @@ func (r Roles) PermissionSet(context.Context, uint64, []string) ([]domain.Permis
 func Contribution(code string) []domain.PermissionContribution {
 	return []domain.PermissionContribution{{PermissionCode: code, PermissionApplicationID: 1, RoleID: 3, RoleCode: "iam.reader", RoleApplicationID: 1, RoleStatus: "ACTIVE", AssignmentStatus: "ACTIVE", ApplicationCode: "iam", ApplicationStatus: "ACTIVE"}}
 }
+
+func (r Roles) RolePermissionPairs(context.Context, uint64) ([]domain.RolePermissionPair, error) {
+	panic("unexpected mapping inventory read")
+}

@@ -56,23 +56,9 @@ func (s *sessionProfileService) UpdateProfile(ctx context.Context, req domain.Pr
 	if repos.State == nil || repos.Reader == nil || repos.Writer == nil || repos.Version == nil || repos.Audit == nil || repos.Outbox == nil {
 		return nil, common.ErrInternalServerError
 	}
-	verified, err := authfeature.AuthenticateSession(ctx, principal.Claims(), repos.State, s.deps.Now())
+	principal, current, err := s.lockedProfile(ctx, repos, principal)
 	if err != nil {
 		return nil, err
-	}
-	principal, err = sessions.PrincipalFromContext(verified)
-	if err != nil {
-		return nil, err
-	}
-	if err = principal.AuthorizeMethod(profilev1.ProfileService_UpdateProfile_FullMethodName); err != nil {
-		return nil, err
-	}
-	current, err := repos.Reader.GetByUserId(principal.UserID())
-	if err != nil {
-		return nil, featurecommon.DependencyError(err)
-	}
-	if current.UserId != principal.UserID() || current.Id == 0 {
-		return nil, common.ErrForbidden
 	}
 	updated := replaceFields(current, req, fields)
 	res = &UpdateResult{Profile: updated, Version: principal.UserVersion(), Changed: updated != current}
@@ -92,17 +78,10 @@ func (s *sessionProfileService) persistUpdate(ctx context.Context, repos Session
 	}
 	action := types.AuditNoOp
 	if result.Changed {
-		if result.Version == math.MaxInt64 {
-			return common.ErrInternalServerError
+		if err = persistProfileFields(repos, principal, before, result); err != nil {
+			return err
 		}
-		result.Version++
 		action = types.AuditUserProfileUpdated
-		if err = repos.Writer.Update(&domain.UpdateProfileRequest{Id: before.Id, Name: result.Profile.Name, Address: result.Profile.Address, Phone: result.Profile.Phone}); err != nil {
-			return featurecommon.DependencyError(err)
-		}
-		if err = repos.Version.SetVersion(principal.UserID(), result.Version); err != nil {
-			return featurecommon.DependencyError(err)
-		}
 	}
 	target := strconv.FormatUint(principal.UserID(), 10)
 	now := s.deps.Now().UTC()
@@ -124,4 +103,40 @@ func (s *sessionProfileService) persistUpdate(ctx context.Context, repos Session
 
 func profileSnapshot(p domain.Profile, version int64) *domain.SafeSnapshot {
 	return &domain.SafeSnapshot{Version: version, Name: &p.Name, Address: &p.Address, Phone: &p.Phone}
+}
+
+func (s *sessionProfileService) lockedProfile(ctx context.Context, repos SessionRepositories, principal sessions.Principal) (sessions.Principal, domain.Profile, error) {
+	verified, err := authfeature.AuthenticateSession(ctx, principal.Claims(), repos.State, s.deps.Now())
+	if err != nil {
+		return sessions.Principal{}, domain.Profile{}, err
+	}
+	principal, err = sessions.PrincipalFromContext(verified)
+	if err != nil {
+		return sessions.Principal{}, domain.Profile{}, err
+	}
+	if err = principal.AuthorizeMethod(profilev1.ProfileService_UpdateProfile_FullMethodName); err != nil {
+		return sessions.Principal{}, domain.Profile{}, err
+	}
+	current, err := repos.Reader.GetByUserId(principal.UserID())
+	if err != nil {
+		return sessions.Principal{}, domain.Profile{}, featurecommon.DependencyError(err)
+	}
+	if current.UserId != principal.UserID() || current.Id == 0 {
+		return sessions.Principal{}, domain.Profile{}, common.ErrForbidden
+	}
+	return principal, current, nil
+}
+
+func persistProfileFields(repos SessionRepositories, principal sessions.Principal, before domain.Profile, result *UpdateResult) error {
+	if result.Version == math.MaxInt64 {
+		return common.ErrInternalServerError
+	}
+	result.Version++
+	if err := repos.Writer.Update(&domain.UpdateProfileRequest{Id: before.Id, Name: result.Profile.Name, Address: result.Profile.Address, Phone: result.Profile.Phone}); err != nil {
+		return featurecommon.DependencyError(err)
+	}
+	if err := repos.Version.SetVersion(principal.UserID(), result.Version); err != nil {
+		return featurecommon.DependencyError(err)
+	}
+	return nil
 }

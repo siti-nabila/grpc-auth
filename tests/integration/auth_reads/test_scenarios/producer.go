@@ -19,6 +19,7 @@ import (
 	"github.com/siti-nabila/grpc-auth/internal/handler"
 	"github.com/siti-nabila/grpc-auth/internal/interceptors"
 	"github.com/siti-nabila/grpc-auth/internal/serviceauth"
+	"github.com/siti-nabila/grpc-auth/internal/telemetry"
 	"github.com/siti-nabila/grpc-auth/pkg/config"
 	"github.com/siti-nabila/grpc-auth/pkg/database"
 	"github.com/siti-nabila/grpc-auth/tests/shared/fixtures"
@@ -117,6 +118,13 @@ func producerFlow(t *testing.T) {
 					return response, err
 				})
 			})
+			wantAuditFailures := uint64(0)
+			if kind == "audit failure" {
+				wantAuditFailures = 1
+			}
+			if producer.Metrics.Snapshot(now).Audit[telemetry.RequiredWrite] != wantAuditFailures {
+				t.Fatal("required audit observation")
+			}
 			if kind != "normal" && kind != "restricted" {
 				if !errors.Is(err, cause) || response != nil {
 					t.Fatal("failed production adapter exposed credentials", err)

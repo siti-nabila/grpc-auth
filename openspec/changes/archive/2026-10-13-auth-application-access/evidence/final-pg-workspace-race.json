@@ -1,0 +1,23 @@
+{
+  "label": "final-pg-workspace-race",
+  "mode": "workspace",
+  "command": [
+    "/tmp/auth-assignment-postgres",
+    "test",
+    "test",
+    "-json",
+    "-race",
+    "-tags",
+    "postgres",
+    "-count=1",
+    "./tests/integration/postgres/..."
+  ],
+  "started_at": "2026-10-13T08:22:36.836657+00:00",
+  "seconds": 139.234,
+  "exit_code": 0,
+  "log": "/tmp/aap-final-pg-workspace-race.log",
+  "source_identity": "8746bf2c3914799fb83934466574feb0bb83bd270888ea320db35585d910dc5f",
+  "passed_tests": 513,
+  "failed_tests": [],
+  "skipped_tests": []
+}

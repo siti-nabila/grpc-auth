@@ -11,7 +11,6 @@ import (
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/reader"
 	"github.com/siti-nabila/grpc-auth/internal/serviceauth"
-	"github.com/siti-nabila/grpc-auth/internal/sessions"
 	"github.com/siti-nabila/grpc-auth/pkg/jwt"
 	"github.com/siti-nabila/grpc-auth/pkg/types"
 	"github.com/siti-nabila/orm/orm"
@@ -47,23 +46,8 @@ func ReadUsersSnapshot(ctx context.Context, claims jwt.VerifiedClaims, req domai
 	}
 	owner := featurecommon.NewTransactionOwner(ctx, tx)
 	defer owner.Finish(&err)
-	verified, err := authfeature.AuthenticateSession(ctx, claims, reader.NewSessionStateReader(tx), now)
-	if err != nil {
+	if _, err = authfeature.AuthorizeCurrentPermission(ctx, claims, userv1.UserService_ListUsers_FullMethodName, types.PermissionIAMUserRead, reader.NewSessionStateReader(tx), reader.NewPermissionReader(tx), now); err != nil {
 		return res, err
-	}
-	principal, err := sessions.PrincipalFromContext(verified)
-	if err != nil {
-		return res, err
-	}
-	if err = principal.AuthorizeMethod(userv1.UserService_ListUsers_FullMethodName); err != nil {
-		return res, err
-	}
-	rows, err := reader.NewPermissionReader(tx).Permissions(ctx, principal.UserID())
-	if err != nil {
-		return res, featurecommon.DependencyError(err)
-	}
-	if !featurecommon.HasPermission(featurecommon.ResolvePermissions(rows), string(types.PermissionIAMUserRead)) {
-		return res, common.ErrForbidden
 	}
 	service := &userService{ctx: ctx, userReader: reader.NewUserReaderInSnapshot(ctx, tx)}
 	res, err = service.SearchUsers(req)

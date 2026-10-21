@@ -1,7 +1,7 @@
 # Plan implementasi Phase 2 — User, Role, dan Application Access
 
-Tanggal baseline: 11 Oktober 2026. Status: **IN_PROGRESS**; increment A telah
-diimplementasikan, increment B selesai dengan required backend gates PASS; C–E belum dimulai. Owner backend: `grpc-auth`.
+Tanggal baseline: 11 Oktober 2026. Status: **BACKEND_COMPLETE**; increment A telah
+diimplementasikan, increment B selesai dengan required backend gates PASS; C selesai dan diarsipkan; D selesai dengan required backend gates PASS; E selesai dengan required backend gates PASS. Owner backend: `grpc-auth`.
 Evidence A: [auth-user-management](../openspec/changes/archive/2026-10-11-auth-user-management/evidence.md).
 
 ## 1. Sumber dan batas phase
@@ -46,7 +46,7 @@ berada di working tree; pertahankan semuanya, jangan reset atau commit otomatis.
 ## 3. Urutan increment
 
 Change B **IMPLEMENTED**, required backend verification **PASS**.
-Increment A **IMPLEMENTED**; C–E **NOT_STARTED**. Setiap increment wajib mendapat contract yang
+Increment A/C **IMPLEMENTED**; D **IMPLEMENTED** ([API/evidence](application-access-api.md)); E **IMPLEMENTED** ([API/evidence](effective-permission-api.md)). Setiap increment wajib mendapat contract yang
 sesuai, test backend, evidence dan validasi sebelum sync/archive.
 
 | Urutan | Change | RPC baru | Prasyarat utama |
@@ -54,7 +54,7 @@ sesuai, test backend, evidence dan validasi sebelum sync/archive.
 | A | [auth-user-management](../openspec/changes/archive/2026-10-11-auth-user-management/proposal.md) | GetUser, CreateUser, UpdateUser, ChangeUserStatus | Foundation yang diarsipkan + publication contract A |
 | B | [auth-role-management](../openspec/changes/archive/2026-10-12-auth-role-management/proposal.md) | ListRoles, GetRole, CreateRole, UpdateRole, ChangeRoleStatus, ReplaceRolePermissions; ListPermissions, ListApplications | A, catalog existing + publication contract B |
 | C | `auth-user-role-assignment` | ListUserRoles, GrantUserRoles, RevokeUserRoles | A/B; last-admin guard bersama + publication contract C |
-| D | `auth-application-access` | ListUserApplicationAccess, GrantApplicationAccess, RevokeApplicationAccess | A/B/C; compound mutation + publication contract D |
+| D | [auth-application-access](../openspec/changes/archive/2026-10-13-auth-application-access/proposal.md) | ListUserApplicationAccess, GrantApplicationAccess, RevokeApplicationAccess | A/B/C; compound mutation + publication contract D |
 | E | `auth-effective-permission-reads` | GetMyEffectivePermissions, GetUserEffectivePermissions | B/C/D untuk acceptance end-to-end; resolver existing + publication contract E |
 
 Total: **20 RPC baru** untuk Phase 2; ListUsers existing merupakan regression.
@@ -138,6 +138,13 @@ ListUsers ke catalog tanpa contract yang disetujui.
 
 ## 6. Increment C — Assignment role
 
+Implementasi backend C dan required gates **PASS**: lihat
+[API/inventory30](user-role-assignment-api.md) dan
+[evidence aktual](../openspec/changes/archive/2026-10-12-auth-user-role-assignment/evidence.md).
+Contract C published `v0.0.0-20261012102712-bfb073390ea9` digunakan secara eksplisit.
+C hanya membuktikan subset assignment AC-09/10; D/E/CLM serta Phase6 DEP-01
+masih terpisah. Ledger URA-01..11/EXT-01 PASS mengikuti hasil gate aktual pada evidence.
+
 - ListUserRoles: `iam.user.read`, assignment/status/source aman.
 - GrantUserRoles: `iam.user.role.grant`; target ACTIVE, role/application ACTIVE,
   dan access ACTIVE untuk role bisnis. Batch set maksimum 20, all-or-nothing.
@@ -169,6 +176,10 @@ Acceptance: AC-08/11/12/13/24..26, AND-permission negative, atomic rollback,
 compound changed_role_ids, permission state berubah tanpa mencabut sesi.
 
 ## 8. Increment E — Effective permission reads
+
+Backend E COMPLETE,24/24 tasks; required workspace/standalone test/vet/race/build dan PostgreSQL normal/race PASS. Contract E published/pinned `v0.0.0-20261014032725-545701c82e22`; production inventory35 methods. Lihat [API](effective-permission-api.md) dan [evidence E](../openspec/changes/archive/2026-10-14-auth-effective-permission-reads/evidence/progress.md). DEP-01 tetap gate deployment terpisah.
+
+Keputusan user14 Oktober2026: application_code opsional dan dibatasi namespace caller; unknown/inactive yang diizinkan menghasilkan union kosong. Admin boleh melihat retained union assignment/role ACTIVE untuk target nonaktif dengan user_status; ini bukan izin akses atau rekonstruksi revoked history.
 
 GetMyEffectivePermissions memakai verified self; GetUserEffectivePermissions
 memerlukan `iam.user.read`. Keduanya mengembalikan union permission serta

@@ -37,3 +37,13 @@ func TestCatalogReadHandlers(t *testing.T) { testutils.Run(t, test_scenarios.Cat
 func TestRoleManagementHandlers(t *testing.T) {
 	testutils.Run(t, test_scenarios.RoleManagementHandlers())
 }
+
+func TestAssignmentHandlers(t *testing.T) { testutils.Run(t, test_scenarios.AssignmentHandlers()) }
+
+func TestApplicationHandlers(t *testing.T) { testutils.Run(t, test_scenarios.ApplicationHandlers()) }
+
+func TestEffectivePermissions(t *testing.T) { testutils.Run(t, test_scenarios.EffectivePermissions()) }
+
+func TestAccessEvaluation(t *testing.T) { testutils.Run(t, test_scenarios.AccessEvaluation()) }
+
+func TestAuditLogReads(t *testing.T) { testutils.Run(t, test_scenarios.AuditLogReads()) }

@@ -1,0 +1,17 @@
+{
+  "label": "stage2-full",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./..."
+  ],
+  "started_at": "2026-10-13T02:59:55.757275+00:00",
+  "seconds": 1.646,
+  "exit_code": 0,
+  "log": "/tmp/ecs-stage2-full.log",
+  "passed_tests": 2689,
+  "failed_tests": [],
+  "skipped_tests": []
+}

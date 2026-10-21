@@ -1,0 +1,26 @@
+{
+  "label": "stage2-targeted",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./tests/features/common/...",
+    "./tests/features/user/...",
+    "./tests/features/role/...",
+    "./tests/features/catalog/...",
+    "./tests/features/auth_feature/...",
+    "./tests/features/session/...",
+    "./tests/integration/auth_reads/...",
+    "./tests/handler/...",
+    "./tests/repositories/domain/assignment/...",
+    "./tests/repositories/assignment/..."
+  ],
+  "started_at": "2026-10-13T02:59:37.179826+00:00",
+  "seconds": 2.543,
+  "exit_code": 0,
+  "log": "/tmp/ecs-stage2-targeted.log",
+  "passed_tests": 2044,
+  "failed_tests": [],
+  "skipped_tests": []
+}

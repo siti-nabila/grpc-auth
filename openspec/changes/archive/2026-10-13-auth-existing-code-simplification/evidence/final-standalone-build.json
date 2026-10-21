@@ -1,0 +1,13 @@
+{
+  "label": "final-standalone-build",
+  "mode": "standalone",
+  "command": [
+    "make",
+    "build"
+  ],
+  "started_at": "2026-10-13T03:11:30.922076+00:00",
+  "seconds": 2.024,
+  "exit_code": 0,
+  "log": "/tmp/ecs-final-standalone-build.log",
+  "source_identity": "f322bc405eea1f8773dd60220c1e233f21b91b6cd7c17ecc4dd88a085aa892cf"
+}

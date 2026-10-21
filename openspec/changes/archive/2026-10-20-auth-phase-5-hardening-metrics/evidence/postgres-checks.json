@@ -1,0 +1,170 @@
+[
+  {
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "-tags=postgres",
+      "./tests/integration/postgres",
+      "-count=1",
+      "-race",
+      "-run=TestPostgres(RuntimeMetrics|CommitAcknowledgement)"
+    ],
+    "mode": "workspace",
+    "environment": "dedicated guarded grpc_auth_test from env-test.yaml; credentials omitted",
+    "started_utc": "2026-10-20T08:21:46Z",
+    "ended_utc": "2026-10-20T08:21:52Z",
+    "source_digest": "7395c3e9d90f38878165fca87ed753cc09009d437ef81deaf62ffdc945a96384",
+    "exit_code": 0,
+    "passed": 6,
+    "failed": [
+
+    ],
+    "skipped": [
+
+    ]
+  },
+  {
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "-tags=postgres",
+      "./tests/integration/postgres",
+      "-count=1",
+      "-run=TestPostgres(RuntimeMetrics|CommitAcknowledgement|UserManagement|RoleManagement|AssignmentManagement|ApplicationManagement)"
+    ],
+    "mode": "workspace",
+    "environment": "dedicated guarded grpc_auth_test from env-test.yaml; credentials omitted",
+    "started_utc": "2026-10-20T08:31:06Z",
+    "ended_utc": "2026-10-20T08:31:22Z",
+    "source_digest": "c971303bd164596c72bd779e601ef89fe11b59c1943ce360b047ae3b339887cb",
+    "exit_code": 0,
+    "passed": 160,
+    "failed": [
+
+    ],
+    "skipped": [
+
+    ]
+  },
+  {
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "-tags=postgres",
+      "./tests/integration/postgres",
+      "-count=1",
+      "-race",
+      "-run=TestPostgres(RuntimeMetrics|CommitAcknowledgement|UserManagement|RoleManagement|AssignmentManagement|ApplicationManagement)"
+    ],
+    "mode": "workspace",
+    "environment": "dedicated guarded grpc_auth_test from env-test.yaml; credentials omitted",
+    "started_utc": "2026-10-20T08:32:43Z",
+    "ended_utc": "2026-10-20T08:33:48Z",
+    "source_digest": "c971303bd164596c72bd779e601ef89fe11b59c1943ce360b047ae3b339887cb",
+    "exit_code": 0,
+    "passed": 160,
+    "failed": [
+
+    ],
+    "skipped": [
+
+    ]
+  },
+  {
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "-tags=postgres",
+      "./tests/integration/postgres",
+      "-count=1"
+    ],
+    "mode": "workspace",
+    "environment": "dedicated guarded grpc_auth_test from env-test.yaml; credentials omitted",
+    "started_utc": "2026-10-20T08:35:20Z",
+    "ended_utc": "2026-10-20T08:36:51Z",
+    "source_digest": "c971303bd164596c72bd779e601ef89fe11b59c1943ce360b047ae3b339887cb",
+    "exit_code": 0,
+    "passed": 589,
+    "failed": [
+
+    ],
+    "skipped": [
+
+    ]
+  },
+  {
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "-tags=postgres",
+      "./tests/integration/postgres",
+      "-count=1",
+      "-race"
+    ],
+    "mode": "workspace",
+    "environment": "dedicated guarded grpc_auth_test from env-test.yaml; credentials omitted",
+    "started_utc": "2026-10-20T08:38:37Z",
+    "ended_utc": "2026-10-20T08:41:27Z",
+    "source_digest": "c971303bd164596c72bd779e601ef89fe11b59c1943ce360b047ae3b339887cb",
+    "exit_code": 0,
+    "passed": 589,
+    "failed": [
+
+    ],
+    "skipped": [
+
+    ]
+  },
+  {
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "-tags=postgres",
+      "./tests/integration/postgres",
+      "-count=1"
+    ],
+    "mode": "standalone",
+    "environment": "dedicated guarded grpc_auth_test from env-test.yaml; credentials omitted",
+    "started_utc": "2026-10-20T08:44:12Z",
+    "ended_utc": "2026-10-20T08:44:56Z",
+    "source_digest": "c971303bd164596c72bd779e601ef89fe11b59c1943ce360b047ae3b339887cb",
+    "exit_code": 0,
+    "passed": 589,
+    "failed": [
+
+    ],
+    "skipped": [
+
+    ]
+  },
+  {
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "-tags=postgres",
+      "./tests/integration/postgres",
+      "-count=1",
+      "-race"
+    ],
+    "mode": "standalone",
+    "environment": "dedicated guarded grpc_auth_test from env-test.yaml; credentials omitted",
+    "started_utc": "2026-10-20T08:44:56Z",
+    "ended_utc": "2026-10-20T08:47:46Z",
+    "source_digest": "c971303bd164596c72bd779e601ef89fe11b59c1943ce360b047ae3b339887cb",
+    "exit_code": 0,
+    "passed": 589,
+    "failed": [
+
+    ],
+    "skipped": [
+
+    ]
+  }
+]

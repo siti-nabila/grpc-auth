@@ -2,6 +2,7 @@ package test_scenarios
 
 import (
 	"context"
+	applicationv1 "github.com/siti-nabila/api-contracts/pb/application/v1"
 	sessionv1 "github.com/siti-nabila/api-contracts/pb/session/v1"
 	userv1 "github.com/siti-nabila/api-contracts/pb/user/v1"
 	"github.com/siti-nabila/api-contracts/pkg/dictionary/common"
@@ -27,8 +28,8 @@ func roleRateGroups(t *testing.T) {
 		methods []string
 		burst   int
 	}{
-		{append([]string{userv1.UserService_GetUser_FullMethodName, sessionv1.SessionService_ListMySessions_FullMethodName}, methods[0], methods[1], methods[6], methods[7]), 20},
-		{append([]string{userv1.UserService_UpdateUser_FullMethodName, sessionv1.SessionService_RevokeUserSession_FullMethodName}, methods[2:6]...), 5},
+		{append([]string{userv1.UserService_GetMyEffectivePermissions_FullMethodName, userv1.UserService_GetUserEffectivePermissions_FullMethodName, userv1.UserService_ListUserApplicationAccess_FullMethodName, userv1.UserService_ListUserRoles_FullMethodName, userv1.UserService_GetUser_FullMethodName, sessionv1.SessionService_ListMySessions_FullMethodName}, methods[0], methods[1], methods[6], methods[7]), 20},
+		{append([]string{applicationv1.ApplicationService_GrantApplicationAccess_FullMethodName, applicationv1.ApplicationService_RevokeApplicationAccess_FullMethodName, userv1.UserService_GrantUserRoles_FullMethodName, userv1.UserService_RevokeUserRoles_FullMethodName, userv1.UserService_UpdateUser_FullMethodName, sessionv1.SessionService_RevokeUserSession_FullMethodName}, methods[2:6]...), 5},
 	} {
 		store, _ := ratelimit.NewStore(func() time.Time { return shared.ServiceTime })
 		boundary, e := interceptors.NewAuthRateInterceptor(store, []byte("test-only-secret"), rateEncoder())

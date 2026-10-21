@@ -39,7 +39,7 @@ func userListFixture(t *testing.T) (context.Context, *fixtures.Schema, jwt.Verif
  INSERT INTO permissions(application_id,code,description) VALUES(1,'iam.user.read','fixture');
  INSERT INTO role(role_name,role_code,application_id,code) VALUES('Reader',2,1,'iam.reader'),('Auditor',3,1,'iam.auditor'),('Writer',4,1,'iam.writer'),('Hidden',5,1,'iam.hidden');
  UPDATE role SET status='DISABLED' WHERE id=5;
- INSERT INTO role_permissions VALUES(2,1);
+ INSERT INTO role_permissions(role_id,permission_id) VALUES(2,1);
  INSERT INTO user_role(user_id,role_id) VALUES(1,2);
  INSERT INTO auth(email,password,status,version,created_at) VALUES
  ('alice@example.test','fixture-not-a-login-hash','ACTIVE',2,'2026-01-02'),
@@ -266,7 +266,7 @@ func postgresUserListSnapshot(t *testing.T) {
 		t.Fatal(e)
 	}
 	defer tx.Rollback()
-	if _, e = tx.ExecContext(ctx, `DELETE FROM role_permissions WHERE role_id=2; UPDATE role SET role_name='Changed after snapshot' WHERE id=3; UPDATE profile SET name='Changed after snapshot' WHERE user_id=2; INSERT INTO auth(email,password) VALUES('new-after-snapshot@example.test','fixture-not-a-login-hash')`); e != nil {
+	if _, e = tx.ExecContext(ctx, `UPDATE role_permissions SET deleted_at=CURRENT_TIMESTAMP WHERE role_id=2; UPDATE role SET role_name='Changed after snapshot' WHERE id=3; UPDATE profile SET name='Changed after snapshot' WHERE user_id=2; INSERT INTO auth(email,password) VALUES('new-after-snapshot@example.test','fixture-not-a-login-hash')`); e != nil {
 		t.Fatal(e)
 	}
 	if e = tx.Commit(); e != nil {

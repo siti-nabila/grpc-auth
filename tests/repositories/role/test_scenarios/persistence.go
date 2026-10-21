@@ -26,6 +26,8 @@ var permissionColumns = []string{"id", "application_id", "application_code", "co
 
 func Persistence() []testutils.Scenario {
 	return []testutils.Scenario{
+		{Name: "mapping inventory retains active and deleted pairs on one primary handle", Run: mappingInventory},
+		{Name: "conditional mapping writes preserve strict counts and dependency causes", Run: mappingWrites},
 		{Name: "role readers preserve safe fields and use one supplied handle", Run: roleReads},
 		{Name: "missing and dependency reads preserve distinct semantics", Run: roleReadErrors},
 		{Name: "sequence create conditional update and final mappings share one transaction", Run: roleWrites},
@@ -146,10 +148,11 @@ func roleWrites(t *testing.T) {
 		{Op: "query", SQL: "INSERT INTO role (role_name, role_description, application_id, code, status, is_system, version)", Args: []driver.Value{"Editor", nil, int64(2), "sales.editor", "ACTIVE", false, int64(1)}, Columns: []string{"id"}, Rows: [][]driver.Value{{int64(7)}}},
 		{Op: "query", SQL: "FROM role r", Args: []driver.Value{int64(7)}, Columns: roleColumns, Rows: [][]driver.Value{created}},
 		{Op: "exec", SQL: "UPDATE role SET role_name = $1, role_description = $2, status = $3, version = $4, updated_at = $5 WHERE id = $6 AND version = $7", Args: []driver.Value{"Edited", nil, "ACTIVE", int64(2), at, int64(7), int64(1)}},
-		{Op: "exec", SQL: "DELETE FROM role_permissions WHERE role_id = $1", Args: []driver.Value{int64(7)}, Result: driver.RowsAffected(2)},
-		{Op: "exec", SQL: "INSERT INTO role_permissions (role_id, permission_id)", Args: []driver.Value{int64(7), int64(8)}},
-		{Op: "exec", SQL: "INSERT INTO role_permissions (role_id, permission_id)", Args: []driver.Value{int64(7), int64(9)}},
-		{Op: "exec", SQL: "DELETE FROM role_permissions WHERE role_id = $1", Args: []driver.Value{int64(7)}, Result: driver.RowsAffected(2)},
+
+		{Op: "exec", SQL: "INSERT INTO role_permissions (role_id, permission_id, deleted_at)", Args: []driver.Value{int64(7), int64(8), nil}},
+		{Op: "exec", SQL: "INSERT INTO role_permissions (role_id, permission_id, deleted_at)", Args: []driver.Value{int64(7), int64(9), nil}},
+		{Op: "exec", SQL: "AND deleted_at IS NULL", Args: []driver.Value{at, int64(7), int64(8)}},
+		{Op: "exec", SQL: "AND deleted_at IS NULL", Args: []driver.Value{at, int64(7), int64(9)}},
 	}, func(ctx context.Context, tx domain.Transaction) {
 		w := writer.NewRoleManagementWriter(tx)
 		role, err := w.CreateRole(ctx, domain.RoleSummary{Code: "sales.editor", Name: "Editor", ApplicationID: 2, ApplicationCode: "sales", Status: types.RoleActive, Version: 1})
@@ -163,14 +166,14 @@ func roleWrites(t *testing.T) {
 		if err != nil || !ok {
 			t.Fatalf("update %v %v", ok, err)
 		}
-		ids := []uint64{9, 8}
-		if err = w.ReplacePermissions(ctx, 7, ids); err != nil {
+		ids := []uint64{8, 9}
+		if err = w.ReplacePermissions(ctx, 7, domain.RolePermissionChanges{Inserted: ids}, at); err != nil {
 			t.Fatal(err)
 		}
-		if ids[0] != 9 {
+		if ids[0] != 8 {
 			t.Fatal("mutated caller ids")
 		}
-		if err = w.ReplacePermissions(ctx, 7, nil); err != nil {
+		if err = w.ReplacePermissions(ctx, 7, domain.RolePermissionChanges{Removed: []uint64{8, 9}}, at); err != nil {
 			t.Fatal(err)
 		}
 	})
@@ -179,7 +182,7 @@ func roleWrites(t *testing.T) {
 func roleWriteErrors(t *testing.T) {
 	unique := &pq.Error{Code: "23505"}
 	cause := errors.New("controlled write failure")
-	for _, name := range []string{"duplicate", "insert failure", "zero rows", "many rows", "delete failure", "mapping failure"} {
+	for _, name := range []string{"duplicate", "insert failure", "zero rows", "many rows", "soft-delete failure", "mapping failure"} {
 		t.Run(name, func(t *testing.T) {
 			step := mocks.SQLStep{Op: "query", SQL: "INSERT INTO role", Args: []driver.Value{"Editor", nil, int64(2), "sales.editor", "ACTIVE", false, int64(1)}, Error: cause}
 			steps := []mocks.SQLStep{}
@@ -195,12 +198,12 @@ func roleWriteErrors(t *testing.T) {
 					step.Result = driver.RowsAffected(2)
 					want = common.ErrDependencyUnavailable
 				}
-			case "delete failure", "mapping failure":
-				step = mocks.SQLStep{Op: "exec", SQL: "DELETE FROM role_permissions", Args: []driver.Value{int64(7)}, Error: cause}
+			case "soft-delete failure", "mapping failure":
+				step = mocks.SQLStep{Op: "exec", SQL: "UPDATE role_permissions", Args: []driver.Value{time.Unix(100, 0).UTC(), int64(7), int64(8)}, Error: cause}
 				if name == "mapping failure" {
 					step.Error = nil
 					steps = append(steps, step)
-					step = mocks.SQLStep{Op: "exec", SQL: "INSERT INTO role_permissions", Args: []driver.Value{int64(7), int64(9)}, Error: cause}
+					step = mocks.SQLStep{Op: "exec", SQL: "INSERT INTO role_permissions", Args: []driver.Value{int64(7), int64(9), nil}, Error: cause}
 				}
 			}
 			steps = append(steps, step)
@@ -215,8 +218,8 @@ func roleWriteErrors(t *testing.T) {
 					if ok {
 						t.Fatal("accepted unexpected affected rows")
 					}
-				case "delete failure", "mapping failure":
-					err = w.ReplacePermissions(ctx, 7, []uint64{9})
+				case "soft-delete failure", "mapping failure":
+					err = w.ReplacePermissions(ctx, 7, domain.RolePermissionChanges{Removed: []uint64{8}, Inserted: []uint64{9}}, time.Unix(100, 0))
 				default:
 					_, err = w.CreateRole(ctx, domain.RoleSummary{Name: "Editor", Code: "sales.editor", ApplicationID: 2, ApplicationCode: "sales", Status: types.RoleActive, Version: 1})
 				}
@@ -259,7 +262,7 @@ func roleRepositoryGuards(t *testing.T) {
 	if !errors.Is(err, common.ErrDependencyUnavailable) {
 		t.Fatal(err)
 	}
-	if err = w.ReplacePermissions(ctx, 7, nil); !errors.Is(err, common.ErrDependencyUnavailable) {
+	if err = w.ReplacePermissions(ctx, 7, domain.RolePermissionChanges{Removed: []uint64{8, 9}}, time.Unix(100, 0)); !errors.Is(err, common.ErrDependencyUnavailable) {
 		t.Fatal(err)
 	}
 	ctx, cancel := context.WithCancel(ctx)
@@ -268,7 +271,7 @@ func roleRepositoryGuards(t *testing.T) {
 	if !errors.Is(err, context.Canceled) {
 		t.Fatal(err)
 	}
-	if err = w.ReplacePermissions(ctx, 7, nil); !errors.Is(err, context.Canceled) {
+	if err = w.ReplacePermissions(ctx, 7, domain.RolePermissionChanges{Removed: []uint64{8, 9}}, time.Unix(100, 0)); !errors.Is(err, context.Canceled) {
 		t.Fatal(err)
 	}
 }

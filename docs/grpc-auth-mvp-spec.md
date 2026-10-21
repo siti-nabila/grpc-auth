@@ -577,6 +577,16 @@ trace metadata, deadline dan cancellation dipropagasikan sampai repository.
 
 ## 8. Rate limiter local MVP
 
+Keputusan user 20 Oktober 2026: semua 37 registered RPC menambahkan stage
+service-ingress **600 request/menit, burst 100 per verified service/process**
+setelah TLS/service/method authentication dan sebelum Attempt/Session. Termasuk
+Logout, self/admin revoke dan TesRPC. Quota identity pada tabel di bawah tetap;
+stage service tidak direfund pada downstream denial/validation/cancel atau
+identity rate rejection. Early rejection mengikuti RATE_LIMITED/RESOURCE_EXHAUSTED
+dan positive RetryInfo, tanpa DB/session/audit/handler work. Shared store tetap
+10.000 entries/TTL 15 menit/cleanup 1 menit. Ini approved local aggregate policy,
+bukan quota global atau batas total concurrent connections.
+
 Token bucket process-local, concurrency-safe. Angka ini konfigurasi awal local
 MVP, bukan benchmark/limit produksi; restart boleh reset state dan reload config.
 Setiap bucket independen berikut wajib lolos; service trust diverifikasi dulu.

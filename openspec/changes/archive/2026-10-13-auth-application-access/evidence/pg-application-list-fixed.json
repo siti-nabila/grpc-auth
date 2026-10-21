@@ -1,0 +1,24 @@
+{
+  "label": "pg-application-list-fixed",
+  "mode": "workspace",
+  "command": [
+    "/tmp/auth-assignment-postgres",
+    "test",
+    "test",
+    "-json",
+    "-tags",
+    "postgres",
+    "-count=1",
+    "./tests/integration/postgres/...",
+    "-run",
+    "TestPostgresApplication"
+  ],
+  "started_at": "2026-10-13T08:05:23.546927+00:00",
+  "seconds": 6.408,
+  "exit_code": 0,
+  "log": "/tmp/aap-pg-application-list-fixed.log",
+  "source_identity": "6f4785908f57d13a9411275678eb24c709673f073ce4a433268cd4c17fcf3cd7",
+  "passed_tests": 41,
+  "failed_tests": [],
+  "skipped_tests": []
+}

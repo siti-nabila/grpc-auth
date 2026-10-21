@@ -9,6 +9,7 @@ import (
 	permissionv1 "github.com/siti-nabila/api-contracts/pb/permission/v1"
 	rolev1 "github.com/siti-nabila/api-contracts/pb/role/v1"
 	sessionv1 "github.com/siti-nabila/api-contracts/pb/session/v1"
+	userv1 "github.com/siti-nabila/api-contracts/pb/user/v1"
 	"github.com/siti-nabila/api-contracts/pkg/dictionary/auth"
 	"github.com/siti-nabila/api-contracts/pkg/dictionary/common"
 	"github.com/siti-nabila/grpc-auth/internal/interceptors"
@@ -32,6 +33,7 @@ func Lifecycle() []testutils.Scenario {
 	cases := []testutils.Scenario{{Name: "refresh applicable bucket admission is atomic and early failures use only IP", Run: refreshRate}}
 	methods := []string{authv1.AuthService_RefreshSession_FullMethodName, authv1.AuthService_Logout_FullMethodName, authv1.AuthService_ChangePassword_FullMethodName, sessionv1.SessionService_ListMySessions_FullMethodName, sessionv1.SessionService_ListUserSessions_FullMethodName, sessionv1.SessionService_RevokeMySession_FullMethodName, sessionv1.SessionService_RevokeAllMySessions_FullMethodName, sessionv1.SessionService_RevokeUserSession_FullMethodName, sessionv1.SessionService_RevokeAllUserSessions_FullMethodName}
 	methods = append(methods, rolePolicyMethods()...)
+	methods = append(methods, userv1.UserService_ListUserRoles_FullMethodName, userv1.UserService_GrantUserRoles_FullMethodName, userv1.UserService_RevokeUserRoles_FullMethodName)
 	for _, method := range methods {
 		for _, kind := range []string{"success", "restricted", "missing", "duplicate", "expired", "revoked", "dependency", "namespace"} {
 			cases = append(cases, testutils.Scenario{Name: method + " " + kind, Run: func(t *testing.T) {

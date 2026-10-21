@@ -10,6 +10,8 @@ Mengambil keputusan permission dan ownership dari state primary yang konsisten d
 
 Permission SHALL merupakan union mapping dari assignment ACTIVE dan role ACTIVE pada primary database, dengan contributing roles dipertahankan. Business application permission SHALL juga memerlukan application ACTIVE dan application access ACTIVE milik user. Role code numerik tertentu, wildcard, inheritance, direct grant, JWT role snapshot, event atau cache MUST tidak menjadi bypass. IAM self-service MUST tidak memerlukan admin role atau IAM application grant.
 
+Only role-permission mappings with deleted_at NULL SHALL contribute. A retained soft-deleted mapping SHALL not grant authority even when its role, assignment and application remain ACTIVE or the role is disabled and later enabled. Restoration SHALL contribute only after a committed authorized replacement and only under the existing account/session/application/access gates.
+
 #### Scenario: Two active roles contribute the same permission
 
 - **WHEN** dua role aktif memberi permission yang sama dan satu assignment dicabut sebelum evaluasi berikutnya
@@ -24,6 +26,14 @@ Permission SHALL merupakan union mapping dari assignment ACTIVE dan role ACTIVE 
 
 - **WHEN** active verified user/session tanpa IAM admin role atau IAM app grant memanggil Me atau UpdateProfile yang memenuhi restricted/ownership policy
 - **THEN** self-service tidak ditolak hanya karena tidak mempunyai privilege admin
+
+#### Scenario: Soft-deleted actor permission cannot authorize a new request
+- **WHEN** the sole mapping supplying an actor permission is soft-deleted and committed before the next protected read, mutation or replay recheck
+- **THEN** the operation lacks that permission even with still-valid credentials, without revoking the session or increasing auth_version
+
+#### Scenario: Restored mapping remains subject to business access
+- **WHEN** a mapping is restored but its business application access is REVOKED
+- **THEN** restoration alone grants no effective permission
 
 ### Requirement: Existing methods enforce exact permission and self ownership
 
@@ -88,3 +98,16 @@ Feature mutation SHALL memeriksa ulang actor/user/session/ownership/permission y
 - **THEN** consumer tidak mengembalikan replay yang melewati current authorization
 
 Evidence: [SAF-03..06, SAF-10..11](../../changes/archive/2026-10-10-auth-session-authorization-foundation/design.md#acceptance-dan-evidence-ledger). Phase 2 management/EvaluateAccess RPC tidak dibuat; resolver/read/recheck evidence hanya subset AC-09..13/23/27/31, bukan full management flow PASS.
+
+## Traceability
+
+ORM persistence and mapping-history scope: grpc-auth adapters/business/schema;
+ORM composition/write-result capability: sibling ORM. [ORM-01..07 acceptance
+ledger](../../changes/archive/2026-10-16-auth-repository-orm-only/design.md#acceptance-ledger)
+and [verification evidence](../../changes/archive/2026-10-16-auth-repository-orm-only/evidence/progress.md)
+record PASS against the published ORM and compatible nullable schema, including
+standalone/workspace checks and dedicated PostgreSQL normal/race verification.
+AC-09/10/13/21–26/31 and M-02/05/07/08/09/10/11 keep their existing meaning.
+[Application migration evidence](../../changes/archive/2026-10-16-auth-repository-orm-only/evidence/user-database-migration.json)
+records the separately authorized expansion; consuming-client/deployment Phase 6
+DEP-01 remains separate.

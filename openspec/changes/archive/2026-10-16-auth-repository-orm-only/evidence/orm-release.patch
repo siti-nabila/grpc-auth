@@ -1,0 +1,779 @@
+diff --git a/docs/create-update.id.md b/docs/create-update.id.md
+index 7d2190c..6a7b9ce 100644
+--- a/docs/create-update.id.md
++++ b/docs/create-update.id.md
+@@ -250,3 +250,22 @@ transaksi juga menyediakan `DryRunUpdateBulk`.
+ ## Belum Diimplementasikan
+ 
+ API delete bukan bagian dari repositori ini.
++
++## Hasil INSERT tanpa pengisian generated ID
++
++```go
++result, err := tx.CreateWith(&assignment).ExecResult()
++if err != nil {
++    return err
++}
++rows, err := result.RowsAffected()
++```
++
++ExecResult memakai mapper, dialect builder dan SQL/args yang sama dengan
++CreateWith(...).DryRun() tanpa returning (Mode=exec). Hasil eksekusi dan error
++diteruskan ke caller; method tidak membaca LastInsertId, mengisi primary key,
++atau melakukan commit/rollback. Caller memutuskan makna count nol/lebih dari
++satu dan error RowsAffected. WithReturning ditolak sebelum eksekusi.
++Create, Exec, Scan, ScanInto dan DryRun existing tetap kompatibel. Gunakan model
++khusus INSERT untuk mempertahankan default kolom yang tidak disertakan; nilai
++nol dan nullable mengikuti aturan mapper existing.
+diff --git a/docs/create-update.md b/docs/create-update.md
+index acdc1f3..8e0aaf9 100644
+--- a/docs/create-update.md
++++ b/docs/create-update.md
+@@ -251,3 +251,22 @@ adapter also exposes `DryRunUpdateBulk`.
+ ## Not Implemented
+ 
+ Delete APIs are not part of this repository.
++
++## Insert result without generated ID
++
++```go
++result, err := tx.CreateWith(&assignment).ExecResult()
++if err != nil {
++    return err
++}
++rows, err := result.RowsAffected()
++```
++
++`ExecResult` uses the same mapper, dialect builder and SQL/args as
++`tx.CreateWith(&assignment).DryRun()` without returning intent (`Mode=exec`).
++It returns the execution result/error and does not read LastInsertId, assign a
++primary key, or finalize the transaction. Callers decide whether zero/multiple
++rows or a RowsAffected error are acceptable. WithReturning is rejected before
++execution. Existing Create, Exec, Scan, ScanInto and DryRun keep their behavior.
++Use an insert-specific model to preserve omitted database defaults; explicit
++zero values and nullable fields follow the existing mapper rules.
+diff --git a/docs/query-builder.id.md b/docs/query-builder.id.md
+index a438e7d..704c87f 100644
+--- a/docs/query-builder.id.md
++++ b/docs/query-builder.id.md
+@@ -180,3 +180,39 @@ err := db.UseModel(User{}).
+     Where("email = ?", email).
+     First(&user)
+ ```
++
++## Komposisi subquery
++
++Susun child builder melalui transaction yang sama. Child disimpan sebagai
++snapshot: perubahan builder asal sesudah komposisi tidak mengubah parent.
++Dialect, placeholder, identifier quoting dan urutan argument mengikuti parent,
++termasuk offset setelah nilai SET pada UPDATE. Child nil/invalid atau alias
++invalid menghasilkan error sebelum eksekusi. Alias derived table harus berupa
++identifier sederhana dan tidak memakai AS.
++
++```go
++eligible := tx.UseModel(UserRole{}).
++    Select("user_id").Where("status = ?", "ACTIVE")
++
++q := tx.UseModel(User{}).
++    WhereExists(tx.UseModel(UserRole{}).
++        Select("user_id").Where("user_id = users.id").Where("status = ?", "ACTIVE"))
++
++q = q.WhereInQuery("users.id", eligible)
++q = q.WhereNotExists(tx.UseModel(UserRole{}).
++    Select("user_id").Where("user_id = users.id").Where("status = ?", "REVOKED"))
++
++names := tx.UseModel(UserRole{}).
++    Select("user_id", "MIN(role_name) AS first_name").
++    Where("status = ?", "ACTIVE").GroupBy("user_id")
++q = q.LeftJoinQuery(names, "role_names", "role_names.user_id = users.id")
++
++preview, err := q.DryRun()
++count, err := q.DryRunCount()
++```
++
++DryRun, count dan pagination tidak mengubah builder asal. WhereExists,
++WhereNotExists dan WhereInQuery juga tersedia pada Updates/DryRunUpdates.
++Column, projection, correlation dan ON tetap berupa expression tepercaya seperti
++Where existing; whitelist identifier dan bind nilai request sebagai argument.
++Caller tidak perlu menulis SELECT utuh atau mengganti placeholder sendiri.
+diff --git a/docs/query-builder.md b/docs/query-builder.md
+index fbc7f5c..222f1e1 100644
+--- a/docs/query-builder.md
++++ b/docs/query-builder.md
+@@ -180,3 +180,38 @@ err := db.UseModel(User{}).
+     Where("email = ?", email).
+     First(&user)
+ ```
++
++## Composable subqueries
++
++Compose child builders on the same transaction. Children are snapshots: later
++builder edits do not change a previously composed parent. Rendering uses the
++parent dialect, placeholder mode and identifier configuration, including nested
++arguments after UPDATE SET values. A nil/invalid child or invalid derived alias
++fails before execution. Derived aliases use a simple identifier without AS.
++
++```go
++eligible := tx.UseModel(UserRole{}).
++    Select("user_id").Where("status = ?", "ACTIVE")
++
++q := tx.UseModel(User{}).
++    WhereExists(tx.UseModel(UserRole{}).
++        Select("user_id").Where("user_id = users.id").Where("status = ?", "ACTIVE"))
++
++q = q.WhereInQuery("users.id", eligible)
++q = q.WhereNotExists(tx.UseModel(UserRole{}).
++    Select("user_id").Where("user_id = users.id").Where("status = ?", "REVOKED"))
++
++names := tx.UseModel(UserRole{}).
++    Select("user_id", "MIN(role_name) AS first_name").
++    Where("status = ?", "ACTIVE").GroupBy("user_id")
++q = q.LeftJoinQuery(names, "role_names", "role_names.user_id = users.id")
++
++preview, err := q.DryRun()
++count, err := q.DryRunCount()
++```
++
++`DryRun`, count and pagination preserve child/parent builders. `WhereExists`,
++`WhereNotExists` and `WhereInQuery` also work with `Updates` and `DryRunUpdates`.
++Expressions (columns, projections, correlations and ON) remain trusted SQL
++structure; bind request values and whitelist identifiers as with existing Where.
++Neither a complete SELECT string nor placeholder rewriting is needed in callers.
+diff --git a/query/build.go b/query/build.go
+index d75ff30..b85d9b5 100644
+--- a/query/build.go
++++ b/query/build.go
+@@ -90,8 +90,9 @@ func buildGroupCondition(
+ 	mode config.PlaceholderMode,
+ 	c GroupCondition,
+ 	startIdx int,
++	cfg config.Config,
+ ) (string, []any, int, error) {
+-	groupQuery, groupArgs, nextIdx, err := buildConditions(d, mode, c.Conditions, startIdx)
++	groupQuery, groupArgs, nextIdx, err := buildConditions(d, mode, c.Conditions, startIdx, cfg)
+ 	if err != nil {
+ 		return "", nil, startIdx, err
+ 	}
+@@ -120,6 +121,7 @@ func buildConditions(
+ 	mode config.PlaceholderMode,
+ 	conds []Condition,
+ 	startIdx int,
++	cfg config.Config,
+ ) (string, []any, int, error) {
+ 	if len(conds) == 0 {
+ 		return "", nil, startIdx, nil
+@@ -145,8 +147,20 @@ func buildConditions(
+ 				partIndex++
+ 			}
+ 
++		case subqueryCondition:
++			if c.prefix == "" {
++				return "", nil, startIdx, dictionary.ErrDBQueryEmpty
++			}
++			res, err := c.child.buildAt(cfg, d, mode, idx)
++			if err != nil {
++				return "", nil, startIdx, err
++			}
++			parts = appendConditionPart(parts, partIndex, c.operator, c.prefix+" ("+res.Query+")")
++			args = append(args, res.Args...)
++			idx += len(res.Args)
++			partIndex++
+ 		case GroupCondition:
+-			expr, exprArgs, nextIdx, err := buildGroupCondition(d, mode, c, idx)
++			expr, exprArgs, nextIdx, err := buildGroupCondition(d, mode, c, idx, cfg)
+ 			if err != nil {
+ 				return "", nil, startIdx, err
+ 			}
+@@ -257,18 +271,17 @@ func expandSliceArgsInQuery(query string, args []any) (string, []any, error) {
+ }
+ 
+ func (b *QueryBuilder) build() (QueryBuilderResult, error) {
+-	if b.orm == nil {
++	if b == nil || b.orm == nil {
+ 		return QueryBuilderResult{}, dictionary.ErrDBQueryEmpty
+ 	}
++	return b.buildAt(b.orm.Config(), b.orm.Dialect(), b.orm.PlaceholderMode(), 1)
++}
+ 
+-	if b.model == nil {
++func (b *QueryBuilder) buildAt(cfg config.Config, d dialect.Dialector, mode config.PlaceholderMode, start int) (QueryBuilderResult, error) {
++	if b == nil || b.model == nil {
+ 		return QueryBuilderResult{}, dictionary.ErrDBQueryEmpty
+ 	}
+ 
+-	cfg := b.orm.Config()
+-	d := b.orm.Dialect()
+-	mode := b.orm.PlaceholderMode()
+-
+ 	meta, err := mapper.Parse(b.model, cfg.UseSnakeCase)
+ 	if err != nil {
+ 		return QueryBuilderResult{}, err
+@@ -314,11 +327,13 @@ func (b *QueryBuilder) build() (QueryBuilderResult, error) {
+ 	selectQuery := strings.Join(selectParts, ", ")
+ 	query := fmt.Sprintf("%s %s FROM %s", selectKeyword, selectQuery, table)
+ 
+-	for _, j := range b.joins {
+-		query += " " + j.Type + " " + j.Table + " ON " + j.On
++	joinSQL, args, idx, err := b.buildJoins(cfg, d, mode, start)
++	if err != nil {
++		return QueryBuilderResult{}, err
+ 	}
+-
+-	whereQuery, args, nextIdx, err := buildConditions(d, mode, b.conditions, 1)
++	query += joinSQL
++	whereQuery, whereArgs, nextIdx, err := buildConditions(d, mode, b.conditions, idx, cfg)
++	args = append(args, whereArgs...)
+ 	if err != nil {
+ 		return QueryBuilderResult{}, err
+ 	}
+@@ -331,7 +346,7 @@ func (b *QueryBuilder) build() (QueryBuilderResult, error) {
+ 		query += " GROUP BY " + strings.Join(b.groupBys, ", ")
+ 	}
+ 
+-	havingQuery, havingArgs, _, err := buildConditions(d, mode, b.having, nextIdx)
++	havingQuery, havingArgs, _, err := buildConditions(d, mode, b.having, nextIdx, cfg)
+ 	if err != nil {
+ 		return QueryBuilderResult{}, err
+ 	}
+@@ -389,11 +404,13 @@ func (b *QueryBuilder) buildCount() (QueryBuilderResult, error) {
+ 
+ 	query := fmt.Sprintf("SELECT COUNT(*) FROM %s", table)
+ 
+-	for _, j := range b.joins {
+-		query += " " + j.Type + " " + j.Table + " ON " + j.On
++	joinSQL, args, idx, err := b.buildJoins(cfg, d, mode, 1)
++	if err != nil {
++		return QueryBuilderResult{}, err
+ 	}
+-
+-	whereQuery, args, _, err := buildConditions(d, mode, b.conditions, 1)
++	query += joinSQL
++	whereQuery, whereArgs, _, err := buildConditions(d, mode, b.conditions, idx, cfg)
++	args = append(args, whereArgs...)
+ 	if err != nil {
+ 		return QueryBuilderResult{}, err
+ 	}
+diff --git a/query/builder.go b/query/builder.go
+index b26ef2b..3f5f326 100644
+--- a/query/builder.go
++++ b/query/builder.go
+@@ -2,6 +2,7 @@ package query
+ 
+ import (
+ 	"context"
++	"reflect"
+ 
+ 	"github.com/siti-nabila/orm/builder"
+ 	"github.com/siti-nabila/orm/config"
+@@ -30,7 +31,7 @@ type (
+ 		limit               *int
+ 		offset              *int
+ 		orderBys            []string
+-		joins               []Join
++		joins               []builderJoin
+ 		selectExprs         []string
+ 		groupBys            []string
+ 		having              []Condition
+@@ -44,6 +45,11 @@ type (
+ 		Table string
+ 		On    string
+ 	}
++	builderJoin struct {
++		Join
++		child *QueryBuilder
++		alias string
++	}
+ )
+ 
+ func New(o ormQuery) *QueryBuilder {
+@@ -236,7 +242,10 @@ func (b *QueryBuilder) clone() *QueryBuilder {
+ 	cloned.selectCols = append([]string(nil), b.selectCols...)
+ 	cloned.conditions = cloneConditions(b.conditions)
+ 	cloned.orderBys = append([]string(nil), b.orderBys...)
+-	cloned.joins = append([]Join(nil), b.joins...)
++	cloned.joins = append([]builderJoin(nil), b.joins...)
++	for i := range cloned.joins {
++		cloned.joins[i].child = cloned.joins[i].child.clone()
++	}
+ 	cloned.selectExprs = append([]string(nil), b.selectExprs...)
+ 	cloned.groupBys = append([]string(nil), b.groupBys...)
+ 	cloned.having = cloneConditions(b.having)
+@@ -259,6 +268,17 @@ func cloneConditions(conditions []Condition) []Condition {
+ 		switch c := condition.(type) {
+ 		case ExpressionCondition:
+ 			c.Args = append([]any(nil), c.Args...)
++			for i, arg := range c.Args {
++				value := reflect.ValueOf(arg)
++				if value.IsValid() && value.Kind() == reflect.Slice && !value.IsNil() {
++					copied := reflect.MakeSlice(value.Type(), value.Len(), value.Len())
++					reflect.Copy(copied, value)
++					c.Args[i] = copied.Interface()
++				}
++			}
++			cloned = append(cloned, c)
++		case subqueryCondition:
++			c.child = c.child.clone()
+ 			cloned = append(cloned, c)
+ 		case GroupCondition:
+ 			c.Conditions = cloneConditions(c.Conditions)
+@@ -330,11 +350,11 @@ func (b *QueryBuilder) Join(table string, on string) *QueryBuilder {
+ 		return b
+ 	}
+ 
+-	b.joins = append(b.joins, Join{
++	b.joins = append(b.joins, builderJoin{Join: Join{
+ 		Type:  "JOIN",
+ 		Table: table,
+ 		On:    on,
+-	})
++	}})
+ 
+ 	return b
+ }
+@@ -344,11 +364,11 @@ func (b *QueryBuilder) LeftJoin(table string, on string) *QueryBuilder {
+ 		return b
+ 	}
+ 
+-	b.joins = append(b.joins, Join{
++	b.joins = append(b.joins, builderJoin{Join: Join{
+ 		Type:  "LEFT JOIN",
+ 		Table: table,
+ 		On:    on,
+-	})
++	}})
+ 
+ 	return b
+ }
+@@ -358,11 +378,11 @@ func (b *QueryBuilder) RightJoin(table string, on string) *QueryBuilder {
+ 		return b
+ 	}
+ 
+-	b.joins = append(b.joins, Join{
++	b.joins = append(b.joins, builderJoin{Join: Join{
+ 		Type:  "RIGHT JOIN",
+ 		Table: table,
+ 		On:    on,
+-	})
++	}})
+ 
+ 	return b
+ }
+diff --git a/query/update.go b/query/update.go
+index c807282..6abefdd 100644
+--- a/query/update.go
++++ b/query/update.go
+@@ -55,7 +55,7 @@ func (b *QueryBuilder) buildUpdate() (builder.UpdateQueryResult, error) {
+ 	)
+ 
+ 	if len(b.conditions) > 0 {
+-		whereQuery, whereArgs, _, err = buildConditions(d, mode, b.conditions, len(setCols)+1)
++		whereQuery, whereArgs, _, err = buildConditions(d, mode, b.conditions, len(setCols)+1, cfg)
+ 		if err != nil {
+ 			return builder.UpdateQueryResult{}, err
+ 		}
+diff --git a/orm/orm_adv_ins_result.go b/orm/orm_adv_ins_result.go
+new file mode 100644
+index 0000000..2af29a6
+--- /dev/null
++++ b/orm/orm_adv_ins_result.go
+@@ -0,0 +1,26 @@
++package orm
++
++import (
++	"database/sql"
++	"time"
++
++	"github.com/siti-nabila/orm/pkg/dictionary"
++)
++
++// ExecResult executes an insert without RETURNING or generated-ID assignment.
++// The driver result (including nil) and error are preserved for the caller.
++func (c *CreateCommand) ExecResult() (result sql.Result, err error) {
++	if c == nil || c.orm == nil {
++		return nil, dictionary.ErrDBQueryEmpty
++	}
++	if err = c.validateReturningMode(false); err != nil {
++		return nil, err
++	}
++	start := time.Now()
++	res, _, _, d, err := c.prepareCreateWith()
++	if err != nil {
++		return nil, err
++	}
++	defer func() { c.orm.log(res.Query, d, res.FilteredCols, res.Args, res.Mode, start, err) }()
++	return c.orm.executor.ExecContext(c.ctx, res.Query, res.Args...)
++}
+diff --git a/query/subquery.go b/query/subquery.go
+new file mode 100644
+index 0000000..b02b715
+--- /dev/null
++++ b/query/subquery.go
+@@ -0,0 +1,85 @@
++package query
++
++import (
++	"strings"
++
++	"github.com/siti-nabila/orm/config"
++	"github.com/siti-nabila/orm/dialect"
++	"github.com/siti-nabila/orm/pkg/dictionary"
++)
++
++type subqueryCondition struct {
++	operator ClauseOperator
++	prefix   string
++	child    *QueryBuilder
++}
++
++func (subqueryCondition) isCondition() {}
++
++// WhereExists snapshots child and renders it with the parent configuration.
++func (b *QueryBuilder) WhereExists(child *QueryBuilder) *QueryBuilder {
++	return b.whereSubquery("EXISTS", child)
++}
++
++func (b *QueryBuilder) WhereNotExists(child *QueryBuilder) *QueryBuilder {
++	return b.whereSubquery("NOT EXISTS", child)
++}
++
++func (b *QueryBuilder) WhereInQuery(column string, child *QueryBuilder) *QueryBuilder {
++	prefix := ""
++	if strings.TrimSpace(column) != "" {
++		prefix = column + " IN"
++	}
++	return b.whereSubquery(prefix, child)
++}
++
++func (b *QueryBuilder) whereSubquery(prefix string, child *QueryBuilder) *QueryBuilder {
++	b.conditions = append(b.conditions, subqueryCondition{ClauseAnd, prefix, child.clone()})
++	return b
++}
++
++// LeftJoinQuery snapshots a derived SELECT. Alias must be a simple identifier.
++// ON expressions follow the same trusted-expression contract as LeftJoin.
++func (b *QueryBuilder) LeftJoinQuery(child *QueryBuilder, alias, on string) *QueryBuilder {
++	b.joins = append(b.joins, builderJoin{Join: Join{Type: "LEFT JOIN", On: on}, child: child.clone(), alias: alias})
++	return b
++}
++
++func validSubqueryAlias(alias string) bool {
++	if alias == "" {
++		return false
++	}
++	for i, c := range alias {
++		if c != '_' && !(c >= 'a' && c <= 'z') && !(c >= 'A' && c <= 'Z') && !(i > 0 && c >= '0' && c <= '9') {
++			return false
++		}
++	}
++	return true
++}
++
++func (b *QueryBuilder) buildJoins(cfg config.Config, d dialect.Dialector, mode config.PlaceholderMode, start int) (string, []any, int, error) {
++	var sql strings.Builder
++	var args []any
++	idx := start
++	for _, j := range b.joins {
++		table := j.Table
++		if table == "" {
++			if !validSubqueryAlias(j.alias) || strings.TrimSpace(j.On) == "" {
++				return "", nil, start, dictionary.ErrDBQueryEmpty
++			}
++			res, err := j.child.buildAt(cfg, d, mode, idx)
++			if err != nil {
++				return "", nil, start, err
++			}
++			alias := j.alias
++			if cfg.QuoteIdentifier {
++				alias = d.QuoteIdentifier(alias)
++			}
++			table = "(" + res.Query + ") " + alias
++			args = append(args, res.Args...)
++			idx += len(res.Args)
++		}
++		sql.WriteString(" " + j.Type + " " + table + " ON " + j.On)
++	}
++	return sql.String(), args, idx, nil
++}
+diff --git a/test_scenarios/orm/create_result_test.go b/test_scenarios/orm/create_result_test.go
+new file mode 100644
+index 0000000..0f6a983
+--- /dev/null
++++ b/test_scenarios/orm/create_result_test.go
+@@ -0,0 +1,140 @@
++package orm_test
++
++import (
++	"context"
++	"database/sql"
++	"database/sql/driver"
++	"errors"
++	"reflect"
++	"strings"
++	"testing"
++
++	"github.com/siti-nabila/orm/builder"
++	"github.com/siti-nabila/orm/config"
++
++	"github.com/siti-nabila/orm/dialect"
++	"github.com/siti-nabila/orm/orm"
++)
++
++type resultInsert struct {
++	ID   uint64  `sql:"column:id;primaryKey"`
++	Flag int     `sql:"column:flag"`
++	Note *string `sql:"column:note"`
++}
++
++func (resultInsert) TableName() string { return "result_inserts" }
++
++type resultExecutor struct {
++	d      dialect.Dialector
++	ctx    context.Context
++	query  string
++	args   []any
++	result driver.Result
++	err    error
++	calls  int
++}
++
++func (e *resultExecutor) Connect(context.Context) (driver.Conn, error) { return &resultConn{e}, nil }
++func (e *resultExecutor) Driver() driver.Driver                        { return resultDriver{e} }
++
++type resultDriver struct{ e *resultExecutor }
++
++func (d resultDriver) Open(string) (driver.Conn, error) { return &resultConn{d.e}, nil }
++
++type resultConn struct{ e *resultExecutor }
++
++func (c *resultConn) Prepare(string) (driver.Stmt, error) { return nil, driver.ErrSkip }
++func (c *resultConn) Close() error                        { return nil }
++func (c *resultConn) Begin() (driver.Tx, error)           { return resultTx{}, nil }
++func (c *resultConn) ExecContext(ctx context.Context, q string, args []driver.NamedValue) (driver.Result, error) {
++	values := make([]any, len(args))
++	for i, a := range args {
++		values[i] = a.Value
++	}
++	return c.e.ExecContext(ctx, q, values...)
++}
++
++type resultTx struct{}
++
++func (resultTx) Commit() error   { return nil }
++func (resultTx) Rollback() error { return nil }
++func resultAdapter(t *testing.T, e *resultExecutor, ctx context.Context) *orm.SqlTransactionAdapter {
++	t.Helper()
++	conn := sql.OpenDB(e)
++	t.Cleanup(func() { conn.Close() })
++	tx, err := conn.BeginTx(ctx, nil)
++	if err != nil {
++		t.Fatal(err)
++	}
++	t.Cleanup(func() { tx.Rollback() })
++	return orm.NewSqlTransactionAdapter(ctx, tx, e.d, config.Config{UseSnakeCase: true})
++}
++func (e *resultExecutor) ExecContext(ctx context.Context, q string, args ...any) (driver.Result, error) {
++	e.calls++
++	e.ctx = ctx
++	e.query = q
++	e.args = args
++	return e.result, e.err
++}
++
++type resultFailure struct{ err error }
++
++func (r resultFailure) RowsAffected() (int64, error) { return 0, r.err }
++func (r resultFailure) LastInsertId() (int64, error) { panic("must not assign generated ID") }
++
++func TestCreateWithExecResultPreservesDryRunDriverResultAndContext(t *testing.T) {
++	cause := errors.New("controlled result failure")
++	for _, d := range []dialect.Dialector{dialect.NewPostgres(), dialect.NewMysql(), dialect.NewOracle()} {
++		t.Run(d.Name(), func(t *testing.T) {
++			for _, result := range []driver.Result{driver.RowsAffected(0), driver.RowsAffected(1), driver.RowsAffected(2), driver.RowsAffected(-1), resultFailure{cause}} {
++				e := &resultExecutor{d: d, result: result}
++
++				ctx := context.WithValue(context.Background(), struct{}{}, "request")
++				o := resultAdapter(t, e, ctx)
++				row := &resultInsert{}
++				cmd := o.CreateWith(row)
++				dry, err := cmd.DryRun()
++				if err != nil || dry.Mode != builder.DryRunModeExec || strings.Contains(dry.Query, "RETURNING") {
++					t.Fatal(dry, err)
++				}
++				got, err := cmd.ExecResult()
++				if err != nil || got == nil || e.ctx != ctx || e.calls != 1 || e.query != dry.Query || !reflect.DeepEqual(e.args, []any{int64(0), nil}) || len(dry.Args) != 2 || row.ID != 0 {
++					t.Fatal(got, err, e)
++				}
++				if result != nil {
++					a, ae := result.RowsAffected()
++					b, be := got.RowsAffected()
++					if a != b || !errors.Is(ae, be) {
++						t.Fatal(a, b, ae, be)
++					}
++				}
++			}
++			e := &resultExecutor{d: d, err: cause}
++			o := resultAdapter(t, e, context.Background())
++			if _, err := o.CreateWith(&resultInsert{}).ExecResult(); !errors.Is(err, cause) {
++				t.Fatal(err)
++			}
++			calls := e.calls
++			if _, err := o.CreateWith(&resultInsert{}).WithReturning("id").ExecResult(); err == nil || e.calls != calls {
++				t.Fatal("returning executed", err)
++			}
++			if _, err := o.CreateWith(nil).ExecResult(); err == nil || e.calls != calls {
++				t.Fatal("invalid model executed", err)
++			}
++		})
++	}
++}
++
++func TestExecResultCancellationAndNilCommand(t *testing.T) {
++	var nilCommand *orm.CreateCommand
++	if _, err := nilCommand.ExecResult(); err == nil {
++		t.Fatal("nil command accepted")
++	}
++	ctx, cancel := context.WithCancel(context.Background())
++	e := &resultExecutor{d: dialect.NewPostgres(), result: driver.RowsAffected(1)}
++	tx := resultAdapter(t, e, ctx)
++	cancel()
++	if _, err := tx.CreateWith(&resultInsert{}).ExecResult(); !errors.Is(err, context.Canceled) || e.calls != 0 {
++		t.Fatal(err, e.calls)
++	}
++}
+diff --git a/test_scenarios/query/subquery_test.go b/test_scenarios/query/subquery_test.go
+new file mode 100644
+index 0000000..9314c2d
+--- /dev/null
++++ b/test_scenarios/query/subquery_test.go
+@@ -0,0 +1,131 @@
++package query_test
++
++import (
++	"reflect"
++	"strings"
++	"testing"
++
++	"github.com/siti-nabila/orm/builder"
++	"github.com/siti-nabila/orm/config"
++	"github.com/siti-nabila/orm/dialect"
++	"github.com/siti-nabila/orm/pagination"
++	"github.com/siti-nabila/orm/query"
++)
++
++func TestComposedQueriesUseParentDialectAndOrderedArguments(t *testing.T) {
++	for _, d := range []dialect.Dialector{dialect.NewPostgres(), dialect.NewMysql(), dialect.NewOracle()} {
++		t.Run(d.Name(), func(t *testing.T) {
++			parent := &paginationTestORM{dialect: d}
++			// Deliberately different child dialect/configuration.
++			childORM := &paginationTestORM{dialect: dialect.NewMysql(), config: config.Config{QuoteIdentifier: true}}
++			child := query.New(childORM).Table(paginationTestUser{}).Select("id", "MIN(name) AS first_name").Where("name = ?", "join").GroupBy("id")
++			exists := query.New(childORM).Table(paginationTestUser{}).Select("id").Where("id = users.id").Where("name = ?", "exists")
++			q := query.New(parent).Table(paginationTestUser{}).LeftJoinQuery(child, "names", "names.id = users.id").WhereGroup(func(g *query.QueryBuilder) { g.WhereExists(exists).OrWhere("name = ?", "fallback") }).WhereInQuery("id", exists).WhereNotExists(exists).Where("name = ?", "parent").OrderBy("id ASC")
++			child.Where("name = ?", "later")
++			exists.Where("name = ?", "later")
++			before, err := q.DryRun()
++			if err != nil {
++				t.Fatal(err)
++			}
++			want := []any{"join", "exists", "fallback", "exists", "exists", "parent"}
++			if !reflect.DeepEqual(before.Args, want) || before.Mode != builder.DryRunModeQuery {
++				t.Fatalf("%+v", before)
++			}
++			for i := range want {
++				if !strings.Contains(before.Query, d.PlaceholderByNumber(i+1)) {
++					t.Fatal(before.Query)
++				}
++			}
++			for _, part := range []string{"LEFT JOIN (SELECT id, MIN(name) AS first_name FROM users", ") names ON", "GROUP BY id", "EXISTS (SELECT id FROM users WHERE id = users.id", "id IN (SELECT", "NOT EXISTS (SELECT"} {
++				if !strings.Contains(before.Query, part) {
++					t.Fatalf("missing %s in %s", part, before.Query)
++				}
++			}
++			page, err := q.DryRunScanPaginate(pagination.PaginationOptions{Page: 2, PerPage: 3})
++			if err != nil || !reflect.DeepEqual(page.Count.Args, want) || !reflect.DeepEqual(page.Data.Args, want) || strings.Contains(page.Count.Query, "ORDER BY") {
++				t.Fatalf("%+v %v", page, err)
++			}
++			after, err := q.DryRun()
++			if err != nil || !reflect.DeepEqual(before, after) {
++				t.Fatal("count/page mutated query", after, err)
++			}
++			own, err := child.DryRun()
++			if err != nil || len(own.Args) != 2 || !strings.Contains(own.Query, "`users`") {
++				t.Fatal(own, err)
++			}
++		})
++	}
++}
++
++func TestSubqueryUpdateOffsetsAndInvalidChildrenFailBeforeExecution(t *testing.T) {
++	for _, d := range []dialect.Dialector{dialect.NewPostgres(), dialect.NewMysql(), dialect.NewOracle()} {
++		t.Run(d.Name(), func(t *testing.T) {
++			f := &fakeORM{dialect: d, mode: config.PlaceholderByNumber}
++			child := query.New(f).Table(paginationTestUser{}).Select("id").Where("name = ?", "child")
++			q := query.New(f).Table(&whereOnlyUpdateModel{Flag: 0}).WhereInQuery("id", child).WhereExists(child)
++			res, err := q.DryRunUpdates()
++			if err != nil || res.Mode != builder.DryRunModeExec || !reflect.DeepEqual(res.Args, []any{0, "child", "child"}) || !strings.Contains(res.Query, "name = "+d.PlaceholderByNumber(2)) || !strings.Contains(res.Query, "name = "+d.PlaceholderByNumber(3)) {
++				t.Fatal(res, err)
++			}
++			if _, err = q.Updates(); err != nil || f.calls != 1 {
++				t.Fatal(err, f.calls)
++			}
++			for _, bad := range []*query.QueryBuilder{nil, query.New(f), query.New(f).Table(paginationTestUser{}).Where("name = ?")} {
++				q := query.New(f).Table(&whereOnlyUpdateModel{}).WhereExists(bad)
++				if _, err := q.DryRun(); err == nil {
++					t.Fatal("invalid child accepted")
++				}
++				if _, err := q.DryRunCount(); err == nil {
++					t.Fatal("invalid count child accepted")
++				}
++				if _, err := q.Updates(); err == nil || f.calls != 1 {
++					t.Fatal("invalid child executed", err, f.calls)
++				}
++			}
++		})
++	}
++}
++
++func TestDerivedJoinRejectsInvalidAliasAndQuotesWithParent(t *testing.T) {
++	for _, d := range []dialect.Dialector{dialect.NewPostgres(), dialect.NewMysql(), dialect.NewOracle()} {
++		o := &paginationTestORM{dialect: d, config: config.Config{QuoteIdentifier: true}}
++		child := query.New(o).Table(paginationTestUser{}).Select("id").Where("name = ?", "child")
++		for _, alias := range []string{"", "bad alias", "1bad", "x; DROP TABLE users"} {
++			if _, err := query.New(o).Table(paginationTestUser{}).LeftJoinQuery(child, alias, "x.id = users.id").DryRun(); err == nil {
++				t.Fatalf("accepted alias %q", alias)
++			}
++		}
++		if _, err := query.New(o).Table(paginationTestUser{}).LeftJoinQuery(nil, "x", "x.id = users.id").DryRun(); err == nil {
++			t.Fatal("nil derived child accepted")
++		}
++		res, err := query.New(o).Table(paginationTestUser{}).LeftJoinQuery(child, "x", "x.id = users.id").DryRun()
++		if err != nil || !strings.Contains(res.Query, ") "+d.QuoteIdentifier("x")+" ON") || strings.Contains(res.Query, ") AS ") {
++			t.Fatal(res, err)
++		}
++	}
++}
++
++func TestNamedUpdateComposesSubqueryWithoutPlaceholderCollision(t *testing.T) {
++	f := &fakeORM{dialect: dialect.NewOracle(), mode: config.PlaceholderByName}
++	child := query.New(f).Table(paginationTestUser{}).Select("id").Where("name = ?", "child")
++	got, err := query.New(f).Table(&whereOnlyUpdateModel{Flag: 0}).WhereInQuery("id", child).DryRunUpdates()
++	if err != nil || !strings.Contains(got.Query, "SET flag = :flag") || !strings.Contains(got.Query, "name = :2") || !reflect.DeepEqual(got.Args, []any{0, "child"}) {
++		t.Fatal(got, err)
++	}
++}
++
++func TestSubquerySnapshotPreservesBoundSlicesAndJoinLiteralCompatibility(t *testing.T) {
++	_ = query.Join{Type: "LEFT JOIN", Table: "users", On: "users.id = parent.id"}
++	if reflect.TypeOf(query.Join{}).NumField() != 3 {
++		t.Fatal("public Join shape changed")
++	}
++	o := &paginationTestORM{dialect: dialect.NewPostgres()}
++	ids := []int{1, 2}
++	child := query.New(o).Table(paginationTestUser{}).Select("id").WhereIn("id", ids)
++	parent := query.New(o).Table(paginationTestUser{}).WhereExists(child)
++	ids[0] = 9
++	res, err := parent.DryRun()
++	if err != nil || !reflect.DeepEqual(res.Args, []any{1, 2}) {
++		t.Fatal(res, err)
++	}
++}

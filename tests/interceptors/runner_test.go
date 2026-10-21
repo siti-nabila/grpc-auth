@@ -18,3 +18,8 @@ func TestLifecycleInterceptors(t *testing.T) { testutils.Run(t, test_scenarios.L
 func TestLifecycleRateGroups(t *testing.T)   { testutils.Run(t, test_scenarios.LifecycleRateGroups()) }
 
 func TestRoleRateGroups(t *testing.T) { testutils.Run(t, test_scenarios.RoleRateGroups()) }
+
+func TestAccessEvaluation(t *testing.T) { testutils.Run(t, test_scenarios.AccessEvaluation()) }
+
+func TestAuditLogReads(t *testing.T)    { testutils.Run(t, test_scenarios.AuditLogReads()) }
+func TestServiceAdmission(t *testing.T) { testutils.Run(t, test_scenarios.ServiceAdmission()) }

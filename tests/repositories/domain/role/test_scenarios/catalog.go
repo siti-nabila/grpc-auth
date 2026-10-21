@@ -14,6 +14,7 @@ import (
 	rolev1 "github.com/siti-nabila/api-contracts/pb/role/v1"
 	"github.com/siti-nabila/api-contracts/pkg/dictionary/common"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
+	"github.com/siti-nabila/grpc-auth/tests/repositories/domain/role/fixtures"
 	"github.com/siti-nabila/grpc-auth/tests/shared/testutils"
 	"github.com/siti-nabila/orm/orm"
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -21,6 +22,8 @@ import (
 
 func Catalogs() []testutils.Scenario {
 	return []testutils.Scenario{
+		{Name: "pre-refactor serialized cursors remain readable", Run: serializedCursors},
+		{Name: "catalog normalization leaves caller slices and search unchanged", Run: catalogInputIsolation},
 		{Name: "every public scalar supports both sort directions and projection", Run: catalogRegistry},
 		{Name: "query defaults canonical filters literal search and invalid fields", Run: catalogValidation},
 		{Name: "typed cursor binds method query and sort while excluding page limit projection", Run: catalogCursors},
@@ -164,5 +167,59 @@ func catalogCursorErrors(t *testing.T) {
 		if _, err := domain.RoleCatalog.ParseCursor(changed); err == nil {
 			t.Fatal("unknown or trailing cursor")
 		}
+	}
+}
+
+func serializedCursors(t *testing.T) {
+	for _, c := range []domain.Catalog{domain.RoleCatalog, domain.PermissionCatalog, domain.ApplicationCatalog, domain.UserRoleAssignmentCatalog} {
+		field := "name"
+		target := uint64(7)
+		if c == domain.PermissionCatalog {
+			field = "description"
+			target = 0
+		}
+		q, err := c.Normalize(domain.CatalogQuery{TargetUserID: target, Sort: []orm.SortField{{Field: field, Desc: true}}, LastID: fixtures.SerializedCursors[string(c)]})
+		if err != nil {
+			t.Fatal(c, err)
+		}
+		values, err := c.ParseCursor(q)
+		if err != nil || len(values) != 2 || values[0].Value == nil || *values[0].Value != "Tied name" || values[1].Value == nil || *values[1].Value != "12" {
+			t.Fatal(c, values, err)
+		}
+		if c.NextCursor(q, values) != q.LastID {
+			t.Fatal("cursor encoding changed", c)
+		}
+	}
+	sorts, _ := domain.NormalizeUserListSort([]orm.SortField{{Field: "name", Desc: true}})
+	filter, _ := domain.NormalizeUserListFilter(domain.UserListFilter{})
+	opts := orm.QueryOptions{Sort: sorts}
+	value, err := domain.ParseUserListCursor(fixtures.SerializedUserCursor, opts, filter)
+	if err != nil {
+		t.Fatal("old user cursor", err)
+	}
+	cursor, ok := value.(domain.UserListCursor)
+	if !ok || len(cursor.Values) != 2 || cursor.Values[0].Value == nil || *cursor.Values[0].Value != "Tied name" || cursor.Values[1].Value == nil || *cursor.Values[1].Value != "12" {
+		t.Fatal("old user cursor values", value)
+	}
+}
+
+func catalogInputIsolation(t *testing.T) {
+	in := domain.CatalogQuery{Fields: []string{"name"}, Sort: []orm.SortField{{Field: "name", Desc: true}}, Statuses: []string{"DISABLED", "ACTIVE", "ACTIVE"}, Search: &orm.SearchQuery{Fields: []string{"name", "code"}, Keyword: "  Editor  "}}
+	original := domain.CatalogQuery{Fields: []string{"name"}, Sort: []orm.SortField{{Field: "name", Desc: true}}, Statuses: []string{"DISABLED", "ACTIVE", "ACTIVE"}, Search: &orm.SearchQuery{Fields: []string{"name", "code"}, Keyword: "  Editor  "}}
+	out, err := domain.RoleCatalog.Normalize(in)
+	if err != nil {
+		t.Fatal(err)
+	}
+	out.Fields[0] = "code"
+	out.Sort[0].Desc = false
+	out.Statuses[0] = "DISABLED"
+	out.Search.Fields[0] = "description"
+	out.Search.Keyword = "Changed"
+	if !reflect.DeepEqual(in, original) {
+		t.Fatal("caller input mutated", in)
+	}
+	in.Sort = []orm.SortField{{Field: "invalid"}}
+	if _, err := domain.RoleCatalog.Normalize(in); err == nil || !reflect.DeepEqual(in.Fields, original.Fields) || !reflect.DeepEqual(in.Statuses, original.Statuses) || !reflect.DeepEqual(in.Search, original.Search) {
+		t.Fatal("failed normalization mutated input", in, err)
 	}
 }

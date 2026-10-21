@@ -172,7 +172,7 @@ func postgresSessionListSnapshot(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if _, e = f.DB.ExecContext(ctx, `INSERT INTO permissions(application_id,code,description) VALUES(1,'iam.session.read','fixture'); INSERT INTO role(role_name,role_code,application_id,code) VALUES('Session Reader',2,1,'iam.session_reader'); INSERT INTO role_permissions VALUES(2,1); INSERT INTO user_role(user_id,role_id) VALUES(1,2)`); e != nil {
+	if _, e = f.DB.ExecContext(ctx, `INSERT INTO permissions(application_id,code,description) VALUES(1,'iam.session.read','fixture'); INSERT INTO role(role_name,role_code,application_id,code) VALUES('Session Reader',2,1,'iam.session_reader'); INSERT INTO role_permissions(role_id,permission_id) VALUES(2,1); INSERT INTO user_role(user_id,role_id) VALUES(1,2)`); e != nil {
 		t.Fatal("permission setup", e)
 	}
 	actor := selfActor(t, ctx, f, initial.AccessToken, sessionv1.SessionService_ListUserSessions_FullMethodName)
@@ -220,7 +220,7 @@ func postgresSessionListSnapshot(t *testing.T) {
 		t.Fatal(e)
 	}
 	defer tx.Rollback()
-	if _, e = tx.ExecContext(ctx, `DELETE FROM role_permissions WHERE role_id=2`); e != nil {
+	if _, e = tx.ExecContext(ctx, `UPDATE role_permissions SET deleted_at=CURRENT_TIMESTAMP WHERE role_id=2`); e != nil {
 		t.Fatal(e)
 	}
 	if _, e = tx.ExecContext(ctx, `UPDATE sessions SET device_label='committed-later' WHERE id=$1`, initial.SessionID); e != nil {

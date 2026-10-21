@@ -76,15 +76,8 @@ func (s *refreshService) Refresh(ctx context.Context, raw string) (res *LoginRes
 	if !r.complete() {
 		return nil, common.ErrInternalServerError
 	}
-	current, locked, err := readRefreshProof(ctx, r.Tokens, r.State, digest)
+	current, locked, now, err := s.lockedRefreshProof(ctx, r, candidate, state, digest)
 	if err != nil {
-		return nil, err
-	}
-	if current.ID != candidate.ID || current.SessionID != state.SessionID || current.FamilyID != candidate.FamilyID || locked.UserID != state.UserID {
-		return nil, auth.ErrInvalidSession
-	}
-	now := s.deps.Now().UTC()
-	if err = validateRefreshProof(current, locked, now); err != nil {
 		return nil, err
 	}
 	now = now.Truncate(time.Second)
@@ -129,10 +122,7 @@ func readRefreshProof(ctx context.Context, tokens domain.RefreshReader, states d
 }
 
 func validateRefreshProof(t domain.InitialRefresh, s domain.SessionState, now time.Time) error {
-	if domain.ValidateSessionID(t.ID) != nil || domain.ValidateSessionID(t.FamilyID) != nil || domain.ValidateSessionID(t.SessionID) != nil || t.SessionID != s.SessionID || s.UserID == 0 || s.UserID > 2147483647 || s.UserID != s.SessionUserID || s.AuthVersion < 1 || !s.SessionAuthVersion.Valid || s.SessionAuthVersion.Int64 != s.AuthVersion || s.UserVersion < 1 || s.UserStatus != types.UserActive || s.DeletedAt.Valid {
-		return auth.ErrInvalidSession
-	}
-	if s.CreatedAt.IsZero() || s.CreatedAt.After(now) || !s.ExpiresAt.After(s.CreatedAt) || s.ExpiresAt.Sub(s.CreatedAt) > jwt.MaxSessionLifetime || !now.Before(s.ExpiresAt) || !now.Before(t.ExpiresAt) || t.ExpiresAt.After(s.ExpiresAt) || t.IssuedAt.Before(s.CreatedAt) || t.IssuedAt.After(now) {
+	if !refreshIdentityValid(t, s) || !refreshLifetimeValid(t, s, now) {
 		return auth.ErrInvalidSession
 	}
 	if t.ConsumedAt.Valid {
@@ -189,4 +179,42 @@ func (s *refreshService) rotateRefresh(ctx context.Context, r RefreshRepositorie
 		return nil, common.ErrInternalServerError
 	}
 	return &LoginResult{AccessToken: access.Token, RefreshToken: c.RefreshToken, SessionID: state.SessionID, AccessExpiresAt: access.ExpiresAt, SessionExpiresAt: state.ExpiresAt}, nil
+}
+
+func (s *refreshService) lockedRefreshProof(ctx context.Context, r RefreshRepositories, candidate domain.InitialRefresh, state domain.SessionState, digest []byte) (domain.InitialRefresh, domain.SessionState, time.Time, error) {
+	current, locked, err := readRefreshProof(ctx, r.Tokens, r.State, digest)
+	if err != nil {
+		return current, locked, time.Time{}, err
+	}
+	if current.ID != candidate.ID || current.SessionID != state.SessionID || current.FamilyID != candidate.FamilyID || locked.UserID != state.UserID {
+		return current, locked, time.Time{}, auth.ErrInvalidSession
+	}
+	now := s.deps.Now().UTC()
+	if err = validateRefreshProof(current, locked, now); err != nil {
+		return current, locked, time.Time{}, err
+	}
+	return current, locked, now, nil
+}
+
+func refreshIdentityValid(t domain.InitialRefresh, s domain.SessionState) bool {
+	if domain.ValidateSessionID(t.ID) != nil || domain.ValidateSessionID(t.FamilyID) != nil || domain.ValidateSessionID(t.SessionID) != nil || t.SessionID != s.SessionID {
+		return false
+	}
+	if s.UserID == 0 || s.UserID > 2147483647 || s.UserID != s.SessionUserID {
+		return false
+	}
+	if s.AuthVersion < 1 || !s.SessionAuthVersion.Valid || s.SessionAuthVersion.Int64 != s.AuthVersion || s.UserVersion < 1 {
+		return false
+	}
+	return s.UserStatus == types.UserActive && !s.DeletedAt.Valid
+}
+
+func refreshLifetimeValid(t domain.InitialRefresh, s domain.SessionState, now time.Time) bool {
+	if s.CreatedAt.IsZero() || s.CreatedAt.After(now) || !s.ExpiresAt.After(s.CreatedAt) || s.ExpiresAt.Sub(s.CreatedAt) > jwt.MaxSessionLifetime {
+		return false
+	}
+	if !now.Before(s.ExpiresAt) || !now.Before(t.ExpiresAt) || t.ExpiresAt.After(s.ExpiresAt) {
+		return false
+	}
+	return !t.IssuedAt.Before(s.CreatedAt) && !t.IssuedAt.After(now)
 }

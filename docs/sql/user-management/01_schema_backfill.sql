@@ -197,6 +197,7 @@ CREATE INDEX permissions_application_idx ON public.permissions (application_id, 
 CREATE TABLE public.role_permissions (
     role_id integer NOT NULL REFERENCES public.role (id) ON DELETE RESTRICT,
     permission_id integer NOT NULL REFERENCES public.permissions (id) ON DELETE RESTRICT,
+    deleted_at timestamptz NULL,
     PRIMARY KEY (role_id, permission_id)
 );
 CREATE INDEX role_permissions_permission_idx ON public.role_permissions (permission_id, role_id);

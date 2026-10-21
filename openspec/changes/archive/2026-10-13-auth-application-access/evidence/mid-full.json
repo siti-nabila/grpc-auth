@@ -1,0 +1,18 @@
+{
+  "label": "mid-full",
+  "mode": "standalone",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./..."
+  ],
+  "started_at": "2026-10-13T08:00:35.490226+00:00",
+  "seconds": 13.552,
+  "exit_code": 0,
+  "log": "/tmp/aap-mid-full.log",
+  "source_identity": "e6d79da4069410021a47dccc92381ab7b1bacdb0343650c677af8efcedc564a9",
+  "passed_tests": 3075,
+  "failed_tests": [],
+  "skipped_tests": []
+}

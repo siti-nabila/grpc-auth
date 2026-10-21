@@ -13,7 +13,21 @@ func TestPostgresConfiguration(t *testing.T) {
 	testutils.Run(t, test_scenarios.Configuration())
 }
 
+func TestPostgresRuntimeMetrics(t *testing.T) { testutils.Run(t, test_scenarios.RuntimeMetrics()) }
+
 func TestPostgresRoleSchema(t *testing.T) { testutils.Run(t, test_scenarios.RoleSchema()) }
+
+func TestPostgresAssignmentSchema(t *testing.T) { testutils.Run(t, test_scenarios.AssignmentSchema()) }
+
+func TestPostgresAssignmentManagement(t *testing.T) {
+	testutils.Run(t, test_scenarios.AssignmentManagement())
+}
+
+func TestPostgresAssignmentLists(t *testing.T) { testutils.Run(t, test_scenarios.AssignmentLists()) }
+
+func TestPostgresAssignmentConcurrency(t *testing.T) {
+	testutils.Run(t, test_scenarios.AssignmentConcurrency())
+}
 
 func TestPostgresRolePersistence(t *testing.T) { testutils.Run(t, test_scenarios.RolePersistence()) }
 
@@ -31,9 +45,6 @@ func TestPostgresTransactionOwnership(t *testing.T) {
 	testutils.Run(t, test_scenarios.TransactionOwnership())
 }
 
-func TestPostgresExistingCommands(t *testing.T) {
-	testutils.Run(t, test_scenarios.ExistingCommands())
-}
 func TestPostgresPersistenceCommands(t *testing.T) {
 	testutils.Run(t, test_scenarios.PersistenceCommands())
 }
@@ -98,3 +109,25 @@ func TestPostgresRoleManagement(t *testing.T) { testutils.Run(t, test_scenarios.
 func TestPostgresRoleEvaluation(t *testing.T) { testutils.Run(t, test_scenarios.RoleEvaluation()) }
 
 func TestPostgresRoleConcurrency(t *testing.T) { testutils.Run(t, test_scenarios.RoleConcurrency()) }
+
+func TestPostgresApplicationManagement(t *testing.T) {
+	testutils.Run(t, test_scenarios.ApplicationManagement())
+}
+
+func TestPostgresApplicationLists(t *testing.T) { testutils.Run(t, test_scenarios.ApplicationLists()) }
+
+func TestPostgresApplicationConcurrency(t *testing.T) {
+	testutils.Run(t, test_scenarios.ApplicationConcurrency())
+}
+
+func TestPostgresEffectivePermissions(t *testing.T) {
+	testutils.Run(t, test_scenarios.EffectivePermissions())
+}
+
+func TestPostgresAccessEvaluation(t *testing.T) { testutils.Run(t, test_scenarios.AccessEvaluation()) }
+
+func TestPostgresAuditLogReads(t *testing.T) { testutils.Run(t, test_scenarios.AuditLogReads()) }
+
+func TestPostgresCommitAcknowledgement(t *testing.T) {
+	testutils.Run(t, test_scenarios.CommitAcknowledgement())
+}

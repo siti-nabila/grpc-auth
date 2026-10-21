@@ -33,7 +33,7 @@ func adminFixture(t *testing.T, method string) (context.Context, context.Context
 	if _, e := f.DB.ExecContext(ctx, `INSERT INTO auth(email,password,status) VALUES('target@example.test',$1,'ACTIVE')`, shared.LoginPasswordHash()); e != nil {
 		t.Fatal("target account setup", e)
 	}
-	if _, e := f.DB.ExecContext(ctx, `INSERT INTO permissions(application_id,code,description) VALUES(1,'iam.session.revoke','fixture'); INSERT INTO role(role_name,role_code,application_id,code) VALUES('Session Admin',2,1,'iam.session_admin'); INSERT INTO role_permissions VALUES(2,1); INSERT INTO user_role(user_id,role_id) VALUES(1,2)`); e != nil {
+	if _, e := f.DB.ExecContext(ctx, `INSERT INTO permissions(application_id,code,description) VALUES(1,'iam.session.revoke','fixture'); INSERT INTO role(role_name,role_code,application_id,code) VALUES('Session Admin',2,1,'iam.session_admin'); INSERT INTO role_permissions(role_id,permission_id) VALUES(2,1); INSERT INTO user_role(user_id,role_id) VALUES(1,2)`); e != nil {
 		t.Fatal("admin grant setup", e)
 	}
 

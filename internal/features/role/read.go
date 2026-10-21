@@ -88,7 +88,7 @@ func (s *readService) read(ctx context.Context, method string, load func(ReadRep
 	if r.State == nil || r.Permissions == nil || r.Roles == nil || r.Catalog == nil {
 		return common.ErrDependencyUnavailable
 	}
-	if err = authfeature.AuthorizeCurrentPermission(ctx, p.Claims(), method, types.PermissionIAMRoleRead, r.State, r.Permissions, s.deps.Now().UTC()); err != nil {
+	if _, err = authfeature.AuthorizeCurrentPermission(ctx, p.Claims(), method, types.PermissionIAMRoleRead, r.State, r.Permissions, s.deps.Now().UTC()); err != nil {
 		return err
 	}
 	if err = load(r); err != nil {

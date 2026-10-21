@@ -14,24 +14,35 @@ import (
 
 // AuthorizeCurrentPermission evaluates current user/session and exact permission
 // using readers bound by the owning feature to its primary snapshot or locked transaction.
-func AuthorizeCurrentPermission(ctx context.Context, claims jwt.VerifiedClaims, method string, permission types.PermissionCode, state domain.SessionStateReader, permissions domain.PermissionReader, now time.Time) error {
+func AuthorizeCurrentPermission(ctx context.Context, claims jwt.VerifiedClaims, method string, permission types.PermissionCode, state domain.SessionStateReader, permissions domain.PermissionReader, now time.Time) (sessions.Principal, error) {
+	return AuthorizeCurrentPermissions(ctx, claims, method, []types.PermissionCode{permission}, state, permissions, now)
+}
+
+// AuthorizeCurrentPermissions requires every exact permission from one current read.
+func AuthorizeCurrentPermissions(ctx context.Context, claims jwt.VerifiedClaims, method string, required []types.PermissionCode, state domain.SessionStateReader, permissions domain.PermissionReader, now time.Time) (sessions.Principal, error) {
+	if len(required) == 0 {
+		return sessions.Principal{}, common.ErrInternalServerError
+	}
 	verified, err := AuthenticateSession(ctx, claims, state, now)
 	if err != nil {
-		return err
+		return sessions.Principal{}, err
 	}
 	p, err := sessions.PrincipalFromContext(verified)
 	if err != nil {
-		return err
+		return sessions.Principal{}, err
 	}
 	if err = p.AuthorizeMethod(method); err != nil {
-		return err
+		return sessions.Principal{}, err
 	}
 	rows, err := permissions.Permissions(ctx, p.UserID())
 	if err != nil {
-		return featurecommon.DependencyError(err)
+		return sessions.Principal{}, featurecommon.DependencyError(err)
 	}
-	if !featurecommon.HasPermission(featurecommon.ResolvePermissions(rows), string(permission)) {
-		return common.ErrForbidden
+	resolved := featurecommon.ResolvePermissions(rows)
+	for _, permission := range required {
+		if !featurecommon.HasPermission(resolved, string(permission)) {
+			return sessions.Principal{}, common.ErrForbidden
+		}
 	}
-	return nil
+	return p, nil
 }

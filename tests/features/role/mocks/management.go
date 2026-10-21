@@ -3,6 +3,7 @@ package mocks
 import (
 	"context"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
+	"time"
 )
 
 type Provider struct {
@@ -17,6 +18,7 @@ type Roles struct {
 	Read        func(context.Context, uint64) (domain.RoleSummary, error)
 	App         func(context.Context, string) (domain.ApplicationItem, error)
 	Permissions func(context.Context, uint64) ([]domain.PermissionItem, error)
+	Pairs       func(context.Context, uint64) ([]domain.RolePermissionPair, error)
 	Set         func(context.Context, uint64, []string) ([]domain.PermissionItem, error)
 }
 
@@ -36,7 +38,7 @@ func (r Roles) PermissionSet(ctx context.Context, id uint64, codes []string) ([]
 type Writer struct {
 	Create  func(context.Context, domain.RoleSummary) (domain.RoleSummary, error)
 	Update  func(context.Context, domain.RoleSummary, int64) (bool, error)
-	Replace func(context.Context, uint64, []uint64) error
+	Replace func(context.Context, uint64, domain.RolePermissionChanges, time.Time) error
 }
 
 func (w Writer) CreateRole(ctx context.Context, r domain.RoleSummary) (domain.RoleSummary, error) {
@@ -45,6 +47,10 @@ func (w Writer) CreateRole(ctx context.Context, r domain.RoleSummary) (domain.Ro
 func (w Writer) UpdateRole(ctx context.Context, r domain.RoleSummary, v int64) (bool, error) {
 	return w.Update(ctx, r, v)
 }
-func (w Writer) ReplacePermissions(ctx context.Context, id uint64, ids []uint64) error {
-	return w.Replace(ctx, id, ids)
+func (w Writer) ReplacePermissions(ctx context.Context, id uint64, changes domain.RolePermissionChanges, at time.Time) error {
+	return w.Replace(ctx, id, changes, at)
+}
+
+func (r Roles) RolePermissionPairs(ctx context.Context, id uint64) ([]domain.RolePermissionPair, error) {
+	return r.Pairs(ctx, id)
 }

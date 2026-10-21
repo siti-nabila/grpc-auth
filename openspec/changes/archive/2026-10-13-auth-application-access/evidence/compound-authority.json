@@ -1,0 +1,23 @@
+{
+  "label": "compound-authority",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "-count=1",
+    "./tests/features/auth_feature",
+    "./tests/features/user",
+    "./tests/features/role",
+    "./tests/features/catalog",
+    "./tests/features/session"
+  ],
+  "started_at": "2026-10-13T05:50:16.129089+00:00",
+  "seconds": 5.302,
+  "exit_code": 0,
+  "log": "/tmp/aap-compound-authority.log",
+  "source_identity": "e41e84ef747c7bf52bfc1519d76e7528af89f2ddcd5c6a042f200ce4bdd879ef",
+  "passed_tests": 1549,
+  "failed_tests": [],
+  "skipped_tests": []
+}

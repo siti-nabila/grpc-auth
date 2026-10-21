@@ -30,7 +30,7 @@ func postgresRegisteredLifecycle(t *testing.T) {
 	if _, e := f.DB.ExecContext(ctx, `
  INSERT INTO permissions(application_id,code,description) VALUES(1,'iam.session.read','fixture'),(1,'iam.session.revoke','fixture'),(1,'iam.user.read','fixture');
  INSERT INTO role(role_name,role_code,application_id,code) VALUES('Admin',2,1,'iam.admin'),('Auditor',3,1,'iam.auditor');
- INSERT INTO role_permissions SELECT 2,id FROM permissions;
+ INSERT INTO role_permissions(role_id,permission_id) SELECT 2,id FROM permissions;
  INSERT INTO user_role(user_id,role_id) VALUES(1,2);
  INSERT INTO auth(email,password,status) SELECT 'target@example.test',password,'ACTIVE' FROM auth WHERE id=1;
  INSERT INTO profile(user_id,name,address,phone) VALUES(2,'Target','Display address','123');

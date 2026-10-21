@@ -115,9 +115,15 @@ packages are maintained in the separate `api-contracts` repository.
 
 ## 📡 API Usage
 
-The default server composes nineteen RPCs across UserService, ProfileService,
-AuthService and SessionService with the session foundation pipeline.
-Legacy HS256 and sid-less tokens are rejected. Register returns PENDING metadata
+[User role assignment API](docs/user-role-assignment-api.md) documents historical
+listing, atomic grant/revoke, replay and shared last-admin protection.
+
+The default server composes thirty-seven RPCs across UserService, ProfileService,
+AuthService, SessionService, RoleService, PermissionService, ApplicationService,
+AuthorizationService and AuditService with the session foundation pipeline.
+Runtime uses the session-aware handlers and EdDSA issuer. The unused token-only
+handlers, feature constructors and TokenInterceptor have been removed; exported
+`pkg/jwt` helpers remain available. Legacy HS256 and sid-less tokens are rejected. Register returns PENDING metadata
 and an empty token; activation remains an administrator workflow. RefreshSession rotates the latest opaque refresh token; consumed reuse revokes
 the session. Logout, self/admin session operations and ChangePassword are wired.
 ListUsers supports public scalar/collection multi-sort, query-bound keyset cursors
@@ -206,7 +212,8 @@ Logger:
 ## 📦 Key Packages
 
 ### `pkg/database`
-- **DBLogger** - Database query wrapper with logging
+- **transaction.go** - Request-scoped ORM transaction and primary snapshot provider
+- **db.wrapper.go / DBLogger** - Legacy wrapper; unused by repositories
 - **postgres.go** - PostgreSQL connection management
 - **helper.go** - Query interpolation and formatting
 
@@ -278,3 +285,21 @@ This project is for practice purposes.
 ---
 
 **Last Updated:** 2025
+
+## Application access (increment D)
+
+D adds stored-history ListUserApplicationAccess and atomic GrantApplicationAccess/RevokeApplicationAccess with current compound permissions. See [API and persistence contract](docs/application-access-api.md) and [verification evidence](openspec/changes/archive/2026-10-13-auth-application-access/evidence/progress.md). DEP-01 deployment readiness remains separate.
+
+Increment E adds verified self/admin effective-permission reads with optional caller-namespace filtering and retained ACTIVE-role views for nonactive targets. See [API](docs/effective-permission-api.md) and [evidence](openspec/changes/archive/2026-10-14-auth-effective-permission-reads/evidence/progress.md).
+
+## Access evaluation
+
+The evaluator increment added the 36th method across eight services:
+`/authorization.v1.AuthorizationService/EvaluateAccess`. It evaluates one exact
+permission for the current unrestricted user in an allowed caller namespace,
+using one authoritative primary snapshot. See [API rules](docs/evaluate-access-api.md).
+
+The default server registers 37 methods across nine services with
+`/audit.v1.AuditService/ListAuditLogs`: current `iam.audit.read`, exact history
+filters, fixed newest-first pagination and typed safe snapshots. See
+[audit log API](docs/audit-log-api.md). Deployment readiness remains Phase6 DEP-01.

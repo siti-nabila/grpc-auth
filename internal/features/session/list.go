@@ -6,9 +6,11 @@ import (
 	"github.com/siti-nabila/api-contracts/pkg/dictionary/common"
 	authfeature "github.com/siti-nabila/grpc-auth/internal/features/auth_feature"
 	featurecommon "github.com/siti-nabila/grpc-auth/internal/features/common"
+	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/grpc-auth/internal/serviceauth"
 	"github.com/siti-nabila/grpc-auth/internal/sessions"
 	"github.com/siti-nabila/grpc-auth/pkg/types"
+	"time"
 )
 
 func (s *listService) ListMySessions(ctx context.Context, r ListInput) (*ListResult, error) {
@@ -62,47 +64,59 @@ func (s *listService) list(ctx context.Context, target uint64, input ListInput, 
 	if r.State == nil || r.Sessions == nil || r.Permissions == nil {
 		return nil, common.ErrInternalServerError
 	}
-	verified, err := authfeature.AuthenticateSession(ctx, p.Claims(), r.State, s.deps.Now())
+	p, err = authorizeSessionList(ctx, r, p, target, method, s.deps.Now())
 	if err != nil {
 		return nil, err
-	}
-	p, err = sessions.PrincipalFromContext(verified)
-	if err != nil {
-		return nil, err
-	}
-	if err = p.AuthorizeMethod(method); err != nil {
-		return nil, err
-	}
-	if method == sessionv1.SessionService_ListUserSessions_FullMethodName {
-		rows, e := r.Permissions.Permissions(ctx, p.UserID())
-		if e != nil {
-			return nil, featurecommon.DependencyError(e)
-		}
-		if !featurecommon.HasPermission(featurecommon.ResolvePermissions(rows), string(types.PermissionIAMSessionRead)) {
-			return nil, common.ErrForbidden
-		}
-	} else if target != p.UserID() {
-		return nil, common.ErrForbidden
 	}
 	page, err := r.Sessions.ListPage(ctx, q)
 	if err != nil {
 		return nil, featurecommon.DependencyError(err)
 	}
-	res = &ListResult{Items: make([]ListItem, 0, len(page.Items)), Page: input.Page, Limit: q.Limit, Total: page.Total, HasNext: page.HasNext, HasPrev: q.After != nil}
+	res, err = sessionListResult(page, input, q, target, p.SessionID())
+	if err != nil {
+		return nil, err
+	}
+	if err = owner.Commit(); err != nil {
+		return nil, featurecommon.DependencyError(err)
+	}
+	return res, nil
+}
+
+func authorizeSessionList(ctx context.Context, r ListRepositories, p sessions.Principal, target uint64, method string, now time.Time) (sessions.Principal, error) {
+	if method == sessionv1.SessionService_ListUserSessions_FullMethodName {
+		return authfeature.AuthorizeCurrentPermission(ctx, p.Claims(), method, types.PermissionIAMSessionRead, r.State, r.Permissions, now)
+	}
+	verified, err := authfeature.AuthenticateSession(ctx, p.Claims(), r.State, now)
+	if err != nil {
+		return sessions.Principal{}, err
+	}
+	p, err = sessions.PrincipalFromContext(verified)
+	if err != nil {
+		return sessions.Principal{}, err
+	}
+	if err = p.AuthorizeMethod(method); err != nil {
+		return sessions.Principal{}, err
+	}
+	if target != p.UserID() {
+		return sessions.Principal{}, common.ErrForbidden
+	}
+	return p, nil
+}
+
+func sessionListResult(page domain.SessionListPage, input ListInput, q domain.SessionListQuery, target uint64, currentSessionID string) (*ListResult, error) {
+	res := &ListResult{Items: make([]ListItem, 0, len(page.Items)), Page: input.Page, Limit: q.Limit, Total: page.Total, HasNext: page.HasNext, HasPrev: q.After != nil}
 	for _, row := range page.Items {
 		if row.UserID != target {
 			return nil, common.ErrInternalServerError
 		}
-		res.Items = append(res.Items, ListItem{Session: row, Current: row.ID == p.SessionID()})
+		res.Items = append(res.Items, ListItem{Session: row, Current: row.ID == currentSessionID})
 	}
 	if len(page.Items) > 0 {
-		res.NextCursor, err = nextSessionCursor(q, page.Items[len(page.Items)-1])
+		cursor, err := nextSessionCursor(q, page.Items[len(page.Items)-1])
 		if err != nil {
 			return nil, err
 		}
-	}
-	if err = owner.Commit(); err != nil {
-		return nil, featurecommon.DependencyError(err)
+		res.NextCursor = cursor
 	}
 	return res, nil
 }

@@ -8,3 +8,4 @@ import (
 
 func TestLocalLimiter(t *testing.T)           { testutils.Run(t, test_scenarios.All()) }
 func TestRefreshAtomicAdmission(t *testing.T) { testutils.Run(t, test_scenarios.RefreshAtomic()) }
+func TestServiceAdmission(t *testing.T)       { testutils.Run(t, test_scenarios.Service()) }

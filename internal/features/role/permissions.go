@@ -47,7 +47,15 @@ func (s *managementService) ReplaceRolePermissions(ctx context.Context, input do
 			if before.Version == math.MaxInt64 {
 				return domain.SafeCommandResult{}, common.ErrInternalServerError
 			}
-			if err = r.Writer.ReplacePermissions(ctx, before.ID, permissionIDs(permissions)); err != nil {
+			pairs, err := r.Roles.RolePermissionPairs(ctx, before.ID)
+			if err != nil {
+				return domain.SafeCommandResult{}, featurecommon.DependencyError(err)
+			}
+			changes, err := permissionChanges(before.ID, pairs, sortedPermissionIDs(permissions))
+			if err != nil {
+				return domain.SafeCommandResult{}, err
+			}
+			if err = r.Writer.ReplacePermissions(ctx, before.ID, changes, now); err != nil {
 				return domain.SafeCommandResult{}, featurecommon.DependencyError(err)
 			}
 			if err = advanceRole(ctx, r, &after, input.ExpectedVersion, now); err != nil {

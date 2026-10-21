@@ -50,8 +50,8 @@ func roleManagementMatrix(t *testing.T) {
 			cases = append(cases, "optional key", "clear description", "description only")
 		}
 		if command == "permissions" {
-			cases = append(cases, "empty set", "unknown set", "cross app")
-			stages = append(stages, "permission-set", "role-permissions", "mapping")
+			cases = append(cases, "empty set", "unknown set", "cross app", "restore")
+			stages = append(stages, "permission-set", "role-permissions", "pairs", "mapping")
 		}
 		for _, stage := range stages {
 			for _, failure := range []string{"error", "panic", "cancel"} {
@@ -254,6 +254,18 @@ func roleManagementCase(t *testing.T, command, kind string) {
 				return rows, numbered("permissions")
 			}},
 			Roles: mocks.Roles{
+				Pairs: func(got context.Context, id uint64) ([]domain.RolePermissionPair, error) {
+					checkContext(got)
+					if id != 7 {
+						t.Fatal("mapping target")
+					}
+					pairs := []domain.RolePermissionPair{{RoleID: 7, PermissionID: 10}}
+					if kind == "restore" {
+						at := fixtures.ServiceTime.Add(-time.Hour)
+						pairs = append(pairs, domain.RolePermissionPair{RoleID: 7, PermissionID: 9, DeletedAt: &at})
+					}
+					return pairs, step("pairs")
+				},
 				Read: func(got context.Context, id uint64) (domain.RoleSummary, error) {
 					checkContext(got)
 					if id != 7 {
@@ -315,13 +327,18 @@ func roleManagementCase(t *testing.T, command, kind string) {
 					}
 					return kind != "zero update", step("update")
 				},
-				Replace: func(got context.Context, id uint64, ids []uint64) error {
+				Replace: func(got context.Context, id uint64, changes domain.RolePermissionChanges, at time.Time) error {
 					checkContext(got)
 					expected := []uint64{}
 					for _, p := range newPermissions {
 						expected = append(expected, p.ID)
 					}
-					if id != 7 || !slices.Equal(ids, expected) {
+					inserted, restored := expected, []uint64(nil)
+					if kind == "restore" {
+						inserted = nil
+						restored = expected
+					}
+					if id != 7 || !slices.Equal(changes.Inserted, inserted) || !slices.Equal(changes.Restored, restored) || !at.Equal(fixtures.ServiceTime) || command == "permissions" && !slices.Equal(changes.Removed, []uint64{10}) {
 						t.Fatal("final mapping set")
 					}
 					return step("mapping")

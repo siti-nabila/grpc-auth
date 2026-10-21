@@ -77,13 +77,15 @@ SHALL remain. Code/application/status/ownership/system/numeric-code updates SHAL
 be rejected. ChangeRoleStatus SHALL accept explicit ACTIVE or DISABLED and reason
 3–500 trimmed characters; ReplaceRolePermissions SHALL require explicit final-set
 intent, reason 3–500 and registered same-application permissions, including empty
-set to remove all mappings. These methods SHALL require positive INTEGER-compatible
+set to remove all active mappings. These methods SHALL require positive INTEGER-compatible
 role_id and present positive int64-compatible expected_role_version. Stale new
 requests SHALL return VERSION_CONFLICT/ABORTED before no-op. Effective change
 SHALL increment role version once; a valid new no-op SHALL return changed=false
 with one NO_OP audit and no event/version increment. Updates to an existing custom
 role in a disabled application SHALL remain manageable, but SHALL NOT bypass
 application gates during permission evaluation.
+
+Role-permission pairs SHALL be retained physically. Removing a mapping SHALL set nullable deleted_at to the feature command timestamp; a re-added retained pair SHALL clear deleted_at rather than create a duplicate. Pairs remaining in the final set SHALL keep their state, and repeated removal SHALL not overwrite an existing deletion timestamp. Active mapping reads SHALL include only deleted_at NULL. The existing composite role_id/permission_id uniqueness SHALL cover active and deleted pairs. No hard DELETE or general DeleteRole RPC SHALL be introduced.
 
 #### Scenario: Selected metadata is cleared while other fields are omitted
 - **WHEN** authorized UpdateRole selects only present empty description with current version
@@ -104,6 +106,14 @@ application gates during permission evaluation.
 #### Scenario: Valid same values produce a new no-op
 - **WHEN** an authorized new request has current version and canonical values/set identical to current state
 - **THEN** changed=false and one NO_OP audit commit without another domain event, including unkeyed UpdateRole
+
+#### Scenario: Removed mapping is retained and later restored
+- **WHEN** an authorized versioned replacement removes permission A and a later valid replacement re-adds A
+- **THEN** the same role/permission pair remains stored, first with deleted_at set and then NULL, without duplicate rows or changes to unrelated pairs
+
+#### Scenario: Empty and identical sets preserve soft-delete history
+- **WHEN** an empty final set removes all active mappings and a subsequent new request with current version repeats that empty set
+- **THEN** the first command soft-deletes only active pairs and advances role version once; the second returns a valid no-op without changing retained deletion timestamps
 
 ### Requirement: Role policy changes preserve credentials and take effect on subsequent evaluation
 
@@ -149,6 +159,8 @@ SHALL use an independent transaction; audit failure SHALL preserve the original
 error and bounded telemetry. Commit uncertainty SHALL NOT be claimed success
 or certain rollback. Broker availability SHALL NOT be a prerequisite.
 
+Soft deletion, restoration and new mapping insertion SHALL share that same command transaction. A failure at any of those stages SHALL restore the previous active set and deletion timestamps on confirmed rollback; replay SHALL perform no mapping write, including no timestamp refresh.
+
 #### Scenario: Response is lost and permission input order changes
 - **WHEN** a committed keyed request is retried within retention with the same canonical permission set in a different order
 - **THEN** the original safe response is returned with no extra mappings, audit, event or version, even if target version subsequently advanced
@@ -158,7 +170,7 @@ or certain rollback. Broker availability SHALL NOT be a prerequisite.
 - **THEN** conflicting input returns ABORTED, another target uses independent scope, and expired scope is processed as a new atomically excluded command with current version/business checks
 
 #### Scenario: A later mapping guard or required write fails
-- **WHEN** a delete/insert/version/audit/event/result step or subsequent business guard fails after tentative writes
+- **WHEN** a soft-delete/restore/insert/version/audit/event/result step or subsequent business guard fails after tentative writes
 - **THEN** the whole business transaction rolls back and independent failure auditing can record the safe reason without success effects
 
 #### Scenario: Failure audit also fails after cancellation or panic
@@ -168,6 +180,10 @@ or certain rollback. Broker availability SHALL NOT be a prerequisite.
 #### Scenario: Commit outcome is unknown or broker is absent
 - **WHEN** commit cannot establish its outcome or an otherwise valid command commits without a relay
 - **THEN** uncertainty is reported without fabricated rollback certainty, while confirmed committed events remain pending without requiring RabbitMQ
+
+#### Scenario: Restoration or soft deletion fails during replacement
+- **WHEN** a command fails after a tentative mapping soft-delete or restoration and rollback is confirmed
+- **THEN** all mapping states/timestamps and role version remain as before, with no committed success audit, outbox or replay result
 
 ### Requirement: Additive role contracts and numeric mutation admission preserve existing behavior
 
@@ -201,3 +217,16 @@ backend owner grpc-auth, contract owner api-contracts. Published contract and
 dedicated PostgreSQL verification prerequisites are satisfied by actual
 [evidence](../../changes/archive/2026-10-12-auth-role-management/evidence.md) and [scenario mappings](../../changes/archive/2026-10-12-auth-role-management/scenario-traceability.md).
 [Tasks](../../changes/archive/2026-10-12-auth-role-management/tasks.md) track completion; actual deployment remains Phase6 DEP-01.
+
+## Traceability
+
+ORM persistence and mapping-history scope: grpc-auth adapters/business/schema;
+ORM composition/write-result capability: sibling ORM. [ORM-01..07 acceptance
+ledger](../../changes/archive/2026-10-16-auth-repository-orm-only/design.md#acceptance-ledger)
+and [verification evidence](../../changes/archive/2026-10-16-auth-repository-orm-only/evidence/progress.md)
+record PASS against the published ORM and compatible nullable schema, including
+standalone/workspace checks and dedicated PostgreSQL normal/race verification.
+AC-09/10/13/21–26/31 and M-02/05/07/08/09/10/11 keep their existing meaning.
+[Application migration evidence](../../changes/archive/2026-10-16-auth-repository-orm-only/evidence/user-database-migration.json)
+records the separately authorized expansion; consuming-client/deployment Phase 6
+DEP-01 remains separate.

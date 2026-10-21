@@ -42,17 +42,17 @@ type roleHarness struct {
 func roleMethods() []string {
 	return []string{rolev1.RoleService_ListRoles_FullMethodName, rolev1.RoleService_GetRole_FullMethodName, rolev1.RoleService_CreateRole_FullMethodName, rolev1.RoleService_UpdateRole_FullMethodName, rolev1.RoleService_ChangeRoleStatus_FullMethodName, rolev1.RoleService_ReplaceRolePermissions_FullMethodName, permissionv1.PermissionService_ListPermissions_FullMethodName, applicationv1.ApplicationService_ListApplications_FullMethodName}
 }
-func newRoleHarness(t *testing.T) *roleHarness {
+func newRoleHarness(t *testing.T, extra ...string) *roleHarness {
 	t.Helper()
-	m := newManagementHarness(t, roleMethods()...)
+	m := newManagementHarness(t, append(roleMethods(), extra...)...)
 	_, e := m.f.DB.ExecContext(m.ctx, `INSERT INTO permissions(application_id,code,description) VALUES(1,'iam.role.read','Read roles'),(1,'iam.role.create','Create roles'),(1,'iam.role.update','Update roles'),(1,'iam.role.permission.update','Replace permissions'),(1,'iam.permission.read','Read catalog');
- INSERT INTO role_permissions SELECT 2,id FROM permissions WHERE code LIKE 'iam.role.%' OR code='iam.permission.read';
+ INSERT INTO role_permissions(role_id,permission_id) SELECT 2,id FROM permissions WHERE code LIKE 'iam.role.%' OR code='iam.permission.read';
  INSERT INTO applications(code,name) VALUES('sales','Sales');
  INSERT INTO role(role_name,role_code,application_id,code,version) VALUES('Editor',3,2,'sales.editor',7),('Overlap',4,2,'sales.overlap',1),('Historical',5,2,'sales.historical',1);
  SELECT setval('role_numeric_code_seq',100,false);
  INSERT INTO permissions(application_id,code,description) VALUES(2,'sales.order.read','Read orders'),(2,'sales.order.update','Update orders');
- INSERT INTO role_permissions SELECT 3,id FROM permissions WHERE code LIKE 'sales.%';
- INSERT INTO role_permissions SELECT 4,id FROM permissions WHERE code='sales.order.read';
+ INSERT INTO role_permissions(role_id,permission_id) SELECT 3,id FROM permissions WHERE code LIKE 'sales.%';
+ INSERT INTO role_permissions(role_id,permission_id) SELECT 4,id FROM permissions WHERE code='sales.order.read';
  INSERT INTO user_role(user_id,role_id) VALUES(2,3),(2,4);
  INSERT INTO user_role(user_id,role_id,status,revoked_at,revoke_reason) VALUES(2,5,'REVOKED',CURRENT_TIMESTAMP,'Historical revocation');
  INSERT INTO user_application_access(user_id,application_id) VALUES(2,2);`)
@@ -199,7 +199,7 @@ func postgresRoleFailures(t *testing.T) {
 		if command == "create" || command == "replace" {
 			stages = append(stages, "mapping insert")
 			if command == "replace" {
-				stages = append(stages, "mapping delete")
+				stages = append(stages, "mapping soft-delete", "mapping restore")
 			}
 		}
 		if command != "create" {
@@ -208,6 +208,9 @@ func postgresRoleFailures(t *testing.T) {
 		for _, stage := range stages {
 			t.Run(command+"/"+stage, func(t *testing.T) {
 				h := newRoleHarness(t)
+				if command == "replace" {
+					prepareRoleMappingDiff(t, h)
+				}
 				before := roleBusinessState(t, h)
 				table, op, condition := "role", "UPDATE", "TRUE"
 				if command == "create" {
@@ -216,8 +219,10 @@ func postgresRoleFailures(t *testing.T) {
 				switch stage {
 				case "mapping insert":
 					table, op = "role_permissions", "INSERT"
-				case "mapping delete":
-					table, op = "role_permissions", "DELETE"
+				case "mapping soft-delete":
+					table, op, condition = "role_permissions", "UPDATE", "NEW.deleted_at IS NOT NULL AND OLD.deleted_at IS NULL"
+				case "mapping restore":
+					table, op, condition = "role_permissions", "UPDATE", "NEW.deleted_at IS NULL AND OLD.deleted_at IS NOT NULL"
 				case "audit":
 					table, op, condition = "audit_logs", "INSERT", "NEW.action<>'SECURITY_ATTEMPT_FAILED'"
 				case "outbox":
@@ -250,7 +255,7 @@ func postgresRoleFailures(t *testing.T) {
 					_, e = h.roles.ChangeRoleStatus(h.actor("fault"), roleStatus(7, "DISABLED"))
 				case "replace":
 					method = rolev1.RoleService_ReplaceRolePermissions_FullMethodName
-					_, e = h.roles.ReplaceRolePermissions(h.actor("fault"), roleReplace(7, "sales.order.read"))
+					_, e = h.roles.ReplaceRolePermissions(h.actor("fault"), roleReplace(7, "sales.order.read", "sales.order.create"))
 				}
 				want := codes.Unavailable
 				if stage == "conditional" {
@@ -262,6 +267,8 @@ func postgresRoleFailures(t *testing.T) {
 				if before != roleBusinessState(t, h) {
 					t.Fatal("partial role outcome after failed command")
 				}
+				assertManagementFailureMetrics(t, h.managementHarness, stage)
+
 				var failures int
 				e = h.f.DB.QueryRowContext(h.ctx, `SELECT count(*) FROM audit_logs WHERE action='SECURITY_ATTEMPT_FAILED' AND target_id=$1`, method).Scan(&failures)
 				if e != nil || failures != 1 {

@@ -39,36 +39,14 @@ func (s *managementService) updateUser(ctx context.Context, r ManagementReposito
 	if before.Version != input.ExpectedVersion {
 		return domain.SafeCommandResult{}, usererrors.ErrVersionConflict
 	}
-	after := before
-	if input.Name != nil {
-		after.Name = *input.Name
-	}
-	if input.Address != nil {
-		after.Address = *input.Address
-	}
-	if input.Phone != nil {
-		after.Phone = *input.Phone
-	}
+	after := updatedUserProfile(before, input)
 	changed := after.Name != before.Name || after.Address != before.Address || after.Phone != before.Phone
 	action := types.AuditNoOp
 	if changed {
-		if before.Version == math.MaxInt64 {
-			return domain.SafeCommandResult{}, common.ErrInternalServerError
+		if err = persistManagedProfile(ctx, r, after, input, now); err != nil {
+			return domain.SafeCommandResult{}, err
 		}
-		ok, e := r.ProfileMutation.AdvanceProfileVersion(ctx, input.UserID, input.ExpectedVersion, now)
-		if e != nil {
-			return domain.SafeCommandResult{}, featurecommon.DependencyError(e)
-		}
-		if !ok {
-			return domain.SafeCommandResult{}, usererrors.ErrVersionConflict
-		}
-		ok, e = r.ProfileMutation.UpdateProfile(ctx, input.UserID, after)
-		if e != nil {
-			return domain.SafeCommandResult{}, featurecommon.DependencyError(e)
-		}
-		if !ok {
-			return domain.SafeCommandResult{}, auth.ErrNotFound
-		}
+
 		after.Version++
 		action = types.AuditUserProfileUpdated
 	}
@@ -91,4 +69,39 @@ func (s *managementService) updateUser(ctx context.Context, r ManagementReposito
 
 func managementProfileSnapshot(r domain.UserDetail) *domain.SafeSnapshot {
 	return &domain.SafeSnapshot{Version: r.Version, Name: &r.Name, Address: &r.Address, Phone: &r.Phone}
+}
+
+func updatedUserProfile(before domain.UserDetail, input domain.UpdateUserInput) domain.UserDetail {
+	after := before
+	if input.Name != nil {
+		after.Name = *input.Name
+	}
+	if input.Address != nil {
+		after.Address = *input.Address
+	}
+	if input.Phone != nil {
+		after.Phone = *input.Phone
+	}
+	return after
+}
+
+func persistManagedProfile(ctx context.Context, r ManagementRepositories, after domain.UserDetail, input domain.UpdateUserInput, now time.Time) error {
+	if after.Version == math.MaxInt64 {
+		return common.ErrInternalServerError
+	}
+	ok, err := r.ProfileMutation.AdvanceProfileVersion(ctx, input.UserID, input.ExpectedVersion, now)
+	if err != nil {
+		return featurecommon.DependencyError(err)
+	}
+	if !ok {
+		return usererrors.ErrVersionConflict
+	}
+	ok, err = r.ProfileMutation.UpdateProfile(ctx, input.UserID, after)
+	if err != nil {
+		return featurecommon.DependencyError(err)
+	}
+	if !ok {
+		return auth.ErrNotFound
+	}
+	return nil
 }

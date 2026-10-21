@@ -1,0 +1,19 @@
+{
+  "label": "handlers-admission",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./tests/handler/...",
+    "./tests/interceptors/..."
+  ],
+  "started_at": "2026-10-13T07:59:53.899530+00:00",
+  "seconds": 3.216,
+  "exit_code": 0,
+  "log": "/tmp/aap-handlers-admission.log",
+  "source_identity": "e6d79da4069410021a47dccc92381ab7b1bacdb0343650c677af8efcedc564a9",
+  "passed_tests": 593,
+  "failed_tests": [],
+  "skipped_tests": []
+}
