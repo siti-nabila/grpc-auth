@@ -1,0 +1,154 @@
+{
+  "recorded_at_utc": "2026-10-10T07:03:25.021786+00:00",
+  "status": "PUBLISHED_VERIFIED",
+  "base_commit": "bfbbeb282ec781316eac5cee6ba8a13cc6d40093",
+  "published_target_version": "v0.0.0-20261010071509-42a9e6fa23ad",
+  "consumer_pinned_version": "v0.0.0-20261010071509-42a9e6fa23ad",
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "31fc8e3cec06ffc168c6cfb8f012fd92953776c08249356b359e3db591624437"
+    },
+    {
+      "path": "proto/user/v1/user.payload.proto",
+      "sha256": "4a0108fd7d9fc4488bcb21227463e6c987a8f088f8b2cb72041930b4892d5b0f"
+    },
+    {
+      "path": "proto/profile/v1/profile.payload.proto",
+      "sha256": "360fbe660c3d74fc989fb28873e639a90d443d535f93da4cee8255777802c014"
+    },
+    {
+      "path": "pb/user/v1/user.payload.pb.go",
+      "sha256": "36ef9a408d92520f1b214d88beb2ca4292ae6c566f879b947e41a2d0a7fb7e15"
+    },
+    {
+      "path": "pb/profile/v1/profile.payload.pb.go",
+      "sha256": "3cb2ce3d462ab579e287bcc38def6a5b7b5feab43a977dcc904a0c4057403d7b"
+    },
+    {
+      "path": "pkg/dictionary/auth/errors.go",
+      "sha256": "64da44440107c3503ca6b2eeb08bef763627735fbef0e1e5ed58c848a2e4d58b"
+    },
+    {
+      "path": "pkg/dictionary/auth/errors.yaml",
+      "sha256": "ea5c8afa6ecffd28a5c4875b25fa0b76654557e0514752b7afc84d95985ae46c"
+    },
+    {
+      "path": "pkg/dictionary/common/errors.go",
+      "sha256": "bc2485ead5d42ef0d25c61c3e3c28212b79ce12c7fb889f20550453896281f41"
+    },
+    {
+      "path": "pkg/dictionary/common/errors.yaml",
+      "sha256": "1e9d5f3b0010f6f48d1935657f6c5187fd9e5dbb261a0f1d6b612710ef56b1dc"
+    },
+    {
+      "path": "pkg/grpcerror/decode.go",
+      "sha256": "b33ea60066c197d0cc417b895676ed279fb66f967abe849765b4111dc9610b2e"
+    },
+    {
+      "path": "pkg/grpcerror/mapping/auth_err.go",
+      "sha256": "3b46dff158a90d78814aab4995e673a3f4b8ec2fe06671493c0a62c7abf6a988"
+    },
+    {
+      "path": "pkg/grpcerror/mapping/common_err.go",
+      "sha256": "0a9102804ce966bfcb58f98115bc0a9a03e495e555fc615da250156c148d406b"
+    },
+    {
+      "path": "tests/grpcerror/test_scenarios/grpcerror_scenarios.go",
+      "sha256": "c16b3e307a54a68dfb76a6aa48e47b1aacc9021c54cc2c074f49446f184bac64"
+    },
+    {
+      "path": "tests/grpcerror/test_scenarios/session_errors.go",
+      "sha256": "5be6ea4c1eed3f7e629a3709db05cb6b0a93964fd1c233b08a063abee9db8db2"
+    },
+    {
+      "path": "docs/auth-session-contract.md",
+      "sha256": "f732f552036dcd7d9f3e2d95def9a289c1bee88ebb48309f307bfb9fe4c711fd"
+    },
+    {
+      "path": "tests/protobuf/fixtures/legacy.go",
+      "sha256": "416b00d784881ac2ec710b2b5c019f8615a27e6fae54d822f4e23835578312b7"
+    },
+    {
+      "path": "tests/protobuf/fixtures/paginator.payload.json",
+      "sha256": "92df5c6e91bc79a5a42e6a97134cd3c1541a6a1c57debbde853916ae8757389e"
+    },
+    {
+      "path": "tests/protobuf/fixtures/profile.payload.json",
+      "sha256": "856bfc2481afc430d102151aa2ecabf7f0a06b2fee3cd25f82ee6646a46143f2"
+    },
+    {
+      "path": "tests/protobuf/fixtures/profile.service.json",
+      "sha256": "f37d95324363b22927ed1fbc7d4a9eac612fc51fd6f25d487f48cfd7b5440ceb"
+    },
+    {
+      "path": "tests/protobuf/fixtures/user.payload.json",
+      "sha256": "842d118b192008ee4219ecc3cda598788b1516654e49ae3de5332b0267b9c1ff"
+    },
+    {
+      "path": "tests/protobuf/fixtures/user.service.json",
+      "sha256": "b45c5d571a8205a4f126cf0adb36d145c7ad2699871a7446efb8a518f3804847"
+    },
+    {
+      "path": "tests/protobuf/runner_test.go",
+      "sha256": "a23cc2f730857921a3f5d78578f9cec6cc1fbc377b5730c7ef2dc28b9f2d72f4"
+    },
+    {
+      "path": "tests/protobuf/test_scenarios/session_contract.go",
+      "sha256": "5680bb4eb0f81be91adf3235e35b4999cd923286d7dd42cd018e46e60ed97523"
+    }
+  ],
+  "publication": {
+    "commit": "42a9e6fa23ada9dd939369b9203e1282eacd0f9e",
+    "remote": "https://github.com/siti-nabila/api-contracts.git",
+    "branch": "feat/user-err",
+    "commit_time_utc": "2026-10-10T07:15:09Z",
+    "verified_at_utc": "2026-10-10T07:17:34.228041+00:00",
+    "remote_ref_matches": true,
+    "downloaded_files_match": 23,
+    "sum": "h1:AHC3W1uS8foXjeGzXwARaZ+x/JIrAuJ1AhjikCHcXAo=",
+    "go_mod_sum": "h1:Jb5bNxnX/aW6YWghT/pXorXlmIDRRxXltY8gL7Udzg4="
+  },
+  "consumer_verification": [
+    {
+      "mode": "workspace",
+      "command": "rtk proxy env GOPROXY=off go test ./...",
+      "exit_code": 0
+    },
+    {
+      "mode": "workspace",
+      "command": "rtk proxy env GOPROXY=off go vet ./...",
+      "exit_code": 0
+    },
+    {
+      "mode": "workspace",
+      "command": "rtk proxy env GOPROXY=off go build ./...",
+      "exit_code": 0
+    },
+    {
+      "mode": "workspace",
+      "command": "rtk proxy env GOPROXY=off make build",
+      "exit_code": 0
+    },
+    {
+      "mode": "standalone",
+      "command": "rtk proxy env GOWORK=off GOPROXY=off go test ./...",
+      "exit_code": 0
+    },
+    {
+      "mode": "standalone",
+      "command": "rtk proxy env GOWORK=off GOPROXY=off go vet ./...",
+      "exit_code": 0
+    },
+    {
+      "mode": "standalone",
+      "command": "rtk proxy env GOWORK=off GOPROXY=off go build ./...",
+      "exit_code": 0
+    },
+    {
+      "mode": "standalone",
+      "command": "rtk proxy env GOWORK=off GOPROXY=off make build",
+      "exit_code": 0
+    }
+  ]
+}

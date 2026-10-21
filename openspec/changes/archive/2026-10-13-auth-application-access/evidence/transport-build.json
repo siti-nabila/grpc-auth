@@ -1,0 +1,18 @@
+{
+  "label": "transport-build",
+  "mode": "standalone",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./internal/..."
+  ],
+  "started_at": "2026-10-13T07:54:58.292646+00:00",
+  "seconds": 3.595,
+  "exit_code": 0,
+  "log": "/tmp/aap-transport-build.log",
+  "source_identity": "f76019d9005448556cf7636ccea7d4968da15cd2cecd19c2775a915b54829f83",
+  "passed_tests": 3,
+  "failed_tests": [],
+  "skipped_tests": []
+}

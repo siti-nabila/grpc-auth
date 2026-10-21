@@ -48,6 +48,7 @@ graphify-out/
 .env.*
 !.env.example
 /env.yaml
+/env-test.yaml
 /env.*.yaml
 !/env.example.yaml
 secrets/

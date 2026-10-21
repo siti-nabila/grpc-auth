@@ -34,9 +34,17 @@ func (o *TransactionOwner) Commit() error {
 		return err
 	}
 	// A failed commit can have an unknown outcome. Never retry the mutation.
+	finished := false
+	defer func() {
+		if !finished {
+			o.observeFinalization()
+		}
+	}()
 	err := o.tx.Commit()
+	finished = true
 	o.closed = true
 	if err != nil {
+		o.observeFinalization()
 		cleanupErr := o.tx.Rollback()
 		if !errors.Is(cleanupErr, sql.ErrTxDone) {
 			err = errors.Join(err, cleanupErr)

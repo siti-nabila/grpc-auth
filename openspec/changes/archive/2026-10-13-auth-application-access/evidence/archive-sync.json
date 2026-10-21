@@ -1,0 +1,29 @@
+{
+  "capability": "user-application-access",
+  "operation": "new main spec",
+  "requirements": 9,
+  "scenarios": 35,
+  "requirement_body_matches_delta": true,
+  "purpose_copied_verbatim": true,
+  "schema": "spec-driven",
+  "completed_tasks": 33,
+  "total_tasks": 33,
+  "main_spec": "/Users/bleki/Desktop/mini-projects/grpc-auth/openspec/specs/user-application-access/spec.md",
+  "archive_destination": "/Users/bleki/Desktop/mini-projects/grpc-auth/openspec/changes/archive/2026-10-13-auth-application-access",
+  "status": "ARCHIVED_AND_SYNCED",
+  "archive_date": "2026-10-13",
+  "local_links_checked": 65,
+  "broken_links": [],
+  "main_spec_verified_after_archive": true,
+  "strict_main_specs": {
+    "passed": 20,
+    "failed": 0
+  },
+  "archived_changes_validation": {
+    "passed": 9,
+    "failed": 0
+  },
+  "git_diff_check": "PASS",
+  "active_changes": 0,
+  "implementation_source_unchanged": true
+}

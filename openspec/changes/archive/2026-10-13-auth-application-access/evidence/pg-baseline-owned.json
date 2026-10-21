@@ -1,0 +1,24 @@
+{
+  "label": "pg-baseline-owned",
+  "mode": "workspace",
+  "command": [
+    "/tmp/auth-assignment-postgres",
+    "test",
+    "test",
+    "-json",
+    "-tags",
+    "postgres",
+    "-count=1",
+    "./tests/integration/postgres/...",
+    "-run",
+    "TestPostgresAssignment|TestPostgresRolePersistence"
+  ],
+  "started_at": "2026-10-13T08:01:11.921828+00:00",
+  "seconds": 8.199,
+  "exit_code": 0,
+  "log": "/tmp/aap-pg-baseline-owned.log",
+  "source_identity": "e9e0a0b1e278ac68cd05fca31c534cd4d45d63a40fabc17a815549909ca9d500",
+  "passed_tests": 74,
+  "failed_tests": [],
+  "skipped_tests": []
+}

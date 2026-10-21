@@ -36,27 +36,34 @@ var (
 )
 
 func DBConnect(src DbSource) {
+	if err := DBConnectChecked(src); err != nil {
+		panic(err)
+	}
+}
+
+// DBConnectChecked lets startup release previously opened pools on failure.
+func DBConnectChecked(src DbSource) error {
 
 	mu.Lock()
 	defer mu.Unlock()
 
 	config, exists := dbConfigs[src]
 	if !exists {
-		panic("DB configuration not found")
+		return fmt.Errorf("DB configuration not found")
 	}
 
 	switch strings.ToLower(config.Driver) {
 	case "postgres":
-		openPostgresConnection(config, src)
+		return openPostgresConnection(config, src)
 	case "oracle":
-		openOracleConnection(config, src)
+		return openOracleConnection(config, src)
 	default:
-		panic("Unsupported database driver")
+		return fmt.Errorf("unsupported database driver")
 	}
 
 }
 
-func openPostgresConnection(config DBConfig, src DbSource) {
+func openPostgresConnection(config DBConfig, src DbSource) error {
 	var (
 		dsn string
 	)
@@ -69,16 +76,17 @@ func openPostgresConnection(config DBConfig, src DbSource) {
 	)
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("cannot open PostgreSQL pool")
 	}
 	db.SetMaxOpenConns(25)
 	db.SetMaxIdleConns(25)
 	db.SetConnMaxLifetime(1 * time.Hour)
 	dbNatConnections[src] = db
 	fmt.Println("Connected to Postgres database:", src)
+	return nil
 }
 
-func openOracleConnection(config DBConfig, src DbSource) {
+func openOracleConnection(config DBConfig, src DbSource) error {
 	var (
 		dsn string
 	)
@@ -91,24 +99,25 @@ func openOracleConnection(config DBConfig, src DbSource) {
 	)
 	db, err := sql.Open("godror", dsn)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("cannot open Oracle pool")
 	}
 	db.SetMaxOpenConns(25)
 	db.SetMaxIdleConns(25)
 	db.SetConnMaxLifetime(1 * time.Hour)
 	dbNatConnections[src] = db
 	fmt.Println("Connected to Oracle database:", src)
+	return nil
 }
 
 func DBClose(src DbSource) {
+	mu.Lock()
+	defer mu.Unlock()
 	sqlDB, exists := dbNatConnections[src]
 	if !exists {
 		return
 	}
-	err := sqlDB.Close()
-	if err != nil {
-		fmt.Println("Error closing database connection:", err)
-	}
+	_ = sqlDB.Close()
+	delete(dbNatConnections, src)
 }
 
 func DBAddConnection(src DbSource, cfg DBConfig) {

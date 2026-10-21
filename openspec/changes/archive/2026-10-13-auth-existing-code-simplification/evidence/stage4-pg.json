@@ -1,0 +1,23 @@
+{
+  "label": "stage4-pg",
+  "mode": "workspace",
+  "command": [
+    "/tmp/auth-assignment-postgres",
+    "test",
+    "test",
+    "-json",
+    "-tags",
+    "postgres",
+    "-count=1",
+    "-run",
+    "TestPostgres(CatalogSnapshots|AssignmentLists|UserListLifecycle|SessionListLifecycle|RolePersistence)",
+    "./tests/integration/postgres"
+  ],
+  "started_at": "2026-10-13T03:08:56.108909+00:00",
+  "seconds": 3.311,
+  "exit_code": 0,
+  "log": "/tmp/ecs-stage4-pg.log",
+  "passed_tests": 58,
+  "failed_tests": [],
+  "skipped_tests": []
+}

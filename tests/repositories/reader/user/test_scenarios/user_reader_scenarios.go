@@ -47,19 +47,20 @@ func buildsParameterizedFilters(t *testing.T) {
 		t.Fatalf("DryRun() error = %v", err)
 	}
 	for _, fragment := range []string{
-		"SELECT DISTINCT",
-		"JOIN user_role ur ON ur.user_id = a.id",
+		"SELECT a.id AS auth_id",
+		"FROM auth a LEFT JOIN profile p",
+		"EXISTS (SELECT ur.user_id FROM user_role ur",
 		"JOIN role r ON r.id = ur.role_id",
 		"a.created_at >= $1",
 		"a.created_at < $2",
-		"r.role_code IN ($3, $4)",
+		"r.role_code IN ($5, $6)",
 	} {
 		if !strings.Contains(result.Query, fragment) {
 			t.Errorf("query = %q, want fragment %q", result.Query, fragment)
 		}
 	}
-	if len(result.Args) != 4 {
-		t.Fatalf("args = %#v, want four parameterized values", result.Args)
+	if len(result.Args) != 6 {
+		t.Fatalf("args = %#v, want six parameterized values", result.Args)
 	}
 	if actual, ok := result.Args[0].(time.Time); !ok || !actual.Equal(createdFrom) {
 		t.Errorf("created_from arg = %#v, want %v", result.Args[0], createdFrom)
@@ -67,7 +68,7 @@ func buildsParameterizedFilters(t *testing.T) {
 	if actual, ok := result.Args[1].(time.Time); !ok || !actual.Equal(createdTo) {
 		t.Errorf("created_to arg = %#v, want %v", result.Args[1], createdTo)
 	}
-	if result.Args[2] != uint64(1) || result.Args[3] != uint64(2) {
-		t.Errorf("role args = %#v, want [1 2]", result.Args[2:])
+	if result.Args[4] != uint64(1) || result.Args[5] != uint64(2) {
+		t.Errorf("role args = %#v, want [1 2]", result.Args[4:])
 	}
 }

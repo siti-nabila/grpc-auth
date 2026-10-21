@@ -1,0 +1,51 @@
+{
+  "head": "fd1147049d52b6115f9b59e802585f11be301b76",
+  "branch": "feat/role-management",
+  "dirty": [
+    "?? proto/response.json"
+  ],
+  "sha256": {
+    "proto/.DS_Store": "1c42f388e6b9954b9681d34caa63a519e0e78a61d52f7d1a331a5f674e7952b9",
+    "proto/response.json": "8d0bc0d6952c169a1399847a8acf978b1dffd4b4914265257865407173d649b6",
+    "proto/session/v1/session.payload.proto": "a27d777a806d9eeedc8b41708de9b8596d3f23cc926c8d4d2d1a4ef16f5def25",
+    "proto/session/v1/session.service.proto": "d2ae713fe9539cd780d3273832450bb13473aa7e999f02b4c6958f81dffa3e22",
+    "proto/permission/v1/permission.service.proto": "822497bf3a9dacc71a34222dfaa26d36030daf9bd11f72254065ada4b57b67e9",
+    "proto/permission/v1/permission.payload.proto": "43b0ae758308555de33d23dd1efa070cabc1496a579e2f02512da0e65a16daba",
+    "proto/paginator/v1/paginator.payload.proto": "e800f5e2e719da238066e7d69c809e73ff979feadb2819ebb4b1e203b6f78719",
+    "proto/application/v1/application.payload.proto": "5b90333ec442ea1e55263ace908ad9eca08addf6026bdf91feed79ab28fc4120",
+    "proto/application/v1/application.service.proto": "c0860c752c711f7f0a0a106cccbe25e724e0b60d04281bb5b0ce712387a9d724",
+    "proto/profile/v1/profile.service.proto": "8390e38a4c05a80bfb843c8ec4bbab66dd9390e543e4d3fe7c3feaff4c2f4e77",
+    "proto/profile/v1/profile.payload.proto": "360fbe660c3d74fc989fb28873e639a90d443d535f93da4cee8255777802c014",
+    "proto/user/v1/user.service.proto": "fdb46800bd7c0cce9f6eb9adeb4d95aabf7a190f8159e44c64e2f195b9a94851",
+    "proto/user/v1/user.payload.proto": "1730461d4c2c12f262ced381bcd68f8ef687d4142905a26ccf237c9e4c3f2cc8",
+    "proto/auth/v1/auth.service.proto": "3eb98c2b738e11629fcd629a7c6bf6bff0667c281246f24ca05cd8f415920f59",
+    "proto/auth/v1/auth.payload.proto": "606010569d1056d00abae6971bad86fcfcb1df1b74f931e5dd6ba896a1801570",
+    "proto/role/v1/role.service.proto": "2e357647da0ca6c42e54d151c38ec2f6195527122e8fe596a86e37585dd92b30",
+    "proto/role/v1/role.payload.proto": "a5f19272de03ac4c587d850e85572d43b5a7ebe41a1f48256c1150d97ee744ed",
+    "pkg/dictionary/grpc_code.go": "40405517284f95c782da967d8b2202bc44c23b7951cdc8c187456ca30bf3cc9e",
+    "pkg/dictionary/.DS_Store": "2ebc08d1699a103feb0d48df5ae7ecd9375e124b943de344c18ed9ed476043c7",
+    "pkg/dictionary/registry.go": "5bae011f2c3959a7fda8185995e345213f998a33972e54a182706a3ca1e3e573",
+    "pkg/dictionary/field_errors.go": "1b4d3a309f781c07248d5bd7b8172fda07df8ba572c6954ee9bbed7aaaf86765",
+    "pkg/dictionary/definition.go": "bed33b9364a7e5174a14e042e314ac207bbe7a82ad91b23d98d160112919b179",
+    "pkg/dictionary/role/errors.yaml": "54075cbeb15d38e5fa7aad28480fc6f4d08911b90d1873f31779c14bd0d07bea",
+    "pkg/dictionary/role/errors.go": "77c320639acce36cb7576188d9592cfa80db3a0aaf48aa34d206aada0d201475",
+    "pkg/dictionary/auth/errors.yaml": "a3f8424384af1fa3345d1b95b7670386f87b63b4d1c7c08c8b2e69bbd5760c7c",
+    "pkg/dictionary/auth/errors.go": "d48f6b71d25e66f99aac85e948a777b508cc82bee884950892c314a609a7bd82",
+    "pkg/dictionary/user/errors.yaml": "cf52ccbe1b04dfe306f5a7b04a4c0a78e53742500e4557a98bd3739297e2318f",
+    "pkg/dictionary/user/errors.go": "b863df45476f008911e30457c79163ae3530e096bf044ca3ac370590ca2eb375",
+    "pkg/dictionary/common/errors.yaml": "1e9d5f3b0010f6f48d1935657f6c5187fd9e5dbb261a0f1d6b612710ef56b1dc",
+    "pkg/dictionary/common/errors.go": "bc2485ead5d42ef0d25c61c3e3c28212b79ce12c7fb889f20550453896281f41",
+    "pkg/dictionary/application/errors.yaml": "d5db87717d08026ab9b1c1c674b187bd0276c02ea2b587d34ca088b4d8c0f7f2",
+    "pkg/dictionary/application/errors.go": "5d226fa5088d9f49443b3063e4dc4807c8d477ad24c20f1bb242d3c89d96bfdf",
+    "pkg/grpcerror/mapping/role_err.go": "3f00dad6265cd04eb1b649a74adac6d3bc494f1548fa5965ddaff0f17c038977",
+    "pkg/grpcerror/mapping/user_err.go": "2cf3bfcadceb942ee0cc626789a7387264ef5c189cb88831f3e06b136293631f",
+    "pkg/grpcerror/mapping/common_err.go": "0a9102804ce966bfcb58f98115bc0a9a03e495e555fc615da250156c148d406b",
+    "pkg/grpcerror/mapping/auth_err.go": "2807aecade984e591c0e28622fadb20cf3933b42b16ae4b0c9e89fa440553b80",
+    "pkg/grpcerror/mapping/application_err.go": "1f24a425562ce23a537d6fa5d6acedc229b373e687bc1f61c91eb504334f751d"
+  },
+  "generators": {
+    "protoc": "libprotoc 33.4",
+    "protoc-gen-go": "protoc-gen-go v1.36.11",
+    "protoc-gen-go-grpc": "protoc-gen-go-grpc 1.6.1"
+  }
+}

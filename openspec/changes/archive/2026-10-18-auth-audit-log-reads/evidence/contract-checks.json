@@ -1,0 +1,72 @@
+[
+  {
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./..."
+    ],
+    "mode": "workspace",
+    "started_at": "2026-10-18T07:32:02.452227+00:00",
+    "ended_at": "2026-10-18T07:32:04.355906+00:00",
+    "exit": 0,
+    "tests": {
+      "pass": 140,
+      "fail": 0,
+      "skip": 0
+    },
+    "log_sha256": "59b0a10e5130393d2811c39df0f606aa52458183925063f22e4d1b2f7657c0b4"
+  },
+  {
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "mode": "workspace",
+    "started_at": "2026-10-18T07:32:04.357045+00:00",
+    "ended_at": "2026-10-18T07:32:04.594483+00:00",
+    "exit": 0,
+    "tests": {
+      "pass": 0,
+      "fail": 0,
+      "skip": 0
+    },
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./..."
+    ],
+    "mode": "standalone",
+    "started_at": "2026-10-18T07:32:04.594692+00:00",
+    "ended_at": "2026-10-18T07:32:06.875953+00:00",
+    "exit": 0,
+    "tests": {
+      "pass": 140,
+      "fail": 0,
+      "skip": 0
+    },
+    "log_sha256": "61a85aef67ca7cf07c440b634e890febeacfd9d38784a73aad4f8a78e0e44a7a"
+  },
+  {
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "mode": "standalone",
+    "started_at": "2026-10-18T07:32:06.876958+00:00",
+    "ended_at": "2026-10-18T07:32:07.088948+00:00",
+    "exit": 0,
+    "tests": {
+      "pass": 0,
+      "fail": 0,
+      "skip": 0
+    },
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

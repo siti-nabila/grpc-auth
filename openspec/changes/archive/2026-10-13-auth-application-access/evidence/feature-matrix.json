@@ -1,0 +1,24 @@
+{
+  "label": "feature-matrix",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./tests/features/application/..."
+  ],
+  "started_at": "2026-10-13T07:57:41.989194+00:00",
+  "seconds": 3.106,
+  "exit_code": 1,
+  "log": "/tmp/aap-feature-matrix.log",
+  "source_identity": "667840df145ec4c1f5927cf015e3dc3ef5a675cad6ec428eb569dab685d0d508",
+  "passed_tests": 221,
+  "failed_tests": [
+    "TestApplicationAccess/compound_access_authority_snapshot_mutation_replay_and_atomic_failure_matrix/grant/access-only",
+    "TestApplicationAccess/compound_access_authority_snapshot_mutation_replay_and_atomic_failure_matrix/revoke/access-only",
+    "TestApplicationAccess/compound_access_authority_snapshot_mutation_replay_and_atomic_failure_matrix",
+    "TestApplicationAccess",
+    "github.com/siti-nabila/grpc-auth/tests/features/application"
+  ],
+  "skipped_tests": []
+}

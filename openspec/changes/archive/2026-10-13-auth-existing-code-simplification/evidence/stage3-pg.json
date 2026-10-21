@@ -1,0 +1,23 @@
+{
+  "label": "stage3-pg",
+  "mode": "workspace",
+  "command": [
+    "/tmp/auth-assignment-postgres",
+    "test",
+    "test",
+    "-json",
+    "-tags",
+    "postgres",
+    "-count=1",
+    "-run",
+    "TestPostgres(SessionFoundation|SessionProfileConcurrency|LoginProducer|RefreshLifecycle|SessionGeneration|LogoutLifecycle|SelfSessionLifecycle|PasswordLifecycle|AdminSessionLifecycle)",
+    "./tests/integration/postgres"
+  ],
+  "started_at": "2026-10-13T03:04:26.208238+00:00",
+  "seconds": 12.992,
+  "exit_code": 0,
+  "log": "/tmp/ecs-stage3-pg.log",
+  "passed_tests": 177,
+  "failed_tests": [],
+  "skipped_tests": []
+}

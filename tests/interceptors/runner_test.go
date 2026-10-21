@@ -10,3 +10,16 @@ import (
 func TestInterceptors(t *testing.T) {
 	testutils.Run(t, test_scenarios.All())
 }
+
+func TestAuthRateLimiter(t *testing.T)  { testutils.Run(t, test_scenarios.Rate()) }
+func TestSecurityAttempts(t *testing.T) { testutils.Run(t, test_scenarios.SecurityAttempts()) }
+
+func TestLifecycleInterceptors(t *testing.T) { testutils.Run(t, test_scenarios.Lifecycle()) }
+func TestLifecycleRateGroups(t *testing.T)   { testutils.Run(t, test_scenarios.LifecycleRateGroups()) }
+
+func TestRoleRateGroups(t *testing.T) { testutils.Run(t, test_scenarios.RoleRateGroups()) }
+
+func TestAccessEvaluation(t *testing.T) { testutils.Run(t, test_scenarios.AccessEvaluation()) }
+
+func TestAuditLogReads(t *testing.T)    { testutils.Run(t, test_scenarios.AuditLogReads()) }
+func TestServiceAdmission(t *testing.T) { testutils.Run(t, test_scenarios.ServiceAdmission()) }

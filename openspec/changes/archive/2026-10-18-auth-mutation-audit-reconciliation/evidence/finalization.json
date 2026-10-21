@@ -1,0 +1,12 @@
+{
+  "finished_at_utc": "2026-10-18T12:16:10.358248+00:00",
+  "local_links_anchors_checked": 165,
+  "strict_openspec": "PASS",
+  "diff_check": "PASS",
+  "gofmt_changed_go": "PASS",
+  "full_descriptors_unchanged": 20,
+  "production_source_changes": 0,
+  "preserved_baseline_files": 776,
+  "code_snapshot_sha256": "e4e69276962d8f4b19ff453976c1d5d55940e7eebf88710a3bc3d7d51b81a2ed",
+  "acceptance": "MAR-01..07 PASS; DEP-01 and Phase 5 separate"
+}

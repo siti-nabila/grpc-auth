@@ -18,10 +18,13 @@ type (
 		KeepAliveTimeout time.Duration
 		KeepAliveIdle    time.Duration
 
-		Database map[string]database.DBConfig
-		Services map[string]ServiceConfig
-		JWT      JWTConfig
-		Logger   LoggerConfig
+		Database           map[string]database.DBConfig
+		Services           map[string]ServiceConfig
+		JWT                JWTConfig
+		Logger             LoggerConfig
+		AccessIssuer       AccessIssuerConfig
+		AuthLimiter        AuthLimiterConfig
+		CommandFingerprint CommandFingerprintConfig
 	}
 
 	ServiceConfig struct {

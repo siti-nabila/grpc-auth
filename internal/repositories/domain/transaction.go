@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"github.com/siti-nabila/orm/orm"
 	"github.com/siti-nabila/orm/query"
 )
 
@@ -17,4 +18,16 @@ type Transaction interface {
 
 type TransactionProvider interface {
 	Begin(context.Context) (Transaction, error)
+}
+
+// ReadSnapshotProvider leaves lifecycle ownership in the feature. Mutation
+// providers retain ReadCommitted; this path is only for consistent read RPCs.
+type ReadSnapshotProvider interface {
+	BeginSnapshot(context.Context) (Transaction, error)
+}
+
+// InsertWriter exposes the ORM insert builder on the supplied transaction.
+// Context, connection and finalization remain owned by that transaction.
+type InsertWriter interface {
+	CreateWith(any) *orm.CreateCommand
 }

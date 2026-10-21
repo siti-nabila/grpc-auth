@@ -1,0 +1,17 @@
+{
+  "label": "baseline-standalone",
+  "mode": "standalone",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./..."
+  ],
+  "started_at": "2026-10-13T02:45:53.854839+00:00",
+  "seconds": 25.339,
+  "exit_code": 0,
+  "log": "/tmp/ecs-baseline-standalone.log",
+  "passed_tests": 2733,
+  "failed_tests": [],
+  "skipped_tests": []
+}

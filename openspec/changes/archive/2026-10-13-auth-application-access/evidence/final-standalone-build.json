@@ -1,0 +1,14 @@
+{
+  "label": "final-standalone-build",
+  "mode": "standalone",
+  "command": [
+    "make",
+    "build",
+    "BIN_DIR=/tmp/aap-build-standalone"
+  ],
+  "started_at": "2026-10-13T08:18:57.885245+00:00",
+  "seconds": 0.518,
+  "exit_code": 0,
+  "log": "/tmp/aap-final-standalone-build.log",
+  "source_identity": "8746bf2c3914799fb83934466574feb0bb83bd270888ea320db35585d910dc5f"
+}

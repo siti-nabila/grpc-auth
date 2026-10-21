@@ -1,0 +1,152 @@
+[
+  {
+    "name": "alr-default-work",
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./..."
+    ],
+    "mode": "workspace",
+    "started_at_utc": "2026-10-18T09:46:43.737083+00:00",
+    "finished_at_utc": "2026-10-18T09:47:17.659817+00:00",
+    "exit": 0,
+    "counts": {
+      "passed": 3513,
+      "failed": 0,
+      "skipped": 0
+    },
+    "log_sha256": "e40493e1c204526ca927540909b7bac6f5a6c3e198458cc89e641bd788d9b9fa"
+  },
+  {
+    "name": "alr-default-off",
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./..."
+    ],
+    "mode": "standalone",
+    "started_at_utc": "2026-10-18T09:46:43.737047+00:00",
+    "finished_at_utc": "2026-10-18T09:47:16.602217+00:00",
+    "exit": 0,
+    "counts": {
+      "passed": 3513,
+      "failed": 0,
+      "skipped": 0
+    },
+    "log_sha256": "ea55688c2a1e7e2f0626c048480f22c4002ef5cbeea36dd5d37bb88160eba33d"
+  },
+  {
+    "name": "alr-race-work",
+    "command": [
+      "go",
+      "test",
+      "-race",
+      "-json",
+      "./..."
+    ],
+    "mode": "workspace",
+    "started_at_utc": "2026-10-18T09:47:36.641729+00:00",
+    "finished_at_utc": "2026-10-18T09:47:55.765733+00:00",
+    "exit": 0,
+    "counts": {
+      "passed": 3513,
+      "failed": 0,
+      "skipped": 0
+    },
+    "log_sha256": "2fe9aae5d779692c803dceabc7c4f9bc1cf8c0347190becba8fd2321962cc2b1"
+  },
+  {
+    "name": "alr-race-off",
+    "command": [
+      "go",
+      "test",
+      "-race",
+      "-json",
+      "./..."
+    ],
+    "mode": "standalone",
+    "started_at_utc": "2026-10-18T09:48:29.350879+00:00",
+    "finished_at_utc": "2026-10-18T09:48:50.795735+00:00",
+    "exit": 0,
+    "counts": {
+      "passed": 3513,
+      "failed": 0,
+      "skipped": 0
+    },
+    "log_sha256": "712dd7a3b8323afe163c8574b7e12f89105adaf93f32ec93ae516ce0d66b1e1a"
+  },
+  {
+    "name": "alr-vet-work",
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "mode": "workspace",
+    "started_at_utc": "2026-10-18T09:46:43.737087+00:00",
+    "finished_at_utc": "2026-10-18T09:46:46.734253+00:00",
+    "exit": 0,
+    "counts": {
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0
+    },
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "alr-vet-off",
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "mode": "standalone",
+    "started_at_utc": "2026-10-18T09:47:13.471165+00:00",
+    "finished_at_utc": "2026-10-18T09:47:14.400121+00:00",
+    "exit": 0,
+    "counts": {
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0
+    },
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "alr-build-work",
+    "command": [
+      "make",
+      "build",
+      "BIN_DIR=/private/tmp/alr-build-work"
+    ],
+    "mode": "workspace",
+    "started_at_utc": "2026-10-18T09:47:13.471203+00:00",
+    "finished_at_utc": "2026-10-18T09:47:15.409028+00:00",
+    "exit": 0,
+    "counts": {
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0
+    },
+    "log_sha256": "641403cd267c646dce78a42e9f6d1859fa614fc66b4d2cedee09ad1f5f8412d0"
+  },
+  {
+    "name": "alr-build-off",
+    "command": [
+      "make",
+      "build",
+      "BIN_DIR=/private/tmp/alr-build-off"
+    ],
+    "mode": "standalone",
+    "started_at_utc": "2026-10-18T09:47:36.641733+00:00",
+    "finished_at_utc": "2026-10-18T09:47:39.347976+00:00",
+    "exit": 0,
+    "counts": {
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0
+    },
+    "log_sha256": "0ca618e203415e5ef92ae911e23844f4ce69316f3ac5d5407b1de15ccd9c9df7"
+  }
+]

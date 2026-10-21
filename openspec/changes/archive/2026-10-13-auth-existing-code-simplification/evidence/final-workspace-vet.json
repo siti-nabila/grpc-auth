@@ -1,0 +1,14 @@
+{
+  "label": "final-workspace-vet",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "vet",
+    "./..."
+  ],
+  "started_at": "2026-10-13T03:11:01.296010+00:00",
+  "seconds": 0.725,
+  "exit_code": 0,
+  "log": "/tmp/ecs-final-workspace-vet.log",
+  "source_identity": "f322bc405eea1f8773dd60220c1e233f21b91b6cd7c17ecc4dd88a085aa892cf"
+}

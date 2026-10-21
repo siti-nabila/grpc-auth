@@ -1,0 +1,620 @@
+[
+  {
+    "scenario": "All command writes succeed",
+    "controlled_runners": [
+      "tests/features/common#TestTransactionOwnership",
+      "tests/features/user#TestManagement",
+      "tests/features/role#TestRoleManagement",
+      "tests/features/application#TestApplicationAccess"
+    ],
+    "postgres_runners": [
+      "TestPostgresPersistenceCommands",
+      "TestPostgresUserManagement",
+      "TestPostgresRoleManagement",
+      "TestPostgresApplicationManagement"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Any required write fails",
+    "controlled_runners": [
+      "tests/features/common#TestTransactionOwnership",
+      "tests/features/user#TestManagement",
+      "tests/features/role#TestRoleManagement",
+      "tests/features/application#TestApplicationAccess"
+    ],
+    "postgres_runners": [
+      "TestPostgresPersistenceCommands",
+      "TestPostgresUserManagement",
+      "TestPostgresRoleManagement",
+      "TestPostgresApplicationManagement"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Production mutation fails at each required write",
+    "controlled_runners": [
+      "tests/features/common#TestTransactionOwnership",
+      "tests/features/user#TestManagement",
+      "tests/features/role#TestRoleManagement",
+      "tests/features/application#TestApplicationAccess"
+    ],
+    "postgres_runners": [
+      "TestPostgresPersistenceCommands",
+      "TestPostgresUserManagement",
+      "TestPostgresRoleManagement",
+      "TestPostgresApplicationManagement"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Cancellation or panic interrupts a tentative command",
+    "controlled_runners": [
+      "tests/features/common#TestTransactionOwnership",
+      "tests/features/user#TestManagement",
+      "tests/features/role#TestRoleManagement",
+      "tests/features/application#TestApplicationAccess"
+    ],
+    "postgres_runners": [
+      "TestPostgresPersistenceCommands",
+      "TestPostgresUserManagement",
+      "TestPostgresRoleManagement",
+      "TestPostgresApplicationManagement"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Commit acknowledgement fails",
+    "controlled_runners": [
+      "tests/features/common#TestCommitAcknowledgement"
+    ],
+    "postgres_runners": [
+      "TestPostgresCommitAcknowledgement"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Event is stored without a broker",
+    "controlled_runners": [
+      "tests/repositories/transaction#TestPersistence",
+      "tests/features/common#TestMutationEventCorrelation"
+    ],
+    "postgres_runners": [
+      "TestPostgresPersistenceCommands",
+      "TestPostgresLoginProducer",
+      "TestPostgresRoleManagement",
+      "TestPostgresAssignmentManagement",
+      "TestPostgresApplicationManagement"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Batch or compound event is prepared",
+    "controlled_runners": [
+      "tests/repositories/transaction#TestPersistence",
+      "tests/features/common#TestMutationEventCorrelation"
+    ],
+    "postgres_runners": [
+      "TestPostgresPersistenceCommands",
+      "TestPostgresLoginProducer",
+      "TestPostgresRoleManagement",
+      "TestPostgresAssignmentManagement",
+      "TestPostgresApplicationManagement"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "A terminal session event is prepared by a future consumer",
+    "controlled_runners": [
+      "tests/features/auth_feature#TestLogout",
+      "tests/features/session#TestSelfRevocation",
+      "tests/features/session#TestAdminRevocation"
+    ],
+    "postgres_runners": [
+      "TestPostgresLogoutLifecycle",
+      "TestPostgresSelfSessionLifecycle",
+      "TestPostgresAdminSessionLifecycle"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Login and normal refresh do not invent creation events",
+    "controlled_runners": [
+      "tests/features/auth_feature#TestSessionLogin",
+      "tests/features/auth_feature#TestRefresh"
+    ],
+    "postgres_runners": [
+      "TestPostgresLoginProducer",
+      "TestPostgresRefreshLifecycle"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "A single session reaches its terminal state once",
+    "controlled_runners": [
+      "tests/features/auth_feature#TestRefresh",
+      "tests/features/auth_feature#TestLogout",
+      "tests/features/session#TestSelfRevocation",
+      "tests/features/session#TestAdminRevocation"
+    ],
+    "postgres_runners": [
+      "TestPostgresRefreshLifecycle",
+      "TestPostgresLogoutLifecycle",
+      "TestPostgresSelfSessionLifecycle",
+      "TestPostgresAdminSessionLifecycle"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Password and global revocation use one user aggregate event",
+    "controlled_runners": [
+      "tests/features/auth_feature#TestChangePassword",
+      "tests/features/session#TestSelfRevocation",
+      "tests/features/session#TestAdminRevocation"
+    ],
+    "postgres_runners": [
+      "TestPostgresPasswordLifecycle",
+      "TestPostgresSelfSessionLifecycle",
+      "TestPostgresAdminSessionLifecycle"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Status mutation carries its existing revocation signal",
+    "controlled_runners": [
+      "tests/features/user#TestManagement"
+    ],
+    "postgres_runners": [
+      "TestPostgresUserManagement"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Role assignment and application access remain compound commands",
+    "controlled_runners": [
+      "tests/features/user#TestAssignments",
+      "tests/features/application#TestApplicationAccess"
+    ],
+    "postgres_runners": [
+      "TestPostgresAssignmentManagement",
+      "TestPostgresApplicationManagement"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "A newly scoped command has no effective change",
+    "controlled_runners": [
+      "tests/features/common#TestIdempotency",
+      "tests/features/user#TestManagement",
+      "tests/features/user#TestManagementReplay",
+      "tests/features/role#TestRoleManagement",
+      "tests/features/application#TestApplicationAccess"
+    ],
+    "postgres_runners": [
+      "TestPostgresPersistenceCommands",
+      "TestPostgresUserManagement",
+      "TestPostgresRoleManagement",
+      "TestPostgresAssignmentManagement",
+      "TestPostgresApplicationManagement"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "The no-op result is replayed",
+    "controlled_runners": [
+      "tests/features/common#TestIdempotency",
+      "tests/features/user#TestManagement",
+      "tests/features/user#TestManagementReplay",
+      "tests/features/role#TestRoleManagement",
+      "tests/features/application#TestApplicationAccess"
+    ],
+    "postgres_runners": [
+      "TestPostgresPersistenceCommands",
+      "TestPostgresUserManagement",
+      "TestPostgresRoleManagement",
+      "TestPostgresAssignmentManagement",
+      "TestPostgresApplicationManagement"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Management no-op and self-service behavior keep their separate contracts",
+    "controlled_runners": [
+      "tests/features/common#TestIdempotency",
+      "tests/features/user#TestManagement",
+      "tests/features/user#TestManagementReplay",
+      "tests/features/role#TestRoleManagement",
+      "tests/features/application#TestApplicationAccess",
+      "tests/features/profile#TestSessionProfile"
+    ],
+    "postgres_runners": [
+      "TestPostgresPersistenceCommands",
+      "TestPostgresUserManagement",
+      "TestPostgresRoleManagement",
+      "TestPostgresAssignmentManagement",
+      "TestPostgresApplicationManagement",
+      "TestPostgresSessionProfileConcurrency"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Current authority is lost before a saved result is requested",
+    "controlled_runners": [
+      "tests/features/common#TestIdempotency",
+      "tests/features/user#TestManagement",
+      "tests/features/user#TestManagementReplay",
+      "tests/features/role#TestRoleManagement",
+      "tests/features/application#TestApplicationAccess"
+    ],
+    "postgres_runners": [
+      "TestPostgresUserManagementConcurrency",
+      "TestPostgresRoleConcurrency",
+      "TestPostgresApplicationConcurrency"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "An identical committed result precedes target stale-version checks",
+    "controlled_runners": [
+      "tests/features/common#TestIdempotency",
+      "tests/features/user#TestManagement",
+      "tests/features/user#TestManagementReplay",
+      "tests/features/role#TestRoleManagement",
+      "tests/features/application#TestApplicationAccess"
+    ],
+    "postgres_runners": [
+      "TestPostgresPersistenceCommands",
+      "TestPostgresUserManagement",
+      "TestPostgresRoleManagement",
+      "TestPostgresAssignmentManagement",
+      "TestPostgresApplicationManagement",
+      "TestPostgresCommitAcknowledgement"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Concurrent key scope and payloads remain distinct",
+    "controlled_runners": [
+      "tests/features/common#TestIdempotency",
+      "tests/features/user#TestManagement",
+      "tests/features/user#TestManagementReplay",
+      "tests/features/role#TestRoleManagement",
+      "tests/features/application#TestApplicationAccess"
+    ],
+    "postgres_runners": [
+      "TestPostgresUserManagementConcurrency",
+      "TestPostgresRoleConcurrency",
+      "TestPostgresAssignmentConcurrency",
+      "TestPostgresApplicationConcurrency"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Presence expiry and role updates preserve identity semantics",
+    "controlled_runners": [
+      "tests/features/common#TestIdempotency",
+      "tests/features/user#TestManagement",
+      "tests/features/user#TestManagementReplay",
+      "tests/features/role#TestRoleManagement",
+      "tests/features/application#TestApplicationAccess"
+    ],
+    "postgres_runners": [
+      "TestPostgresPersistenceCommands",
+      "TestPostgresUserManagement",
+      "TestPostgresRoleManagement",
+      "TestPostgresAssignmentManagement",
+      "TestPostgresApplicationManagement"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Future reuse consumer commits revocation and then denies",
+    "controlled_runners": [
+      "tests/features/auth_feature#TestRefresh"
+    ],
+    "postgres_runners": [
+      "TestPostgresRefreshLifecycle"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Security writes fail before commit",
+    "controlled_runners": [
+      "tests/features/auth_feature#TestRefresh"
+    ],
+    "postgres_runners": [
+      "TestPostgresRefreshLifecycle"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Refresh busy is not evidence of consumed-token reuse",
+    "controlled_runners": [
+      "tests/features/auth_feature#TestRefresh"
+    ],
+    "postgres_runners": [
+      "TestPostgresRefreshLifecycle"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Production consumed-token reuse commits before denial",
+    "controlled_runners": [
+      "tests/features/auth_feature#TestRefresh"
+    ],
+    "postgres_runners": [
+      "TestPostgresRefreshLifecycle"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Reuse persistence or finalization cannot prove success",
+    "controlled_runners": [
+      "tests/features/auth_feature#TestRefresh",
+      "tests/features/common#TestCommitAcknowledgement"
+    ],
+    "postgres_runners": [
+      "TestPostgresRefreshLifecycle",
+      "TestPostgresCommitAcknowledgement"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Pending event is stored while no relay exists",
+    "controlled_runners": [
+      "tests/repositories/transaction#TestPersistence",
+      "tests/features/common#TestMutationEventCorrelation"
+    ],
+    "postgres_runners": [
+      "TestPostgresPersistenceCommands",
+      "TestPostgresLoginProducer",
+      "TestPostgresRoleManagement",
+      "TestPostgresAssignmentManagement",
+      "TestPostgresApplicationManagement"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Login producer is integrated for activation",
+    "controlled_runners": [
+      "tests/features/auth_feature#TestSessionLogin"
+    ],
+    "postgres_runners": [
+      "TestPostgresLoginProducer"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "A failed command needs security attempt evidence",
+    "controlled_runners": [
+      "tests/interceptors#TestSecurityAttempts",
+      "tests/integration/auth_reads#TestRegisteredLifecycle",
+      "tests/integration/auth_reads#TestFailureAudit"
+    ],
+    "postgres_runners": [
+      "TestPostgresSecurityAttempts",
+      "TestPostgresUserManagement"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Register or profile response is lost",
+    "controlled_runners": [
+      "tests/features/auth_feature#TestPendingRegistration",
+      "tests/features/profile#TestSessionProfile"
+    ],
+    "postgres_runners": [
+      "TestPostgresLoginProducer",
+      "TestPostgresSessionProfileConcurrency"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Direct calls retain the verified authority boundary",
+    "controlled_runners": [
+      "tests/interceptors#TestSecurityAttempts",
+      "tests/integration/auth_reads#TestRegisteredLifecycle",
+      "tests/integration/auth_reads#TestFailureAudit",
+      "tests/handler#TestUserManagementHandlers",
+      "tests/handler#TestRoleManagementHandlers"
+    ],
+    "postgres_runners": [
+      "TestPostgresRegisteredServer",
+      "TestPostgresUserManagement",
+      "TestPostgresRoleManagement"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Independent attempt persistence fails after command cleanup",
+    "controlled_runners": [
+      "tests/interceptors#TestSecurityAttempts",
+      "tests/integration/auth_reads#TestRegisteredLifecycle",
+      "tests/integration/auth_reads#TestFailureAudit"
+    ],
+    "postgres_runners": [
+      "TestPostgresSecurityAttempts",
+      "TestPostgresUserManagement"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Login denial and refresh reuse are already accounted for",
+    "controlled_runners": [
+      "tests/interceptors#TestSecurityAttempts",
+      "tests/integration/auth_reads#TestRegisteredLifecycle",
+      "tests/integration/auth_reads#TestFailureAudit",
+      "tests/features/auth_feature#TestRefresh"
+    ],
+    "postgres_runners": [
+      "TestPostgresSecurityAttempts",
+      "TestPostgresUserManagement",
+      "TestPostgresRefreshLifecycle"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Rate or unverified identity is rejected",
+    "controlled_runners": [
+      "tests/interceptors#TestSecurityAttempts",
+      "tests/integration/auth_reads#TestRegisteredLifecycle",
+      "tests/integration/auth_reads#TestFailureAudit",
+      "tests/interceptors#TestAuthRateLimiter"
+    ],
+    "postgres_runners": [
+      "TestPostgresSecurityAttempts",
+      "TestPostgresUserManagement"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  },
+  {
+    "scenario": "Existing clients keep their wire and credential contracts",
+    "controlled_runners": [
+      "tests/integration/auth_reads#TestRegisteredLifecycle",
+      "tests/handler#TestHandler",
+      "tests/handler#TestSessionLoginHandler",
+      "tests/handler#TestRefreshHandler"
+    ],
+    "postgres_runners": [
+      "TestPostgresRegisteredServer",
+      "TestPostgresRegisteredLifecycle"
+    ],
+    "status": "PASS",
+    "evidence": [
+      "backend-checks.json",
+      "postgres-checks.json"
+    ]
+  }
+]

@@ -1,0 +1,31 @@
+{
+  "label": "registered-access-fixed",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./tests/integration/auth_reads/...",
+    "-run",
+    "TestRegisteredApplicationAccess"
+  ],
+  "started_at": "2026-10-13T08:09:12.699356+00:00",
+  "seconds": 2.784,
+  "exit_code": 1,
+  "log": "/tmp/aap-registered-access-fixed.log",
+  "source_identity": "88a333b7436c36080fab474ed7014ac966eefa5fff63961c5a8adc154d154e6c",
+  "passed_tests": 6,
+  "failed_tests": [
+    "TestRegisteredApplicationAccess/D_registered_production_SQL_list_grant_revoke_noop_replay_AND_denial_context_and_dependency/list",
+    "TestRegisteredApplicationAccess/D_registered_production_SQL_list_grant_revoke_noop_replay_AND_denial_context_and_dependency/list_empty",
+    "TestRegisteredApplicationAccess/D_registered_production_SQL_list_grant_revoke_noop_replay_AND_denial_context_and_dependency/list_dependency",
+    "TestRegisteredApplicationAccess/D_registered_production_SQL_list_grant_revoke_noop_replay_AND_denial_context_and_dependency/list_canceled",
+    "TestRegisteredApplicationAccess/D_registered_production_SQL_list_grant_revoke_noop_replay_AND_denial_context_and_dependency/revoke",
+    "TestRegisteredApplicationAccess/D_registered_production_SQL_list_grant_revoke_noop_replay_AND_denial_context_and_dependency/revoke_noop",
+    "TestRegisteredApplicationAccess/D_registered_production_SQL_list_grant_revoke_noop_replay_AND_denial_context_and_dependency/revoke_replay",
+    "TestRegisteredApplicationAccess/D_registered_production_SQL_list_grant_revoke_noop_replay_AND_denial_context_and_dependency",
+    "TestRegisteredApplicationAccess",
+    "github.com/siti-nabila/grpc-auth/tests/integration/auth_reads"
+  ],
+  "skipped_tests": []
+}

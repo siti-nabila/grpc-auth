@@ -1,0 +1,30 @@
+{
+  "items": [
+    {
+      "id": "auth-user-role-assignment",
+      "type": "change",
+      "valid": true,
+      "issues": [],
+      "durationMs": 8
+    }
+  ],
+  "summary": {
+    "totals": {
+      "items": 1,
+      "passed": 1,
+      "failed": 0
+    },
+    "byType": {
+      "change": {
+        "items": 1,
+        "passed": 1,
+        "failed": 0
+      }
+    }
+  },
+  "version": "1.0",
+  "root": {
+    "path": "/Users/bleki/Desktop/mini-projects/grpc-auth",
+    "source": "nearest"
+  }
+}

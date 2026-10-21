@@ -1,0 +1,22 @@
+{
+  "label": "pg-mid-full",
+  "mode": "workspace",
+  "command": [
+    "/tmp/auth-assignment-postgres",
+    "test",
+    "test",
+    "-json",
+    "-tags",
+    "postgres",
+    "-count=1",
+    "./tests/integration/postgres/..."
+  ],
+  "started_at": "2026-10-13T08:09:16.957462+00:00",
+  "seconds": 31.933,
+  "exit_code": 0,
+  "log": "/tmp/aap-pg-mid-full.log",
+  "source_identity": "88a333b7436c36080fab474ed7014ac966eefa5fff63961c5a8adc154d154e6c",
+  "passed_tests": 505,
+  "failed_tests": [],
+  "skipped_tests": []
+}

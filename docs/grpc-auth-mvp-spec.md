@@ -135,7 +135,7 @@ otomatis mendapat privilege karena memakai prefix service yang sama.
 
 | Parameter | Keputusan MVP |
 | --- | --- |
-| Algoritma | HS256 hanya baseline sebelum cutover; Phase 3 signing/verifying EdDSA dengan Ed25519; sesudah cutover HS256 ditolak |
+| Algoritma | HS256 hanya baseline historis; source signing/verifying EdDSA dengan Ed25519 diterapkan bersama session-aware Login, termasuk increment Phase 1/3. Deployment cutover dan login ulang digate di Phase 6; source aktif menolak HS256 |
 | Issuer | Exact ApplicationName dari env.yaml; konfigurasi kosong gagal startup; issuer request harus sama |
 | Audience | Tidak wajib dan tidak divalidasi, sesuai keputusan pengguna; verifier utama tetap grpc-auth |
 | Claims | sub sebagai decimal user ID, sid UUID session, jti UUID token, iss, iat, exp, auth_version; user_id legacy boleh additive untuk compatibility tetapi bila ada harus sama dengan sub |
@@ -577,6 +577,16 @@ trace metadata, deadline dan cancellation dipropagasikan sampai repository.
 
 ## 8. Rate limiter local MVP
 
+Keputusan user 20 Oktober 2026: semua 37 registered RPC menambahkan stage
+service-ingress **600 request/menit, burst 100 per verified service/process**
+setelah TLS/service/method authentication dan sebelum Attempt/Session. Termasuk
+Logout, self/admin revoke dan TesRPC. Quota identity pada tabel di bawah tetap;
+stage service tidak direfund pada downstream denial/validation/cancel atau
+identity rate rejection. Early rejection mengikuti RATE_LIMITED/RESOURCE_EXHAUSTED
+dan positive RetryInfo, tanpa DB/session/audit/handler work. Shared store tetap
+10.000 entries/TTL 15 menit/cleanup 1 menit. Ini approved local aggregate policy,
+bukan quota global atau batas total concurrent connections.
+
 Token bucket process-local, concurrency-safe. Angka ini konfigurasi awal local
 MVP, bukan benchmark/limit produksi; restart boleh reset state dan reload config.
 Setiap bucket independen berikut wajib lolos; service trust diverifikasi dulu.
@@ -724,19 +734,36 @@ disiapkan dahulu; permission RPC tanpa guard bukan deliverable yang berfungsi.
 | 0 | Source/docs/contract tersedia | Inventaris bagian 2, full-method/message/error mapping, actual schema/bootstrap plan, scoped OpenSpec change | Tidak ada ambiguous business decision atau dependency tersembunyi pada change |
 | 1 | Scope dependency contract relevan disetujui | Transaction/shared reader-writer, TryLock protocol, audit/outbox/idempotency repositories, session persistence/auth foundation, opt-in DB harness | Mock dan PostgreSQL lifecycle/atomicity tests PASS; missing schema hanya perubahan eksplisit setelah preflight |
 | 2 | Phase 1; service/user/session/permission guard siap | User/status, custom roles/mapping, assignment/app access; seluruh command dengan expected version/key/audit/event | Permission/ownership/system-role/last-admin/union/no-op/replay concurrent PASS |
-| 3 | Persistence/auth guard + key/caller/client readiness | Register/login/password/restricted/refresh/logout/revoke, EdDSA cutover dan login ulang | Algorithm/issuer/TTL/sid/auth_version/TLS/service credential tests dan refresh PostgreSQL PASS |
+| 3 | Persistence/auth guard + backend key/caller validation dan contract | Register/login/password/restricted/refresh/logout/revoke, EdDSA source wiring | Algorithm/issuer/TTL/sid/auth_version/TLS/service credential tests dan refresh PostgreSQL PASS; external deployment readiness di Phase 6 |
 | 4 | Implemented mutation RPC tersedia | Reconcile matrix/contract/AC, negative cases, security audit, event trigger/password/reuse compatibility | Semua mutation sesuai R/N, credential redacted, error mapping benar |
-| 5 | Trusted key/IP dan error contract | Limiter/hardening/metrics local | M-10/M-11 PASS; auth basic limiter sudah tersedia sebelum public auth dinyatakan selesai |
-| 6 | Semua mandatory increments dan dependencies | Full regression, opt-in DB, compatibility/version evidence | Semua MVP_REQUIRED PASS; tidak ada critical blocker |
+| 5 | Backend key/IP trust policy dan error contract | Limiter/hardening/metrics local | M-10/M-11 backend PASS; auth basic limiter tersedia sejak auth source; actual consumer IP sanitization di Phase 6 |
+| 6 | Semua mandatory backend increments tersedia | Full regression, opt-in DB, compatibility/version evidence dan readiness deployment lintas service | Semua MVP_REQUIRED PASS dan DEP-01 PASS; tidak ada critical blocker sebelum deployment |
 
-Gate cutover Phase 3: pasangan key siap dan sign/verify PASS, session/status/
-auth_version/issuer/TTL checks aktif, service token/TLS semua caller siap,
-rest-orc dapat menangani response baru dan login ulang, minimal satu platform
-admin ACTIVE terverifikasi. Saat cutover revoke semua session/family lama,
-reject JWT lama tanpa claims/HS256, mulai EdDSA; tidak ada dual-algorithm window.
-Readiness gagal → jangan cutover; setelah cutover rollback tidak membuka kembali
-credential/session/auth_version lama. Tidak menjalankan migration/bootstrap
-ulang hanya karena script tersedia.
+Keputusan user 10 Oktober 2026: readiness deployment dipindahkan ke **Phase 6**,
+phase terakhir. Phase 1–5 tetap memerlukan secure source, published contract dan
+backend tests terkait; kesiapan actual deployment/rest-orc tidak menahan
+penyelesaian increment backend. Implementasi EdDSA-only bersama real Login dan
+guard lengkap boleh selesai lebih awal, tanpa mempertahankan HS256 atau bypass.
+Deployment dan cutover/login ulang pada environment target menunggu DEP-01.
+
+### 10.1 Phase 6 readiness deployment
+
+Gate ini dipindahkan dari task 9.1 change auth-session-authorization-foundation.
+Status **BLOCKED / belum PASS**, tetap mandatory MVP dan bukan POST_MVP.
+Owner: deployment owner bersama rest-orc dan consuming application owner.
+
+- [ ] DEP-01 Verifikasi actual consuming-client TLS/service credential, trusted client-IP/proxy sanitization, RetryInfo handling, PENDING/token-empty registration, safe credential storage/login ulang, serta actual deployment key/caller rotation/schema/minimal ACTIVE admin. Catat version set/evidence dan koordinasikan release/rollback tanpa memulihkan legacy credentials, revoked sessions atau auth_version lama. Backend tests/config lokal tidak meluluskan gate ini.
+
+Pasangan key environment target harus siap dan sign/verify PASS; session/status/
+auth_version/issuer/TTL checks aktif; service token/TLS semua caller serta
+compatible response/login ulang pada consumer terverifikasi. Recheck minimal
+satu platform admin ACTIVE dan schema pada environment target. Retention/archival
+production disepakati bila target deployment production. Pada deployment cutover,
+revoke session/family lama sesuai approved migration policy dan reject legacy
+JWT/HS256; tidak ada dual-algorithm window. Readiness gagal menahan deployment
+Phase 6, bukan mengubah backend yang selesai menjadi HS256. Rollback tidak
+memulihkan credential/session/auth_version lama. Tidak menjalankan migration,
+bootstrap atau deployment otomatis hanya karena checklist sudah tersedia.
 
 Implementation verification: gofmt pada Go yang berubah, targeted test, default
 go test ./..., go vet bila relevan, race untuk concurrency/shared state,
@@ -759,7 +786,7 @@ MVP implementation siap; membuat context OpenSpec tidak menciptakan change/tasks
 | D-01 | Satu grpc-auth; IAM lengkap, relay/consumer/CLM ditunda | Disepakati plan |
 | D-02 | Opaque service token per caller + TLS; service identity terpisah dari JWT user | Disepakati pengguna |
 | D-03 | Register PENDING tanpa credential; activation admin; TesRPC dipertahankan | Disepakati pengguna |
-| D-04 | EdDSA pada Phase 3; issuer ApplicationName; audience ignored | Disepakati pengguna/plan terbaru |
+| D-04 | EdDSA source bersama real Login/session-aware guards pada increment Phase 1/3; deployment cutover/login ulang digate di Phase 6; issuer ApplicationName; audience ignored | Keputusan user 10 Oktober 2026 |
 | D-05 | Access 15 menit, refresh/session absolute 7 hari, skew 30 detik, non-sliding | Disepakati pengguna |
 | D-06 | Strict refresh rotation, single-flight client, locked server, response-lost login ulang | Disepakati pengguna/plan; tanpa credential replay cache |
 | D-07 | Profile name/address/phone editable sendiri, email/password melalui profil dilarang; status/role/owner tetap protected | Disepakati pengguna; selaras source ProfileRequest |
@@ -771,6 +798,7 @@ MVP implementation siap; membuat context OpenSpec tidak menciptakan change/tasks
 | D-13 | Target full methods/message additive, field-mask compatibility, session terminal revision 2 tanpa counter schema baru | Keputusan desain berdasarkan source; contract dan DB evidence masih prerequisite |
 | D-14 | DeleteRole/reset admin-publik/CRUD permission, cache allow dan distributed limiter bukan MVP | Disepakati plan terbaru |
 | D-15 | Feature memanggil Begin/Commit/Rollback/TryLock; repository memakai tx yang diberikan, provider teknis tetap infrastructure/ORM existing | Disepakati pengguna |
+| D-16 | Readiness deployment/EXT-02 dipindah dari task foundation 9.1 ke Phase 6 DEP-01; tetap mandatory sebelum deployment, tidak menahan completion backend Phase 1–5 | Disetujui user 10 Oktober 2026 |
 
 Prasyarat teknis yang masih harus dibuktikan pada implementation change: schema
 live dan batas kolom aktual, module contract baru/published version, TLS/key

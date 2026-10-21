@@ -1,0 +1,21 @@
+{
+  "label": "query-refactor",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./tests/repositories/domain/...",
+    "./tests/repositories/reader/...",
+    "./tests/repositories/assignment/...",
+    "./tests/features/user/...",
+    "./internal/features/user"
+  ],
+  "started_at": "2026-10-13T03:06:46.218617+00:00",
+  "seconds": 4.732,
+  "exit_code": 0,
+  "log": "/tmp/ecs-query-refactor.log",
+  "passed_tests": 567,
+  "failed_tests": [],
+  "skipped_tests": []
+}

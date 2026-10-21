@@ -24,5 +24,7 @@ func newSharedErrorEncoder() *grpcerror.Encoder {
 		grpcmapping.AuthCodeMappings()...,
 	)
 	mappings = append(mappings, grpcmapping.UserCodeMappings()...)
+	mappings = append(mappings, grpcmapping.RoleCodeMappings()...)
+	mappings = append(mappings, grpcmapping.ApplicationCodeMappings()...)
 	return grpcerror.NewEncoder(mappings...)
 }

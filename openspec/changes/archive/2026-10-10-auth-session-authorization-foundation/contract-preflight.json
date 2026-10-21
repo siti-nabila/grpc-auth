@@ -1,0 +1,173 @@
+{
+  "inspected_at_utc": "2026-10-10T06:42:52.116255+00:00",
+  "scope": "READ_ONLY_SOURCE_CONTRACT_PREFLIGHT",
+  "grpc_auth_head": "b89f37270d019c8d0d7823a3ff5d3526874d2232",
+  "graph_built_at_commit": "b89f37270d019c8d0d7823a3ff5d3526874d2232",
+  "api_contracts_pinned_version": "v0.0.0-20261010044649-bfbbeb282ec7",
+  "workspace_contract_source": "/Users/bleki/Desktop/mini-projects/api-contracts",
+  "published_contract_source": "/Users/bleki/go/pkg/mod/github.com/siti-nabila/api-contracts@v0.0.0-20261010044649-bfbbeb282ec7",
+  "compared_files": [
+    {
+      "path": "pb/user/v1/user.payload.pb.go",
+      "workspace_sha256": "1d15c5a6665f231a00413634009ecd170eed42beec6df25765fba39827607585",
+      "pinned_sha256": "1d15c5a6665f231a00413634009ecd170eed42beec6df25765fba39827607585",
+      "identical": true
+    },
+    {
+      "path": "pb/user/v1/user.service_grpc.pb.go",
+      "workspace_sha256": "89e38637d28660953795e54e09bd9aeb73ccdaed10bb7848a68e61411517dd4a",
+      "pinned_sha256": "89e38637d28660953795e54e09bd9aeb73ccdaed10bb7848a68e61411517dd4a",
+      "identical": true
+    },
+    {
+      "path": "pb/profile/v1/profile.payload.pb.go",
+      "workspace_sha256": "59d17e11bddddb75d4ba4b3e615bc367b9845b4a5a1734c157452123cfc23d29",
+      "pinned_sha256": "59d17e11bddddb75d4ba4b3e615bc367b9845b4a5a1734c157452123cfc23d29",
+      "identical": true
+    },
+    {
+      "path": "pb/profile/v1/profile.service_grpc.pb.go",
+      "workspace_sha256": "335dfc62148e7f622b0e8b7906a64d87ff19b1b20d36655e4cb2cfd62ee2cf8e",
+      "pinned_sha256": "335dfc62148e7f622b0e8b7906a64d87ff19b1b20d36655e4cb2cfd62ee2cf8e",
+      "identical": true
+    },
+    {
+      "path": "pkg/dictionary/auth/errors.go",
+      "workspace_sha256": "b103adfc4dc0e031e0a9b08c9c80f9efdee153e46b2d2f22a1ca20c33404b248",
+      "pinned_sha256": "b103adfc4dc0e031e0a9b08c9c80f9efdee153e46b2d2f22a1ca20c33404b248",
+      "identical": true
+    },
+    {
+      "path": "pkg/dictionary/auth/errors.yaml",
+      "workspace_sha256": "7aced226039615ab7f6eb55156df75e7fb27bf0f2b9cd6853920de28f67ff2b2",
+      "pinned_sha256": "7aced226039615ab7f6eb55156df75e7fb27bf0f2b9cd6853920de28f67ff2b2",
+      "identical": true
+    },
+    {
+      "path": "pkg/dictionary/common/errors.go",
+      "workspace_sha256": "1627b16f05662da4711a476b81a878dbcd125a46f8ed81928eb512aa523d57c1",
+      "pinned_sha256": "1627b16f05662da4711a476b81a878dbcd125a46f8ed81928eb512aa523d57c1",
+      "identical": true
+    },
+    {
+      "path": "pkg/dictionary/common/errors.yaml",
+      "workspace_sha256": "754e7b3423cd24457b52baa9f935b570c6447d007cb525e82d168684c68db597",
+      "pinned_sha256": "754e7b3423cd24457b52baa9f935b570c6447d007cb525e82d168684c68db597",
+      "identical": true
+    },
+    {
+      "path": "pkg/dictionary/user/errors.go",
+      "workspace_sha256": "7c7a23b3914b5619b266a00d7b96e6b21f3c6c08173c088625c7436add53be2f",
+      "pinned_sha256": "7c7a23b3914b5619b266a00d7b96e6b21f3c6c08173c088625c7436add53be2f",
+      "identical": true
+    },
+    {
+      "path": "pkg/dictionary/user/errors.yaml",
+      "workspace_sha256": "8654cc69a0653eeebd8d70a132b107ab041f5abaced6b710a507546c0fa1918f",
+      "pinned_sha256": "8654cc69a0653eeebd8d70a132b107ab041f5abaced6b710a507546c0fa1918f",
+      "identical": true
+    },
+    {
+      "path": "pkg/grpcerror/mapping/auth_err.go",
+      "workspace_sha256": "4ed958438fbc4d9615da3649149802060ba9612eb3ced683de4692e49408b87a",
+      "pinned_sha256": "4ed958438fbc4d9615da3649149802060ba9612eb3ced683de4692e49408b87a",
+      "identical": true
+    },
+    {
+      "path": "pkg/grpcerror/mapping/common_err.go",
+      "workspace_sha256": "3dfbf6009d167ed9d2d67db9069fce993b011e14a9e74495f82162c2de27d314",
+      "pinned_sha256": "3dfbf6009d167ed9d2d67db9069fce993b011e14a9e74495f82162c2de27d314",
+      "identical": true
+    },
+    {
+      "path": "pkg/grpcerror/mapping/user_err.go",
+      "workspace_sha256": "0ac0293b9ca719c4f149400f5671da06ac20c71c6def08749bc79c4d3f05d488",
+      "pinned_sha256": "0ac0293b9ca719c4f149400f5671da06ac20c71c6def08749bc79c4d3f05d488",
+      "identical": true
+    }
+  ],
+  "existing_full_methods": [
+    "/user.v1.UserService/Register",
+    "/user.v1.UserService/Login",
+    "/user.v1.UserService/Me",
+    "/user.v1.UserService/ListUsers",
+    "/user.v1.UserService/TesRPC",
+    "/profile.v1.ProfileService/UpdateProfile"
+  ],
+  "existing_protobuf_fields": {
+    "AuthRequest": [
+      "bytes,1,opt,name=email,proto3",
+      "bytes,2,opt,name=password,proto3"
+    ],
+    "UserData": [
+      "varint,1,opt,name=id,proto3",
+      "bytes,2,opt,name=email,proto3",
+      "bytes,3,opt,name=fullname,proto3",
+      "bytes,4,opt,name=address,proto3",
+      "bytes,5,opt,name=phone,proto3",
+      "varint,6,rep,packed,name=role_codes,json=roleCodes,proto3",
+      "bytes,7,rep,name=role_names,json=roleNames,proto3",
+      "bytes,8,opt,name=created_at,json=createdAt,proto3"
+    ],
+    "UserTokenResponse": [
+      "bytes,1,opt,name=token,proto3"
+    ],
+    "ProfileRequest": [
+      "bytes,1,opt,name=name,proto3",
+      "bytes,2,opt,name=address,proto3",
+      "bytes,3,opt,name=phone,proto3"
+    ],
+    "ProfileResponse": [
+      "bytes,1,opt,name=profile,proto3"
+    ]
+  },
+  "catalog_namespaces_available": [
+    "auth",
+    "user",
+    "common"
+  ],
+  "gaps": [
+    {
+      "id": "CON-01",
+      "scope": "grpc-auth registration",
+      "current": "UserTokenResponse only token string field 1",
+      "required": "Preserve token field 1; add registration ID/status; Register returns token empty",
+      "status": "BLOCKED"
+    },
+    {
+      "id": "CON-02",
+      "scope": "Phase 3 producer prerequisite",
+      "current": "No refresh/session/expiry/restricted response fields",
+      "required": "Add refresh_token, session_id, access_expires_at, session_expires_at, must_change_password; preserve token as access credential for Login",
+      "status": "BLOCKED"
+    },
+    {
+      "id": "CON-03",
+      "scope": "grpc-auth safe read",
+      "current": "UserData only existing identity/profile/numeric roles/created_at",
+      "required": "Safe additive status/entity version/role codes/app access as MVP contract; no password/token/hash",
+      "status": "BLOCKED"
+    },
+    {
+      "id": "CON-04",
+      "scope": "grpc-auth profile",
+      "current": "Three scalar full-replacement fields; ProfileResponse only profile",
+      "required": "Additive field_mask and safe version/changed output; preserve replacement when omitted",
+      "status": "BLOCKED"
+    },
+    {
+      "id": "CON-05",
+      "scope": "grpc-auth authentication and prerequisite limiter",
+      "current": "auth catalog has legacy mismatch INVALID_ARGUMENT; common Unauthorized/Forbidden/DependencyUnavailable and mappings exist",
+      "required": "Generic LOGIN_FAILED, SERVICE_AUTHENTICATION_FAILED, INVALID_SESSION and applicable limiter catalog/retry details; preserve old mappings and reuse exact common semantics",
+      "status": "BLOCKED"
+    },
+    {
+      "id": "CON-06",
+      "scope": "external release",
+      "current": "Compared 13 relevant workspace/pinned files identical; pinned module cached",
+      "required": "Target contract implemented/generated/tested in api-contracts and published; explicit authorized dependency update then GOWORK=off test/build",
+      "status": "BLOCKED"
+    }
+  ]
+}

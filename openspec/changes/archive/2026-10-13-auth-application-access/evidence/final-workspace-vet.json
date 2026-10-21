@@ -1,0 +1,14 @@
+{
+  "label": "final-workspace-vet",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "vet",
+    "./..."
+  ],
+  "started_at": "2026-10-13T08:18:57.870967+00:00",
+  "seconds": 1.49,
+  "exit_code": 0,
+  "log": "/tmp/aap-final-workspace-vet.log",
+  "source_identity": "8746bf2c3914799fb83934466574feb0bb83bd270888ea320db35585d910dc5f"
+}

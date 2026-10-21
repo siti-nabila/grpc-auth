@@ -1,0 +1,19 @@
+{
+  "label": "feature-matrix-fixed",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./tests/features/application/...",
+    "./tests/integration/auth_reads/..."
+  ],
+  "started_at": "2026-10-13T07:58:44.541954+00:00",
+  "seconds": 3.688,
+  "exit_code": 0,
+  "log": "/tmp/aap-feature-matrix-fixed.log",
+  "source_identity": "ab2d39ce2a3248daef3b7ddf436d6298d8aed355f27271deacdf7830a701a0f2",
+  "passed_tests": 340,
+  "failed_tests": [],
+  "skipped_tests": []
+}

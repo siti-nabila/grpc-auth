@@ -1,0 +1,63 @@
+{
+  "checked_utc": "2026-10-20T08:49:54.311493+00:00",
+  "source_digest": "c971303bd164596c72bd779e601ef89fe11b59c1943ce360b047ae3b339887cb",
+  "status": "PASS",
+  "gofmt_changed_go_files": 52,
+  "frozen_source_and_module_hashes": "PASS",
+  "local_links_and_anchors": {
+    "files": 12,
+    "links": 86,
+    "new_or_changed_links": "PASS",
+    "unchanged_historical_missing_targets": [
+      {
+        "file": "docs/grpc-auth-mvp-spec.md",
+        "target": "../internal/features/auth_feature/auth.feat.go",
+        "reason": "Unchanged historical baseline source reference; target already absent before apply"
+      },
+      {
+        "file": "docs/grpc-auth-mvp-spec.md",
+        "target": "../internal/handler/auth.handler.go",
+        "reason": "Unchanged historical baseline source reference; target already absent before apply"
+      },
+      {
+        "file": "docs/grpc-auth-mvp-spec.md",
+        "target": "../internal/features/auth_feature/impl.go",
+        "reason": "Unchanged historical baseline source reference; target already absent before apply"
+      },
+      {
+        "file": "docs/grpc-auth-mvp-spec.md",
+        "target": "../internal/interceptors/auth_interceptor.go",
+        "reason": "Unchanged historical baseline source reference; target already absent before apply"
+      },
+      {
+        "file": "docs/grpc-auth-mvp-spec.md",
+        "target": "../internal/sessions/user_session.go",
+        "reason": "Unchanged historical baseline source reference; target already absent before apply"
+      },
+      {
+        "file": "docs/grpc-auth-mvp-spec.md",
+        "target": "../internal/features/profile/profile.feat.go",
+        "reason": "Unchanged historical baseline source reference; target already absent before apply"
+      },
+      {
+        "file": "docs/grpc-auth-mvp-spec.md",
+        "target": "../internal/features/auth_feature/auth.feat.go",
+        "reason": "Unchanged historical baseline source reference; target already absent before apply"
+      }
+    ]
+  },
+  "whitespace_including_untracked": "PASS",
+  "git_diff_check": "PASS",
+  "openspec_strict_validation": "PASS",
+  "openspec_metadata_yaml_shape": "PASS",
+  "full_backend_receipts": 8,
+  "full_postgres_receipts": 4,
+  "both_mode_descriptor_comparisons": "PASS",
+  "source_scope_review": "52 changed/new Go files; documented policy and evidence only; prior unrelated changes preserved",
+  "generated_source_dependencies_runtime_config": "unchanged since apply baseline",
+  "accepted_limitations": [
+    "shared service admission can delay Logout/revoke",
+    "shutdown waits for current synchronous logger write"
+  ],
+  "unresolved_mandatory_gaps": []
+}

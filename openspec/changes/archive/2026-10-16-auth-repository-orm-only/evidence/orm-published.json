@@ -1,0 +1,58 @@
+{
+  "Path": "github.com/siti-nabila/orm",
+  "Version": "v1.8.0-support-subquery",
+  "Info": "/Users/bleki/go/pkg/mod/cache/download/github.com/siti-nabila/orm/@v/v1.8.0-support-subquery.info",
+  "GoMod": "/Users/bleki/go/pkg/mod/cache/download/github.com/siti-nabila/orm/@v/v1.8.0-support-subquery.mod",
+  "Zip": "/Users/bleki/go/pkg/mod/cache/download/github.com/siti-nabila/orm/@v/v1.8.0-support-subquery.zip",
+  "Dir": "/Users/bleki/go/pkg/mod/github.com/siti-nabila/orm@v1.8.0-support-subquery",
+  "Sum": "h1:MRMyyQB0++Q8zrgPFbPjBRroap8H2K+J02T3ALKuOps=",
+  "GoModSum": "h1:u0Kozy+4mmJmvOTER+Hn4kCdxH1PvN/pCnZPFEkUVE8=",
+  "Origin": {
+    "VCS": "git",
+    "URL": "https://github.com/siti-nabila/orm",
+    "Hash": "489a9e43d79970d2826b1f4322765042b24067b2",
+    "Ref": "refs/tags/v1.8.0-support-subquery"
+  },
+  "SourceComparison": {
+    "matched_verified_files": 110,
+    "removed_production_files": [],
+    "changed_production_files": [
+      "query/build.go",
+      "query/builder.go",
+      "query/update.go"
+    ],
+    "added_production_files": [
+      "orm/orm_adv_ins_result.go",
+      "query/subquery.go"
+    ]
+  },
+  "PublishedBranch": "feat/composable-subqueries-insert-result",
+  "ReleasedFiles": {
+    "docs/create-update.id.md": "fa7cf21df40cceccc4b78d57e0fbcefaf292982514e9a7e85a0579aad23ca085",
+    "docs/create-update.md": "990a3c72a817e7ecf3b6de57c7c18dd950211c2dc79e28eb21821b68d6f8e7ab",
+    "docs/query-builder.id.md": "6f94d26d0c7e34e8c2f098b23359526db9e8606048712cb2afcb5fef52fc6ba3",
+    "docs/query-builder.md": "ee08b9f7eb928002a67592780c9190a323260f3bc4597a064e2e5599ab9f055f",
+    "orm/orm_adv_ins_result.go": "f1c512cefba7cb3ffe666bcafa978e47e739581cc3862b755acd1416e9b156b1",
+    "query/build.go": "dcc92434d6d2e1cdb923e428b28603eb2213357adf2d69e2d940cc589e0438b5",
+    "query/builder.go": "a4276490a9ddef258e15b03d8ca367c70c6f7a9b11c2d2a4dd1b17d7bb824da0",
+    "query/subquery.go": "53f6e920612e68490291e6fbb3e01a7b7f8ae2263643b587d342d8969aa15809",
+    "query/update.go": "0bd067cb42936faaa5ac4de7a2139e3ac450cc4306d3453ec86cb1e103d56e39",
+    "test_scenarios/orm/create_result_test.go": "54e333f3285f8f93dd8abf1ea3349948b7585148f76cecba6974094dbe45a3c2",
+    "test_scenarios/query/subquery_test.go": "96ef0369583d75f20e57f588a90976c108456b5ebef617ea432bd10e99390d6a"
+  },
+  "PreviousPublication": {
+    "Version": "v1.6.10-0.20261015132704-7aeb7624d90f",
+    "Origin": {
+      "VCS": "git",
+      "URL": "https://github.com/siti-nabila/orm",
+      "Hash": "7aeb7624d90fb4a41384f1496ca062aa63ad4806"
+    }
+  },
+  "ReleaseTagVerification": {
+    "verified_at": "2026-10-15T13:47:51.187716+00:00",
+    "matched_verified_go_sql_files": 110,
+    "matched_release_files": 11,
+    "exact_v1_8_0_tag_exists": false,
+    "prior_race_postgres_evidence": "Retained for byte-identical source; tag switch does not rerun those gates."
+  }
+}

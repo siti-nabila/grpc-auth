@@ -80,7 +80,7 @@ func discoveryRestart(t *testing.T) {
 	if err = common.AcquireLocks(ownerNext, commondictionary.ErrForbidden, discovered...); err != nil {
 		t.Fatal("retry cleanup leaked scope")
 	}
-	result, err := profile.BindRepositories(next).Reader.GetByUserId(1)
+	result, err := profile.BindSessionRepositories(next).Reader.GetByUserId(1)
 	if err != nil || result.UserId != 1 || result.Name != "Fixture user" {
 		t.Fatal("restart did not recheck committed state")
 	}
@@ -132,8 +132,8 @@ func productionLifecycle(t *testing.T) {
 			if ok, err := ownerB.TryLock(common.UserLockKey(2)); err != nil || !ok {
 				t.Fatal("independent scope blocked")
 			}
-			reposA := profile.BindRepositories(a)
-			reposB := profile.BindRepositories(b)
+			reposA := profile.BindSessionRepositories(a)
+			reposB := profile.BindSessionRepositories(b)
 			if err = reposA.Writer.Update(&domain.UpdateProfileRequest{Id: 1, Name: "committed name", Address: "", Phone: ""}); err != nil {
 				t.Fatal("holder write failed")
 			}
@@ -190,7 +190,7 @@ func productionLifecycle(t *testing.T) {
 			if ok, err := ownerNext.TryLock(common.UserLockKey(1)); err != nil || !ok {
 				t.Fatal("lock leaked after terminal outcome")
 			}
-			after, err := profile.BindRepositories(next).Reader.GetByUserId(1)
+			after, err := profile.BindSessionRepositories(next).Reader.GetByUserId(1)
 			if err != nil {
 				t.Fatal("committed profile read failed")
 			}

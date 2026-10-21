@@ -1,0 +1,28 @@
+{
+  "status": "PUBLISHED_AND_PINNED",
+  "files_sha256": {
+    "proto/audit/v1/audit.payload.proto": "ce46c5c19f1efe85a02360751511e4ef4ed856def499437432a3709b7e89680f",
+    "proto/audit/v1/audit.service.proto": "dc5ab38a752f9993985a38e4c594c59eb4ca7a0b1d70bb6e4a9cb94e715ff25f",
+    "pb/audit/v1/audit.payload.pb.go": "a8816b0b0bcbd0f33393acaa2513ff6e0f3743d0075193523d19fe40835bb214",
+    "pb/audit/v1/audit.service.pb.go": "ae2a5cdaca937669d37cf3a9b8ff6e6112e537351200faba237534941378d856",
+    "pb/audit/v1/audit.service_grpc.pb.go": "1592bc6e494c91a6a9438c4a6e6481beb9060e7570057f30f57e86b0c1a56132",
+    "docs/audit-log-contract.md": "a9be9722f86493a7c85858be7b6cb5def76f5405d20129774103a151767dfdd3",
+    "tests/protobuf/runner_test.go": "24f7896505f3360d5c04f5695e6f524da850ba768c57e49f273ecf6d6727fd6d",
+    "tests/protobuf/test_scenarios/access_evaluation.go": "2b227769bfd6fbb5ab9ab21c656ce2eb327fa31236df8db21fdd6e2a822fafce",
+    "tests/protobuf/test_scenarios/audit_log_reads.go": "de1c70a5023bb7d5dccdc096b0ac979fb1b488591b20efd53b1514e38d4ecfd5",
+    "tests/protobuf/fixtures/audit_log_reads.go": "478a05aa7b4a47938db8db0c88fa6efc36ca0712e931697b9bf781ed3ce5d3aa",
+    "tests/protobuf/fixtures/audit_log_reads_baseline.json": "0bf03c6ed94bf80a51848925a37aa3997f820b57a709cd5e9c9119660ab2d814"
+  },
+  "baseline": "36 methods/eight services;18 complete descriptors unchanged",
+  "target": "37 methods/nine services",
+  "generator_roundtrip": "all generated Go files byte-identical",
+  "authorization": "User authorized source/generated/tests/docs and separately commit/push of these11 files on existing feat/role-management,18 October2026.",
+  "commit": "b4ad807ad5faafe35c3c5081932597f43f8d9e7f",
+  "published_module": {
+    "Path": "github.com/siti-nabila/api-contracts",
+    "Version": "v0.0.0-20261018073250-b4ad807ad5fa",
+    "Time": "2026-10-18T07:32:50Z",
+    "Sum": "h1:Ib/KQ53uqsoWXZ1JbPi1ILjKyLqUdbVjb+s2Q8C5uOs=",
+    "GoModSum": "h1:Jb5bNxnX/aW6YWghT/pXorXlmIDRRxXltY8gL7Udzg4="
+  }
+}

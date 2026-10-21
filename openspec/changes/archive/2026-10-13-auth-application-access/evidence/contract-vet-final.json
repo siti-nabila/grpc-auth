@@ -1,0 +1,14 @@
+{
+  "label": "contract-vet-final",
+  "mode": "standalone",
+  "command": [
+    "go",
+    "vet",
+    "./..."
+  ],
+  "started_at": "2026-10-13T07:49:48.351934+00:00",
+  "seconds": 0.382,
+  "exit_code": 0,
+  "log": "/tmp/aap-contract-vet-final.log",
+  "source_identity": "489f85affedb227856a94fb7a221a4d4c241da390120e02ba7b284044bf8a22d"
+}

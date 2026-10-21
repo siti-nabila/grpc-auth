@@ -1,0 +1,18 @@
+{
+  "label": "auth-profile-refactor",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./tests/features/auth_feature/...",
+    "./tests/features/profile/..."
+  ],
+  "started_at": "2026-10-13T03:02:33.371439+00:00",
+  "seconds": 3.367,
+  "exit_code": 0,
+  "log": "/tmp/ecs-auth-profile-refactor.log",
+  "passed_tests": 425,
+  "failed_tests": [],
+  "skipped_tests": []
+}

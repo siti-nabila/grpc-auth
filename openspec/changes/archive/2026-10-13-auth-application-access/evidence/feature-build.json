@@ -1,0 +1,18 @@
+{
+  "label": "feature-build",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./internal/features/application"
+  ],
+  "started_at": "2026-10-13T07:53:52.390224+00:00",
+  "seconds": 0.967,
+  "exit_code": 0,
+  "log": "/tmp/aap-feature-build.log",
+  "source_identity": "3d1fc56acbfdc47f1c1e5e18e7d0e33783fd34dc8f0fb0d419be046bd0932939",
+  "passed_tests": 0,
+  "failed_tests": [],
+  "skipped_tests": []
+}

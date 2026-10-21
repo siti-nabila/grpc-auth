@@ -1,0 +1,22 @@
+{
+  "label": "domain-targeted",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "-count=1",
+    "./tests/repositories/domain/...",
+    "./tests/repositories/role/...",
+    "./tests/repositories/assignment/...",
+    "./tests/features/user/..."
+  ],
+  "started_at": "2026-10-13T05:47:43.420677+00:00",
+  "seconds": 4.775,
+  "exit_code": 0,
+  "log": "/tmp/aap-domain-targeted.log",
+  "source_identity": "003bf70b561fdc45883b64a660d3f16bc39db2d0853b5c8821b2212d49acb56a",
+  "passed_tests": 639,
+  "failed_tests": [],
+  "skipped_tests": []
+}

@@ -1,0 +1,24 @@
+{
+  "label": "pg-application",
+  "mode": "workspace",
+  "command": [
+    "/tmp/auth-assignment-postgres",
+    "test",
+    "test",
+    "-json",
+    "-tags",
+    "postgres",
+    "-count=1",
+    "./tests/integration/postgres/...",
+    "-run",
+    "TestPostgresApplicationManagement"
+  ],
+  "started_at": "2026-10-13T08:03:15.224591+00:00",
+  "seconds": 6.18,
+  "exit_code": 0,
+  "log": "/tmp/aap-pg-application.log",
+  "source_identity": "c48193eb60f4e2429ca048860293c8b0a88012ddb434ae7acad0adb70f55b303",
+  "passed_tests": 38,
+  "failed_tests": [],
+  "skipped_tests": []
+}

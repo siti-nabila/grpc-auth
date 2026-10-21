@@ -1,0 +1,172 @@
+[
+  {
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./...",
+      "-count=1"
+    ],
+    "mode": "workspace",
+    "environment": "workspace local deterministic fixtures; GOCACHE temporary",
+    "started_utc": "2026-10-20T08:31:45Z",
+    "ended_utc": "2026-10-20T08:32:04Z",
+    "source_digest": "c971303bd164596c72bd779e601ef89fe11b59c1943ce360b047ae3b339887cb",
+    "exit_code": 0,
+    "passed": 3579,
+    "failed": [
+
+    ],
+    "skipped": [
+
+    ]
+  },
+  {
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./...",
+      "-count=1",
+      "-race"
+    ],
+    "mode": "workspace",
+    "environment": "workspace local deterministic fixtures; GOCACHE temporary",
+    "started_utc": "2026-10-20T08:33:27Z",
+    "ended_utc": "2026-10-20T08:33:51Z",
+    "source_digest": "c971303bd164596c72bd779e601ef89fe11b59c1943ce360b047ae3b339887cb",
+    "exit_code": 0,
+    "passed": 3579,
+    "failed": [
+
+    ],
+    "skipped": [
+
+    ]
+  },
+  {
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "mode": "workspace",
+    "environment": "workspace local deterministic fixtures; GOCACHE temporary",
+    "started_utc": "2026-10-20T08:34:53Z",
+    "ended_utc": "2026-10-20T08:34:54Z",
+    "source_digest": "c971303bd164596c72bd779e601ef89fe11b59c1943ce360b047ae3b339887cb",
+    "exit_code": 0,
+    "passed": 0,
+    "failed": [
+
+    ],
+    "skipped": [
+
+    ]
+  },
+  {
+    "command": [
+      "make",
+      "build",
+      "BIN_DIR=/tmp/grpc-auth-phase5-build-workspace"
+    ],
+    "mode": "workspace",
+    "environment": "workspace local deterministic fixtures; GOCACHE temporary",
+    "started_utc": "2026-10-20T08:35:22Z",
+    "ended_utc": "2026-10-20T08:35:24Z",
+    "source_digest": "c971303bd164596c72bd779e601ef89fe11b59c1943ce360b047ae3b339887cb",
+    "exit_code": 0,
+    "passed": 0,
+    "failed": [
+
+    ],
+    "skipped": [
+
+    ]
+  },
+  {
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./...",
+      "-count=1"
+    ],
+    "mode": "standalone",
+    "environment": "workspace local deterministic fixtures; GOCACHE temporary",
+    "started_utc": "2026-10-20T08:36:31Z",
+    "ended_utc": "2026-10-20T08:36:54Z",
+    "source_digest": "c971303bd164596c72bd779e601ef89fe11b59c1943ce360b047ae3b339887cb",
+    "exit_code": 0,
+    "passed": 3579,
+    "failed": [
+
+    ],
+    "skipped": [
+
+    ]
+  },
+  {
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./...",
+      "-count=1",
+      "-race"
+    ],
+    "mode": "standalone",
+    "environment": "workspace local deterministic fixtures; GOCACHE temporary",
+    "started_utc": "2026-10-20T08:38:38Z",
+    "ended_utc": "2026-10-20T08:39:04Z",
+    "source_digest": "c971303bd164596c72bd779e601ef89fe11b59c1943ce360b047ae3b339887cb",
+    "exit_code": 0,
+    "passed": 3579,
+    "failed": [
+
+    ],
+    "skipped": [
+
+    ]
+  },
+  {
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "mode": "standalone",
+    "environment": "workspace local deterministic fixtures; GOCACHE temporary",
+    "started_utc": "2026-10-20T08:40:27Z",
+    "ended_utc": "2026-10-20T08:40:29Z",
+    "source_digest": "c971303bd164596c72bd779e601ef89fe11b59c1943ce360b047ae3b339887cb",
+    "exit_code": 0,
+    "passed": 0,
+    "failed": [
+
+    ],
+    "skipped": [
+
+    ]
+  },
+  {
+    "command": [
+      "make",
+      "build",
+      "BIN_DIR=/tmp/grpc-auth-phase5-build-standalone"
+    ],
+    "mode": "standalone",
+    "environment": "workspace local deterministic fixtures; GOCACHE temporary",
+    "started_utc": "2026-10-20T08:42:42Z",
+    "ended_utc": "2026-10-20T08:42:45Z",
+    "source_digest": "c971303bd164596c72bd779e601ef89fe11b59c1943ce360b047ae3b339887cb",
+    "exit_code": 0,
+    "passed": 0,
+    "failed": [
+
+    ],
+    "skipped": [
+
+    ]
+  }
+]

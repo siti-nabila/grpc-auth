@@ -1,0 +1,20 @@
+{
+  "label": "targeted-final-fix",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./tests/features/application/...",
+    "./tests/integration/auth_reads/...",
+    "./tests/handler/..."
+  ],
+  "started_at": "2026-10-13T08:10:38.911147+00:00",
+  "seconds": 3.553,
+  "exit_code": 0,
+  "log": "/tmp/aap-targeted-final-fix.log",
+  "source_identity": "f8112ffa08b9989341694e8a21325ed4a497d0ada37fe473a0bacbf8007fed6d",
+  "passed_tests": 684,
+  "failed_tests": [],
+  "skipped_tests": []
+}

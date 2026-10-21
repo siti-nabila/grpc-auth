@@ -1,0 +1,12 @@
+{
+  "descriptors_unchanged": 20,
+  "methods_unchanged": 37,
+  "services": 9,
+  "workspace_and_standalone_equal": true,
+  "module_checksums": {
+    "github.com/siti-nabila/api-contracts v0.0.0-20261018073250-b4ad807ad5fa": "h1:Ib/KQ53uqsoWXZ1JbPi1ILjKyLqUdbVjb+s2Q8C5uOs=",
+    "github.com/siti-nabila/api-contracts v0.0.0-20261018073250-b4ad807ad5fa/go.mod": "h1:Jb5bNxnX/aW6YWghT/pXorXlmIDRRxXltY8gL7Udzg4=",
+    "github.com/siti-nabila/orm v1.8.0-support-subquery": "h1:MRMyyQB0++Q8zrgPFbPjBRroap8H2K+J02T3ALKuOps=",
+    "github.com/siti-nabila/orm v1.8.0-support-subquery/go.mod": "h1:u0Kozy+4mmJmvOTER+Hn4kCdxH1PvN/pCnZPFEkUVE8="
+  }
+}

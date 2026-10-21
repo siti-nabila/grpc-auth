@@ -1,0 +1,24 @@
+{
+  "label": "pg-additional",
+  "mode": "workspace",
+  "command": [
+    "/tmp/auth-assignment-postgres",
+    "test",
+    "test",
+    "-json",
+    "-tags",
+    "postgres",
+    "-count=1",
+    "./tests/integration/postgres/...",
+    "-run",
+    "TestPostgresApplicationManagement"
+  ],
+  "started_at": "2026-10-13T08:14:27.284392+00:00",
+  "seconds": 6.357,
+  "exit_code": 0,
+  "log": "/tmp/aap-pg-additional.log",
+  "source_identity": "fa4fc0204c59f8eeba553c890e6daabf9b11c17b1afd7db8aa718fc0081a354b",
+  "passed_tests": 40,
+  "failed_tests": [],
+  "skipped_tests": []
+}

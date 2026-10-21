@@ -1,0 +1,23 @@
+{
+  "label": "stage2-pg",
+  "mode": "workspace",
+  "command": [
+    "/tmp/auth-assignment-postgres",
+    "test",
+    "test",
+    "-json",
+    "-tags",
+    "postgres",
+    "-count=1",
+    "-run",
+    "TestPostgres(UserManagement|RoleConcurrency|AssignmentManagement|AssignmentConcurrency|RoleManagement)",
+    "./tests/integration/postgres"
+  ],
+  "started_at": "2026-10-13T02:59:16.467507+00:00",
+  "seconds": 15.905,
+  "exit_code": 0,
+  "log": "/tmp/ecs-stage2-pg.log",
+  "passed_tests": 157,
+  "failed_tests": [],
+  "skipped_tests": []
+}

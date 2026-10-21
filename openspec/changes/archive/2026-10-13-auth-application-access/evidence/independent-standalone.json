@@ -1,0 +1,19 @@
+{
+  "label": "independent-standalone",
+  "mode": "standalone",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "-count=1",
+    "./..."
+  ],
+  "started_at": "2026-10-13T05:56:38.694007+00:00",
+  "seconds": 14.054,
+  "exit_code": 0,
+  "log": "/tmp/aap-independent-standalone.log",
+  "source_identity": "ed573552438d7ae1ed557f97c19b88c24cb488dca858eb68fd4060169c32c260",
+  "passed_tests": 2802,
+  "failed_tests": [],
+  "skipped_tests": []
+}

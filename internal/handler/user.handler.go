@@ -1,35 +1,19 @@
 package handler
 
 import (
-	"context"
+	"github.com/siti-nabila/grpc-auth/pkg/types"
 	"strings"
 	"time"
 
 	paginatorv1 "github.com/siti-nabila/api-contracts/pb/paginator/v1"
 	userv1 "github.com/siti-nabila/api-contracts/pb/user/v1"
 	commondictionary "github.com/siti-nabila/api-contracts/pkg/dictionary/common"
-	userfeature "github.com/siti-nabila/grpc-auth/internal/features/user"
 	"github.com/siti-nabila/grpc-auth/internal/repositories/domain"
 	"github.com/siti-nabila/orm/orm"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const jakartaUTCOffsetSeconds = 7 * 60 * 60
-
-func (u *UserHandler) ListUsers(ctx context.Context, in *userv1.ListUsersRequest) (*userv1.ListUsersResponse, error) {
-	request, err := UserListRequestFromProto(in)
-	if err != nil {
-		return nil, err
-	}
-
-	feat := userfeature.NewUserService(ctx)
-	page, err := feat.SearchUsers(request)
-	if err != nil {
-		return nil, err
-	}
-
-	return ListUsersResponseFromPage(page), nil
-}
 
 func UserListRequestFromProto(in *userv1.ListUsersRequest) (domain.UserListRequest, error) {
 	if in == nil {
@@ -65,7 +49,7 @@ func queryOptionsFromProto(in *paginatorv1.PageQuery) (orm.QueryOptions, error) 
 
 	for _, sort := range in.GetSort() {
 		if sort == nil {
-			continue
+			return orm.QueryOptions{}, commondictionary.ErrBadRequest
 		}
 		opts.Sort = append(opts.Sort, orm.SortField{
 			Field: sort.GetField(),
@@ -119,11 +103,17 @@ func userListFilterFromProto(in *userv1.UserFilter) (domain.UserListFilter, erro
 		roleCodes = append(roleCodes, roleCode)
 	}
 
-	return domain.UserListFilter{
-		CreatedFrom: createdFrom,
-		CreatedTo:   createdTo,
-		RoleCodes:   roleCodes,
-	}, nil
+	statuses := make([]types.UserStatus, 0, len(in.GetStatuses()))
+	for _, status := range in.GetStatuses() {
+		statuses = append(statuses, types.UserStatus(status))
+	}
+	return domain.NormalizeUserListFilter(domain.UserListFilter{
+		Statuses:        statuses,
+		ApplicationCode: in.GetApplicationCode(),
+		CreatedFrom:     createdFrom,
+		CreatedTo:       createdTo,
+		RoleCodes:       roleCodes,
+	})
 }
 
 func timestampFromProto(value *timestamppb.Timestamp) (*time.Time, error) {
@@ -161,13 +151,8 @@ func searchModeFromProto(mode paginatorv1.SearchMode) (orm.SearchMode, error) {
 func ListUsersResponseFromPage(page orm.PageData[domain.UserSearchRow]) *userv1.ListUsersResponse {
 	items := make([]*userv1.UserListItem, 0, len(page.Items))
 	for _, row := range page.Items {
-		items = append(items, &userv1.UserListItem{
-			Email:   row.Email,
-			Name:    row.Name,
-			Address: row.Address,
-			Phone:   row.Phone,
-			Id:      int32(row.AuthID),
-		})
+		item := userListItem(row)
+		items = append(items, item)
 	}
 
 	return &userv1.ListUsersResponse{
@@ -180,4 +165,25 @@ func ListUsersResponseFromPage(page orm.PageData[domain.UserSearchRow]) *userv1.
 		HasPrev:    page.HasPrev,
 		NextCursor: page.NextCursor,
 	}
+}
+
+func userListItem(row domain.UserSearchRow) *userv1.UserListItem {
+	item := &userv1.UserListItem{
+		Email:   row.Email,
+		Name:    row.Name,
+		Address: row.Address,
+		Phone:   row.Phone,
+		Id:      int32(row.AuthID),
+		Status:  string(row.Status), Version: uint64(row.Version),
+	}
+	if !row.CreatedAt.IsZero() {
+		item.CreatedAt = timestamppb.New(row.CreatedAt)
+	}
+	for _, role := range row.Roles {
+		item.Roles = append(item.Roles, &userv1.UserRoleAssignment{RoleId: role.ID, Code: role.Code, Name: role.Name, Status: string(role.Status), RoleStatus: string(role.RoleStatus)})
+	}
+	for _, app := range row.ApplicationAccess {
+		item.ApplicationAccess = append(item.ApplicationAccess, &userv1.UserApplicationAccess{ApplicationId: app.ID, Code: app.Code, Name: app.Name, Status: string(app.Status), ApplicationStatus: string(app.ApplicationStatus)})
+	}
+	return item
 }

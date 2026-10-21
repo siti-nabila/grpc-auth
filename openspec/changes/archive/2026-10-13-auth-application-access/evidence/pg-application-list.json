@@ -1,0 +1,27 @@
+{
+  "label": "pg-application-list",
+  "mode": "workspace",
+  "command": [
+    "/tmp/auth-assignment-postgres",
+    "test",
+    "test",
+    "-json",
+    "-tags",
+    "postgres",
+    "-count=1",
+    "./tests/integration/postgres/...",
+    "-run",
+    "TestPostgresApplication"
+  ],
+  "started_at": "2026-10-13T08:04:56.766657+00:00",
+  "seconds": 0.436,
+  "exit_code": 1,
+  "log": "/tmp/aap-pg-application-list.log",
+  "source_identity": "fc6a3b1a71128cb55c866436ad64c4d44fe9e70999affd6513ead28099f28cf4",
+  "passed_tests": 0,
+  "failed_tests": [
+    "github.com/siti-nabila/grpc-auth/tests/integration/postgres",
+    "github.com/siti-nabila/grpc-auth/tests/integration/postgres/test_scenarios"
+  ],
+  "skipped_tests": []
+}

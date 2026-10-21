@@ -1,0 +1,20 @@
+{
+  "label": "final-standalone-race",
+  "mode": "standalone",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "-race",
+    "-count=1",
+    "./..."
+  ],
+  "started_at": "2026-10-13T03:11:03.438383+00:00",
+  "seconds": 27.408,
+  "exit_code": 0,
+  "log": "/tmp/ecs-final-standalone-race.log",
+  "source_identity": "f322bc405eea1f8773dd60220c1e233f21b91b6cd7c17ecc4dd88a085aa892cf",
+  "passed_tests": 2690,
+  "failed_tests": [],
+  "skipped_tests": []
+}

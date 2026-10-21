@@ -1,0 +1,24 @@
+{
+  "label": "pg-conditionals",
+  "mode": "workspace",
+  "command": [
+    "/tmp/auth-assignment-postgres",
+    "test",
+    "test",
+    "-json",
+    "-tags",
+    "postgres",
+    "-count=1",
+    "./tests/integration/postgres/...",
+    "-run",
+    "TestPostgresApplicationManagement"
+  ],
+  "started_at": "2026-10-13T08:17:51.457027+00:00",
+  "seconds": 6.559,
+  "exit_code": 0,
+  "log": "/tmp/aap-pg-conditionals.log",
+  "source_identity": "8746bf2c3914799fb83934466574feb0bb83bd270888ea320db35585d910dc5f",
+  "passed_tests": 46,
+  "failed_tests": [],
+  "skipped_tests": []
+}

@@ -1,0 +1,25 @@
+{
+  "label": "feature-restarts",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./tests/features/application/..."
+  ],
+  "started_at": "2026-10-13T08:10:02.218068+00:00",
+  "seconds": 2.552,
+  "exit_code": 1,
+  "log": "/tmp/aap-feature-restarts.log",
+  "source_identity": "2c5aed12803bcd301701a390a7752bbda7ef0079f9df5ac91b2e5165801cc41a",
+  "passed_tests": 226,
+  "failed_tests": [
+    "TestApplicationAccess/compound_access_authority_snapshot_mutation_replay_and_atomic_failure_matrix/revoke/predecessor",
+    "TestApplicationAccess/compound_access_authority_snapshot_mutation_replay_and_atomic_failure_matrix/revoke/unstable",
+    "TestApplicationAccess/compound_access_authority_snapshot_mutation_replay_and_atomic_failure_matrix/revoke/restart_identity",
+    "TestApplicationAccess/compound_access_authority_snapshot_mutation_replay_and_atomic_failure_matrix",
+    "TestApplicationAccess",
+    "github.com/siti-nabila/grpc-auth/tests/features/application"
+  ],
+  "skipped_tests": []
+}

@@ -1,0 +1,24 @@
+{
+  "label": "pg-application-races",
+  "mode": "workspace",
+  "command": [
+    "/tmp/auth-assignment-postgres",
+    "test",
+    "test",
+    "-json",
+    "-tags",
+    "postgres",
+    "-count=1",
+    "./tests/integration/postgres/...",
+    "-run",
+    "TestPostgresApplication"
+  ],
+  "started_at": "2026-10-13T08:07:08.381178+00:00",
+  "seconds": 7.876,
+  "exit_code": 0,
+  "log": "/tmp/aap-pg-application-races.log",
+  "source_identity": "4f5803cc9ac72e21383ae806f77a3f60b9d160f182e3b3daedaec0d5215da1c7",
+  "passed_tests": 62,
+  "failed_tests": [],
+  "skipped_tests": []
+}

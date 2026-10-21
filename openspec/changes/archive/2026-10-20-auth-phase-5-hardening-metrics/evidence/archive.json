@@ -1,0 +1,81 @@
+{
+  "archived_utc": "2026-10-20T08:53:03.993087+00:00",
+  "change": "auth-phase-5-hardening-metrics",
+  "schema": "spec-driven",
+  "archive": "openspec/changes/archive/2026-10-20-auth-phase-5-hardening-metrics",
+  "tasks": {
+    "complete": 25,
+    "total": 25
+  },
+  "specs_synced": {
+    "local-auth-rate-limiting": {
+      "added": 1,
+      "modified": 2,
+      "preserved_unmentioned_requirements": true
+    },
+    "local-runtime-metrics": {
+      "added": 8,
+      "new_main_spec": true
+    }
+  },
+  "delta_comparison": "All delta requirement bodies and scenarios match main specs before archive",
+  "pre_archive_artifact_hashes": {
+    ".openspec.yaml": "ff4326f8b42dcf8851877f4f3989c7fecb8f97d8154686d7d74b7281b70e6b9b",
+    "tasks.md": "ea12821635f09482f6d0643449fec6543ae36dba0acb3692cbcecf3d95b2fe47",
+    "design.md": "a687472b65072ce1ffaed77e2e957256f1a2fab304134a26efd7d98e24ae162d",
+    "proposal.md": "77391f99f1d6cf55c6e30d14672512d3529bc85ca4a1b8f3d0f3031ceeb92895",
+    "evidence/postgres-checks.json": "6a889ff95d15e97a7171a92c10ee642493ba641909600747834c1049240d8afa",
+    "evidence/gap-ledger.md": "cc5087f4a81fd08058d76135894c819d7f8395d97e0c832957c75ebe5c5f0bbb",
+    "evidence/progress.md": "b0a2bba19cc201a20d1324896e89cc21f2fadda37c08e80ff486d1a2baea0720",
+    "evidence/final-validation.json": "566b47b379163c7af25443cb6e2ece1b6044c1f1993576118ecf91358e50021c",
+    "evidence/baseline.json": "27dbabfb1f83a14c33bda71f216440baee6019b3911f1cf38078a7d88781c09e",
+    "evidence/coverage-matrix.md": "a578407cd8be4242c828168ee627e63bf1b76623437946caee65fc2e0cdf389e",
+    "evidence/backend-checks.json": "f4482de18f66fd2dc6992a03762a4cd63c267d3dc9380dacd676403f51a80099",
+    "evidence/audit-bindings.json": "67e18b845e088fc6492320da21a1af7234ae5d6538a99b0099479e3598fb14bc",
+    "evidence/scenario-traceability.json": "e4be9d9eba516d7e8129740aebfe9d45886b9fdbf6a4cf10c4a78e250f01eed4",
+    "evidence/implementation-source.json": "1f29495d25359f71a51809888b1eed9f682e638140f01d28f31c9ef0b46a7d2b",
+    "evidence/contract-checks.json": "d082a4db8169fe182986e99025b0741adc9e47d1be8b8a547c9cd230138aceab",
+    "specs/local-runtime-metrics/spec.md": "64c760974c69676f8503fc2041342e0c65ff42d69fd07257052c9ab30cde5931",
+    "specs/local-auth-rate-limiting/spec.md": "23019241d6e3680853fb7220c39d1cfbb07b8453e060c3ce16e0f014ecd70e95"
+  },
+  "relocated_markdown_links": [
+    {
+      "file": "openspec/changes/archive/2026-10-20-auth-phase-5-hardening-metrics/design.md",
+      "before": "a687472b65072ce1ffaed77e2e957256f1a2fab304134a26efd7d98e24ae162d",
+      "after": "077dbdae8203fa165a47f32f6ea8f58a47ff885fd16e6c0b5e1330f0660a2893"
+    },
+    {
+      "file": "openspec/changes/archive/2026-10-20-auth-phase-5-hardening-metrics/proposal.md",
+      "before": "77391f99f1d6cf55c6e30d14672512d3529bc85ca4a1b8f3d0f3031ceeb92895",
+      "after": "1aa6d9cc641f54a8347b8c51573af36113545b7767dc4cd9106a849c5a5d61c3"
+    },
+    {
+      "file": "openspec/changes/archive/2026-10-20-auth-phase-5-hardening-metrics/evidence/progress.md",
+      "before": "b0a2bba19cc201a20d1324896e89cc21f2fadda37c08e80ff486d1a2baea0720",
+      "after": "e8b39c28db8904985f715617791b0a8a594e7c5741a0e44557681bcad60c654f"
+    },
+    {
+      "file": "docs/phase-5-hardening-metrics-plan.md",
+      "before": "7f82b08db1568f7746542bbdbf9b4289575ae3991999fc2a443bb88db3383b84",
+      "after": "07f65915b98edfe99d80e294a8544956ad50b8f423ecaba340fac5d41865cd75"
+    },
+    {
+      "file": "docs/phase-5-runtime-metrics.md",
+      "before": "64148fc423ffd579efc831bbbc701d24e7629bc0357ff647cab45710e091799c",
+      "after": "57e9ce9d6abc4a9f61eeadb9448bfa8e3f44283cd515bcc5b26704cb655b3dc9"
+    }
+  ],
+  "go_source_unchanged": true,
+  "validation": "PASS",
+  "final_checked_utc": "2026-10-20T08:53:35.618451+00:00",
+  "main_specs_strict_validation": {
+    "passed": 25,
+    "failed": 0
+  },
+  "archive_local_links_checked": 55,
+  "active_change_removed": true,
+  "metadata_and_original_evidence_preserved": true,
+  "go_source_digest": "c971303bd164596c72bd779e601ef89fe11b59c1943ce360b047ae3b339887cb",
+  "git_diff_check": "PASS",
+  "verification_scope": "Documentation/spec sync/archive only; previously verified Go source hashes unchanged"
+}

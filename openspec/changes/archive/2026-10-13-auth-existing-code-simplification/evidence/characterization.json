@@ -1,0 +1,19 @@
+{
+  "label": "characterization",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./tests/repositories/domain/role/...",
+    "./tests/integration/auth_reads/...",
+    "./tests/configs/..."
+  ],
+  "started_at": "2026-10-13T02:52:47.448709+00:00",
+  "seconds": 2.6,
+  "exit_code": 0,
+  "log": "/tmp/ecs-characterization.log",
+  "passed_tests": 233,
+  "failed_tests": [],
+  "skipped_tests": []
+}

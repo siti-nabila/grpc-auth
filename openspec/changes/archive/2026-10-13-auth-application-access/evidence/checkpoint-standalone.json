@@ -1,0 +1,19 @@
+{
+  "label": "checkpoint-standalone",
+  "mode": "standalone",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "-count=1",
+    "./..."
+  ],
+  "started_at": "2026-10-13T05:59:08.842811+00:00",
+  "seconds": 13.314,
+  "exit_code": 0,
+  "log": "/tmp/aap-checkpoint-standalone.log",
+  "source_identity": "758193b041bdd801dbbe51ea6c8c6aedd5f56a7b4e092c45a4d5ce57d7163307",
+  "passed_tests": 2806,
+  "failed_tests": [],
+  "skipped_tests": []
+}

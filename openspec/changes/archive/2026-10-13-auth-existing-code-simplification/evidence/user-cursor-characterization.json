@@ -1,0 +1,17 @@
+{
+  "label": "user-cursor-characterization",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./tests/repositories/domain/role/..."
+  ],
+  "started_at": "2026-10-13T03:05:42.781917+00:00",
+  "seconds": 1.968,
+  "exit_code": 0,
+  "log": "/tmp/ecs-user-cursor-characterization.log",
+  "passed_tests": 48,
+  "failed_tests": [],
+  "skipped_tests": []
+}

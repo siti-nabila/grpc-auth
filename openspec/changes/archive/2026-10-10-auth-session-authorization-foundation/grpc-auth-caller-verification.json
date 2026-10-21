@@ -1,0 +1,21 @@
+{
+  "actual_local_tls13_handshake_valid": true,
+  "caller_config_valid": true,
+  "caller_rotation_configuration": "current-only; no previous credential configured",
+  "canceled_request_rejected": true,
+  "checked_at_utc": "2026-10-10T14:45:51Z",
+  "current_credential_expiry_boundary_rejected": true,
+  "database_connected": false,
+  "default_server_switched": false,
+  "duplicate_token_rejected": true,
+  "iam_namespace_allowed": true,
+  "missing_token_rejected": true,
+  "non_tls_peer_rejected": true,
+  "private_values_or_hashes_recorded": false,
+  "scope": "actual local TLS and production caller verifier, without RPC handlers or server registration",
+  "six_method_caller_authentication_valid": true,
+  "unknown_token_rejected": true,
+  "unlisted_method_rejected": true,
+  "unlisted_namespace_rejected": true,
+  "all_local_caller_checks_passed": true
+}

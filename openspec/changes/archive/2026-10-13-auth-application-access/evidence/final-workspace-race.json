@@ -1,0 +1,19 @@
+{
+  "label": "final-workspace-race",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "-race",
+    "./..."
+  ],
+  "started_at": "2026-10-13T08:18:57.871900+00:00",
+  "seconds": 1.685,
+  "exit_code": 0,
+  "log": "/tmp/aap-final-workspace-race.log",
+  "source_identity": "8746bf2c3914799fb83934466574feb0bb83bd270888ea320db35585d910dc5f",
+  "passed_tests": 3096,
+  "failed_tests": [],
+  "skipped_tests": []
+}

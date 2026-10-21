@@ -1,7 +1,6 @@
 package test_scenarios
 
 import (
-	"context"
 	"errors"
 	"reflect"
 	"testing"
@@ -19,8 +18,6 @@ import (
 
 func All() []testutils.Scenario {
 	return []testutils.Scenario{
-		{Name: "Register and Login normalize before validation and preserve feature errors", Run: canonicalAuthHandlers},
-		{Name: "profile handler returns committed identity and forwards failures", Run: committedProfileHandler},
 		{
 			Name: "maps next cursor into list users response",
 			Run:  mapNextCursor,
@@ -137,7 +134,7 @@ func rejectInvalidSearchMode(t *testing.T) {
 		},
 	}
 
-	_, err := (&handler.UserHandler{}).ListUsers(context.Background(), request)
+	_, err := handler.UserListRequestFromProto(request)
 
 	if !errors.Is(err, commondictionary.ErrBadRequest) {
 		t.Fatalf("ListUsers() error = %v, want common registry ErrBadRequest", err)

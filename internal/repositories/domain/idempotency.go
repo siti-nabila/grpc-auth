@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/siti-nabila/api-contracts/pkg/dictionary/common"
+	"github.com/siti-nabila/grpc-auth/pkg/types"
 )
 
 const IdempotencyWindow = 24 * time.Hour
@@ -84,22 +85,63 @@ func positiveDecimal(value string) bool {
 
 // SafeCommandResult deliberately cannot represent a token or credential response.
 type SafeCommandResult struct {
-	UserID         uint64   `json:"user_id,omitempty"`
-	RoleID         uint64   `json:"role_id,omitempty"`
-	Version        int64    `json:"version,omitempty"`
-	Changed        bool     `json:"changed"`
-	ChangedRoleIDs []uint64 `json:"changed_role_ids,omitempty"`
-	ApplicationID  uint64   `json:"application_id,omitempty"`
-	SessionID      string   `json:"session_id,omitempty"`
-	Status         string   `json:"status,omitempty"`
-	Name           *string  `json:"name,omitempty"`
-	Address        *string  `json:"address,omitempty"`
-	Phone          *string  `json:"phone,omitempty"`
-	LoginRequired  bool     `json:"login_required,omitempty"`
+	UserID             uint64                `json:"user_id,omitempty"`
+	RoleID             uint64                `json:"role_id,omitempty"`
+	Version            int64                 `json:"version,omitempty"`
+	Changed            bool                  `json:"changed"`
+	ChangedRoleIDs     []uint64              `json:"changed_role_ids,omitempty"`
+	ApplicationID      uint64                `json:"application_id,omitempty"`
+	SessionID          string                `json:"session_id,omitempty"`
+	Status             string                `json:"status,omitempty"`
+	Name               *string               `json:"name,omitempty"`
+	Address            *string               `json:"address,omitempty"`
+	Phone              *string               `json:"phone,omitempty"`
+	LoginRequired      bool                  `json:"login_required,omitempty"`
+	Email              *string               `json:"email,omitempty"`
+	CreatedAt          *time.Time            `json:"created_at,omitempty"`
+	MustChangePassword *bool                 `json:"must_change_password,omitempty"`
+	Roles              []UserListRole        `json:"roles,omitempty"`
+	ApplicationAccess  []UserListApplication `json:"application_access,omitempty"`
+	Role               *RoleSummary          `json:"role,omitempty"`
+	Permissions        []PermissionItem      `json:"permissions,omitempty"`
 }
 
 func (r SafeCommandResult) Validate() error {
+	if err := r.validateRoleResult(); err != nil {
+		return err
+	}
+	if r.Email != nil && (!userText(*r.Email, 6, 50) || strings.TrimSpace(strings.ToLower(*r.Email)) != *r.Email || !strings.Contains(*r.Email, "@")) {
+		return common.ErrBadRequest
+	}
+	if r.CreatedAt != nil && r.CreatedAt.IsZero() {
+		return common.ErrBadRequest
+	}
+	for _, role := range r.Roles {
+		if ValidateManagementTarget(role.ID) != nil || !boundedText(role.Code, 100, true) || !boundedText(role.Name, 100, true) || role.Status != types.AssignmentActive || role.RoleStatus != types.RoleActive {
+			return common.ErrBadRequest
+		}
+	}
+	for _, app := range r.ApplicationAccess {
+		if ValidateManagementTarget(app.ID) != nil || !boundedText(app.Code, 50, true) || !boundedText(app.Name, 100, true) || app.Status != types.ApplicationAccessActive || app.ApplicationStatus != types.ApplicationActive {
+			return common.ErrBadRequest
+		}
+	}
 	return (SafeSnapshot{Version: r.Version, Status: r.Status, Name: r.Name, Address: r.Address, Phone: r.Phone, RoleIDs: r.ChangedRoleIDs, SessionID: r.SessionID}).Validate()
+}
+
+// UserDetail returns the stored initial safe response, never mutable current data.
+func (r SafeCommandResult) UserDetail() (UserDetail, error) {
+	if err := r.Validate(); err != nil {
+		return UserDetail{}, err
+	}
+	if ValidateManagementTarget(r.UserID) != nil || r.Version < 1 || !ManagementUserStatus(types.UserStatus(r.Status)) || r.Email == nil || r.CreatedAt == nil || r.MustChangePassword == nil || r.Name == nil || r.Address == nil || r.Phone == nil {
+		return UserDetail{}, common.ErrInternalServerError
+	}
+	return UserDetail{ID: r.UserID, Email: *r.Email, Name: *r.Name, Address: *r.Address, Phone: *r.Phone, Status: types.UserStatus(r.Status), Version: r.Version, CreatedAt: *r.CreatedAt, MustChangePassword: *r.MustChangePassword, Roles: r.Roles, ApplicationAccess: r.ApplicationAccess}, nil
+}
+
+func UserDetailCommandResult(r UserDetail, changed bool) SafeCommandResult {
+	return SafeCommandResult{UserID: r.ID, Version: r.Version, Changed: changed, Status: string(r.Status), Email: &r.Email, Name: &r.Name, Address: &r.Address, Phone: &r.Phone, CreatedAt: &r.CreatedAt, MustChangePassword: &r.MustChangePassword, Roles: r.Roles, ApplicationAccess: r.ApplicationAccess}
 }
 
 func (r *SafeCommandResult) UnmarshalJSON(data []byte) error {

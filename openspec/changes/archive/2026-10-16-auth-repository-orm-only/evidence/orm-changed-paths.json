@@ -1,0 +1,12 @@
+{
+  "changed": [
+    "docs/create-update.id.md",
+    "docs/create-update.md",
+    "docs/query-builder.id.md",
+    "docs/query-builder.md",
+    "query/build.go",
+    "query/builder.go",
+    "query/update.go"
+  ],
+  "missing": []
+}

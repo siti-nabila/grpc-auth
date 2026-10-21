@@ -1,0 +1,265 @@
+{
+  "recorded_at_jakarta": "2026-10-14T11:16:23.069953+07:00",
+  "timestamp_semantics": "Result-recording time; commands were executed during this apply session",
+  "source_digest": "855468acaee0c4068a42d3b3a6a94fb1ae579e9778acbff337475d5c1c361e2f",
+  "contract": {
+    "commit": "545701c82e2234041df1bf4d2ce4fef7665dd75d",
+    "version": "v0.0.0-20261014032725-545701c82e22",
+    "sum": "h1:UR+dSQt+mzhQAMRcVeSzN3v8fdNkUpaMg6RU95XZ6r0=",
+    "go_mod_sum": "h1:Jb5bNxnX/aW6YWghT/pXorXlmIDRRxXltY8gL7Udzg4="
+  },
+  "safe_environment": {
+    "go": "go1.26.2 darwin/arm64",
+    "GOCACHE": "/private/tmp/epr-go-cache",
+    "postgres": "Private env-test.yaml Database.GRPC_AUTH_TEST, explicit opt-in and exact dedicated identity; only owned fixture schemas; no Docker/application migration/server deployment"
+  },
+  "results": [
+    {
+      "repository": "api-contracts",
+      "mode": "workspace",
+      "command": "go test ./...",
+      "recorded_at_utc": "2026-10-14T04:16:23.069953+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "130 tests passed in29 packages",
+      "status": "PASS"
+    },
+    {
+      "repository": "api-contracts",
+      "mode": "workspace",
+      "command": "go vet ./...",
+      "recorded_at_utc": "2026-10-14T04:16:23.069953+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "No diagnostics",
+      "status": "PASS"
+    },
+    {
+      "repository": "grpc-auth",
+      "mode": "workspace",
+      "command": "go test ./...",
+      "recorded_at_utc": "2026-10-14T04:16:23.069953+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "3234 tests passed in93 packages",
+      "status": "PASS"
+    },
+    {
+      "repository": "grpc-auth",
+      "mode": "workspace",
+      "command": "go test -race ./...",
+      "recorded_at_utc": "2026-10-14T04:16:23.069953+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "3234 tests passed in93 packages; no race report",
+      "status": "PASS"
+    },
+    {
+      "repository": "grpc-auth",
+      "mode": "workspace",
+      "command": "go vet ./...",
+      "recorded_at_utc": "2026-10-14T04:16:23.069953+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "No diagnostics",
+      "status": "PASS"
+    },
+    {
+      "repository": "grpc-auth",
+      "mode": "workspace",
+      "command": "make build",
+      "recorded_at_utc": "2026-10-14T04:16:23.069953+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "Build succeeded; server not run",
+      "status": "PASS"
+    },
+    {
+      "repository": "grpc-auth",
+      "mode": "workspace",
+      "command": "go test -tags postgres -count=1 ./tests/integration/postgres/...",
+      "recorded_at_utc": "2026-10-14T04:16:23.069953+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "527 tests passed in3 packages; dedicated test DB only",
+      "status": "PASS"
+    },
+    {
+      "repository": "grpc-auth",
+      "mode": "workspace",
+      "command": "go test -tags postgres -count=1 -race ./tests/integration/postgres/...",
+      "recorded_at_utc": "2026-10-14T04:16:23.069953+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "527 tests passed in3 packages; no race report; dedicated test DB only",
+      "status": "PASS"
+    },
+    {
+      "repository": "api-contracts",
+      "mode": "GOWORK=off",
+      "command": "go test ./...",
+      "recorded_at_utc": "2026-10-14T04:16:23.069953+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "130 tests passed in29 packages",
+      "status": "PASS"
+    },
+    {
+      "repository": "api-contracts",
+      "mode": "GOWORK=off",
+      "command": "go vet ./...",
+      "recorded_at_utc": "2026-10-14T04:16:23.069953+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "No diagnostics",
+      "status": "PASS"
+    },
+    {
+      "repository": "grpc-auth",
+      "mode": "GOWORK=off",
+      "command": "go test ./...",
+      "recorded_at_utc": "2026-10-14T04:16:23.069953+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "3234 tests passed in93 packages",
+      "status": "PASS"
+    },
+    {
+      "repository": "grpc-auth",
+      "mode": "GOWORK=off",
+      "command": "go test -race ./...",
+      "recorded_at_utc": "2026-10-14T04:16:23.069953+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "3234 tests passed in93 packages; no race report",
+      "status": "PASS"
+    },
+    {
+      "repository": "grpc-auth",
+      "mode": "GOWORK=off",
+      "command": "go vet ./...",
+      "recorded_at_utc": "2026-10-14T04:16:23.069953+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "No diagnostics",
+      "status": "PASS"
+    },
+    {
+      "repository": "grpc-auth",
+      "mode": "GOWORK=off",
+      "command": "make build",
+      "recorded_at_utc": "2026-10-14T04:16:23.069953+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "Build succeeded; server not run",
+      "status": "PASS"
+    },
+    {
+      "repository": "grpc-auth",
+      "mode": "GOWORK=off",
+      "command": "go test -tags postgres -count=1 ./tests/integration/postgres/...",
+      "recorded_at_utc": "2026-10-14T04:16:23.069953+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "527 tests passed in3 packages; dedicated test DB only",
+      "status": "PASS"
+    },
+    {
+      "repository": "grpc-auth",
+      "mode": "GOWORK=off",
+      "command": "go test -tags postgres -count=1 -race ./tests/integration/postgres/...",
+      "recorded_at_utc": "2026-10-14T04:16:23.069953+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "527 tests passed in3 packages; no race report; dedicated test DB only",
+      "status": "PASS"
+    },
+    {
+      "repository": "api-contracts",
+      "mode": "actual checkout",
+      "command": "make proto",
+      "recorded_at_utc": "2026-10-14T04:16:23.069953+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "Generation succeeded; output matches verified draft13 files and stable regeneration",
+      "status": "PASS"
+    },
+    {
+      "repository": "grpc-auth",
+      "mode": "GOWORK=off",
+      "command": "go mod download -json github.com/siti-nabila/api-contracts@v0.0.0-20261014032725-545701c82e22",
+      "recorded_at_utc": "2026-10-14T04:16:23.069953+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "Origin545701c82e2234041df1bf4d2ce4fef7665dd75d and immutable checksums verified",
+      "status": "PASS"
+    },
+    {
+      "repository": "grpc-auth",
+      "mode": "workspace",
+      "command": "go test -tags postgres -count=1 -run TestPostgresEffectivePermissions ./tests/integration/postgres/...",
+      "recorded_at_utc": "2026-10-14T04:16:23.069953+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "14 E tests passed, including four physical-backend snapshot interleavings, registered B/C/D/status and cleanup",
+      "status": "PASS"
+    },
+    {
+      "repository": "grpc-auth",
+      "mode": "workspace",
+      "command": "go test -tags postgres -count=1 -race -run TestPostgresEffectivePermissions ./tests/integration/postgres/...",
+      "recorded_at_utc": "2026-10-14T04:16:23.069953+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "14 E tests passed; no race report",
+      "status": "PASS"
+    },
+    {
+      "repository": "grpc-auth",
+      "mode": "final artifact/scope review",
+      "command": "gofmt -l changed Go files",
+      "recorded_at_utc": "2026-10-14T04:20:16.597164+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "No pending formatting",
+      "status": "PASS"
+    },
+    {
+      "repository": "grpc-auth",
+      "mode": "final artifact/scope review",
+      "command": "openspec validate auth-effective-permission-reads --strict",
+      "recorded_at_utc": "2026-10-14T04:20:16.597164+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "Change valid",
+      "status": "PASS"
+    },
+    {
+      "repository": "grpc-auth",
+      "mode": "final artifact/scope review",
+      "command": "git diff --check",
+      "recorded_at_utc": "2026-10-14T04:20:16.597164+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "No whitespace errors",
+      "status": "PASS"
+    },
+    {
+      "repository": "grpc-auth",
+      "mode": "final artifact/scope review",
+      "command": "YAML/method inventory and local links/scope/hash review",
+      "recorded_at_utc": "2026-10-14T04:20:16.597164+00:00",
+      "exit_code": 0,
+      "expected": "PASS",
+      "actual": "Exact35 example methods;53 local links/anchors; runtime/test digest stable;20 scoped baseline paths; unrelated user files and actual13-file contract preserved",
+      "status": "PASS"
+    }
+  ],
+  "completion": {
+    "tasks_complete": 24,
+    "tasks_total": 24,
+    "backend_status": "COMPLETE",
+    "deployment_status": "Separate Phase6 DEP-01, not performed",
+    "archive_sync_status": "Not requested"
+  }
+}

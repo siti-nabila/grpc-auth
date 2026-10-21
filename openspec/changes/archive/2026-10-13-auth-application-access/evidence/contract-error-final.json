@@ -1,0 +1,18 @@
+{
+  "label": "contract-error-final",
+  "mode": "standalone",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./..."
+  ],
+  "started_at": "2026-10-13T07:49:25.304637+00:00",
+  "seconds": 2.759,
+  "exit_code": 0,
+  "log": "/tmp/aap-contract-error-final.log",
+  "source_identity": "489f85affedb227856a94fb7a221a4d4c241da390120e02ba7b284044bf8a22d",
+  "passed_tests": 125,
+  "failed_tests": [],
+  "skipped_tests": []
+}

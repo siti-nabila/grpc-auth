@@ -1,0 +1,22 @@
+{
+  "label": "contract-targeted",
+  "mode": "workspace",
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "-count=1",
+    "./tests/protobuf",
+    "./tests/grpcerror",
+    "./tests/dictionary",
+    "./tests/locale"
+  ],
+  "started_at": "2026-10-13T05:42:58.336331+00:00",
+  "seconds": 3.166,
+  "exit_code": 0,
+  "log": "/tmp/aap-contract-targeted.log",
+  "source_identity": "1f17169e539bc44c201a483174fe74231c3a0a303dea6ff570ba0c56b2265124",
+  "passed_tests": 124,
+  "failed_tests": [],
+  "skipped_tests": []
+}

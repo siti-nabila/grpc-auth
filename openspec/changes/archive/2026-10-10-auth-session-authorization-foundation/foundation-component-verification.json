@@ -1,0 +1,177 @@
+{
+  "change": "auth-session-authorization-foundation",
+  "recorded_at_utc": "2026-10-10T10:10:56.434840+00:00",
+  "head": "b89f37270d019c8d0d7823a3ff5d3526874d2232",
+  "working_tree": "uncommitted; source hashes below",
+  "go": "go1.26.2 darwin/arm64",
+  "modules": {
+    "api-contracts": "v0.0.0-20261010071509-42a9e6fa23ad",
+    "orm": "v1.7.0"
+  },
+  "environment": {
+    "workspace": "parent go.work resolves local api-contracts",
+    "standalone": "GOWORK=off resolves published cached modules",
+    "network": "GOPROXY=off; TLS bufconn only",
+    "database": "controlled SQL connector; no real DB test or write",
+    "credentials": "deterministic test fixtures; no deployment secret"
+  },
+  "completed_tasks": [
+    "1.1",
+    "1.2",
+    "1.3",
+    "1.4",
+    "2.1",
+    "2.2",
+    "2.3",
+    "2.4",
+    "3.1",
+    "3.2",
+    "3.3",
+    "3.4",
+    "4.1",
+    "4.2"
+  ],
+  "progress": {
+    "complete": 14,
+    "total": 36
+  },
+  "verification": [
+    {
+      "command": "rtk proxy env GOPROXY=off go test ./...",
+      "expected": "exit 0",
+      "actual": "exit 0",
+      "status": "PASS"
+    },
+    {
+      "command": "rtk proxy env GOPROXY=off go vet ./...",
+      "expected": "exit 0",
+      "actual": "exit 0",
+      "status": "PASS"
+    },
+    {
+      "command": "rtk proxy env GOPROXY=off go test -race ./...",
+      "expected": "exit 0",
+      "actual": "exit 0",
+      "status": "PASS"
+    },
+    {
+      "command": "rtk proxy env GOPROXY=off make build",
+      "expected": "exit 0",
+      "actual": "exit 0",
+      "status": "PASS"
+    },
+    {
+      "command": "rtk proxy env GOWORK=off GOPROXY=off go test ./...",
+      "expected": "exit 0",
+      "actual": "exit 0",
+      "status": "PASS"
+    },
+    {
+      "command": "rtk proxy env GOWORK=off GOPROXY=off go vet ./...",
+      "expected": "exit 0",
+      "actual": "exit 0",
+      "status": "PASS"
+    },
+    {
+      "command": "rtk proxy env GOWORK=off GOPROXY=off make build",
+      "expected": "exit 0",
+      "actual": "exit 0",
+      "status": "PASS"
+    },
+    {
+      "command": "rtk proxy openspec validate auth-session-authorization-foundation --strict",
+      "expected": "exit 0",
+      "actual": "exit 0",
+      "status": "PASS"
+    },
+    {
+      "command": "rtk proxy openspec validate --specs --strict",
+      "expected": "exit 0",
+      "actual": "exit 0",
+      "status": "PASS"
+    },
+    {
+      "command": "rtk proxy git diff --check",
+      "expected": "exit 0",
+      "actual": "exit 0",
+      "status": "PASS"
+    }
+  ],
+  "gofmt_changed_go_files": 46,
+  "components": {
+    "SAF-01": "COMPONENT_PASS; external readiness pending",
+    "SAF-02": "COMPONENT_PASS; real producer pending",
+    "SAF-03": "COMPONENT_PASS; real PostgreSQL committed interleaving proof pending",
+    "SAF-04": "PARTIAL; candidate reads only; existing handler wiring/legacy Me race/profile pending",
+    "SAF-07": "PASS published contract",
+    "SAF-08": "BLOCKED real Login session/refresh/audit/EdDSA/basic limiter",
+    "SAF-09": "BLOCKED caller/client/key/cutover readiness",
+    "SAF-10": "BLOCKED activation"
+  },
+  "read_snapshot": {
+    "provider": "feature-owned RepeatableRead READ ONLY",
+    "mutation_isolation": "ReadCommitted unchanged",
+    "reason": "ORM v1.7.0 ScanPaginate executes count and data separately",
+    "proof": "SQL driver options/context/owner/order/rollback; not PostgreSQL MVCC"
+  },
+  "next_pending_task": "4.3",
+  "ordering_issue": "Existing Me/ListUsers wiring before producer gate rejects legacy Login HS256 sid-less tokens. Design rejects guard activation before compatible real producer. Guidance required; no producer scope expansion or runtime fallback.",
+  "not_executed": [
+    "real Login integration",
+    "opt-in PostgreSQL suites",
+    "server deployment",
+    "DB migration/fixtures",
+    "sibling edit",
+    "dependency update",
+    "commit/push/archive"
+  ],
+  "file_sha256": {
+    "internal/configs/config.go": "626258f4442730432b612940c9f8e6f4cc728329d743714aa621135d43838325",
+    "internal/configs/env.go": "7320ed21b1b30c61c3134a4b9818288ce5905cfef6cc663c604c8c42973e319d",
+    "internal/configs/server.go": "0a6410fdc37f0fdc3997cc8b9052b3e61b6b90841a4f6ef95a88f5787312bbde",
+    "internal/configs/tls.go": "283ee1beb8baa855a40e6877c23260389bf0f92892e9365440865c1ff4450cb1",
+    "internal/features/auth_feature/read_snapshot.go": "18ab8bb6f6a0342880a89c9229cb8e25a4ced8321cb5d6ce8bb90cb7678e3877",
+    "internal/features/auth_feature/session.go": "eead42b14f476311079df7d1afd7445f47ca302a590ceb904ee46faa84b3c8c5",
+    "internal/features/common/authorization.go": "1c584d83e76a0a80d4e9c12a02c72c76de4a8de07badfe4e0e686e6b45e0cd6d",
+    "internal/features/common/dependency.go": "10d8e8370aabe847deb7d754c7b0694e66d6e3ef267454614669929284f0107d",
+    "internal/features/user/read_snapshot.go": "160226ab20df9d9d4339a3b1de883d8045a4ff60e1bf9167f009393e7c41fc16",
+    "internal/interceptors/service_interceptor.go": "9232b8d2eb6cada2959949d6ac5c43f24338370fb4a20a58ecd6b8344bd4e8bc",
+    "internal/repositories/domain/auth.go": "56288d87fcabed475de378bd5aab5724328778a1cc17e2bdbc7a18e773c82c17",
+    "internal/repositories/domain/authorization.go": "389de2b78c25588c16292b7624cbfb8bcefeaf05a98381a183bc9fe293bb9570",
+    "internal/repositories/domain/session.go": "429ba1a2d5a634d5695cf356255cd1c0ae5c8b9178517f38faa8a3106db77041",
+    "internal/repositories/domain/transaction.go": "d0ee3bbea07edfa27743ef6ab6faaa0881781a36eb39d5eca2a19f96e76df0cd",
+    "internal/repositories/domain/user_identity.go": "4aedc5d77fd8e1e4fbb9dcee50029a617e554d614f4a17aa4f0ec5264406acaa",
+    "internal/repositories/reader/authorization.go": "1c65223932d780f5fcde0ae5d626900a51c649d7c54bc7b35f1a0e69d3808290",
+    "internal/repositories/reader/session.go": "13e4a7df5d9cc9c3c751a8efdef01c86f06a4feddf24c3566471f88036f4503d",
+    "internal/repositories/reader/user.reader.go": "dfdb53a8db3002e17e67c161327c1a59a6326e63ed884234751b0d90e9abbcdf",
+    "internal/repositories/reader/user_identity.go": "a2b3e0d436f086aba12ca4b0236892f32b2d4d2b8bf1995bb9df96b80531f078",
+    "internal/repositories/writer/session.go": "f8de343a45593a0b720fa827c210e9fcf345bdf56dc0fab65dbbbbd0f0ac845f",
+    "internal/serviceauth/caller.go": "80820a38c77d7fa797db3dab93a64a016703e590cc24e2a01ae997068b56ce07",
+    "internal/serviceauth/verifier.go": "b2cd0598fc71ff6d3e8788edf72386f5757e1f90f2e223fa5a6909023d85ec3e",
+    "internal/sessions/principal.go": "369269e88aef269215a272328f83995214b7ec6c18fd9ab2e648de3d3b47aa73",
+    "pkg/config/service_auth.go": "cf5d787a8c2c2cee10300272f269b08ce56f4ccb0033c148ff42438db489b209",
+    "pkg/database/transaction.go": "a9c5c5264896a99c80c0cb70ea3d6bb3ed491742e58de5a7c856278dcf2473ad",
+    "pkg/jwt/access.go": "0cbf9d0f6a5fee9cf98d5b1b736a8914efb60392a097ede56a3ba227684dbfe5",
+    "tests/configs/mocks/services.go": "b3591b0c4d6fd0b8c1076adef43eab851ecdbbc994386f0402d8320df227db3f",
+    "tests/configs/runner_test.go": "813312e30493c9ce069eefb565b038acc0bb9bebdac94628ba7fa2a1547b66ae",
+    "tests/configs/test_scenarios/security.go": "a6c8d9adf7e727611b4db0ed41d31309086d52e04b6f3f13c94e59c3079d7ffb",
+    "tests/configs/test_scenarios/server.go": "26ed4722ed7c017a533a443582b659a9cf6695336bba6589df5e1918c297fcce",
+    "tests/features/auth_feature/mocks/session.go": "648937b0702cbd186d13280908851765ba66d2f14459dd0cd606451d72a33080",
+    "tests/features/auth_feature/runner_test.go": "9461d76170c6dad356bd804f902a79413448e595d1cf8fab588c135734150611",
+    "tests/features/auth_feature/test_scenarios/session.go": "3564a1b96f0e2d2834eccb8532a1c841fe779a72af3e16c5c872d3a60ad988b7",
+    "tests/features/common/runner_test.go": "f9e97e3bede4cbcdfa914c4d64c72c2516c97da90a537aa796119a50005702e7",
+    "tests/features/common/test_scenarios/authorization.go": "99d0bad793c2e93db7c1eb772492ffd7f6ace29425cee501ffbbbfadb558caeb",
+    "tests/integration/auth_reads/runner_test.go": "f2feebd5ac1a30f1b18b6ef96aa6bbb9f9a4d4faa25eb219fb1dc81a087ba8c4",
+    "tests/integration/auth_reads/test_scenarios/scenarios.go": "463002b3efcefe2886004888d45f14297d9f2b138e7852103c90b4ebb187a529",
+    "tests/interceptors/test_scenarios/interceptor_scenarios.go": "030f2b254c663e0507bc6043b37d36da221563c57b7202bde87d6b14a79ba1e7",
+    "tests/interceptors/test_scenarios/service.go": "aa1be83181b324601914f3f1b093c0f5c9e1b68efa0f0a4bc08a57aa79f1c3e6",
+    "tests/pkg/jwt/runner_test.go": "79638cbdf69b1e2f8be4d783b85693fc4f6a5d0d8239d0bd679ea4f55e63ee75",
+    "tests/pkg/jwt/test_scenarios/access.go": "18c2b5ebd5845fd0c86d723beb1dfc5e9c729179e5f332886ab74302870c92c4",
+    "tests/repositories/transaction/runner_test.go": "053fa67488fc54ebd8354ad101156c6388e5590fcfd835c3bfc5dd3a4eb5ac90",
+    "tests/repositories/transaction/test_scenarios/authorization.go": "750e802141640c5def20dd8b55b90f9b3308965aeea9720df582a1125442d0eb",
+    "tests/repositories/transaction/test_scenarios/session.go": "c4a967218067db125bcb373efb3fd117bcdb272d2ea4b3ff0818eebb34a63233",
+    "tests/shared/fixtures/access.go": "dd30f64f9b8a24c6676d83a29e4575bfd6cd306f674a837690a317149c9e6827",
+    "tests/shared/fixtures/service_auth.go": "af52d88f651642d16ee2cbb2476a0a556bc35f8b5603f30a9ed9251597f84468"
+  },
+  "local_markdown_links": "PASS"
+}

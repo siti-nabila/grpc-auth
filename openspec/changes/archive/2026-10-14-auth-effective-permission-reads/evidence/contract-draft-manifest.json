@@ -1,0 +1,72 @@
+{
+  "draft_path": "/private/tmp/epr-contract-g8ofpict",
+  "target_root": "/Users/bleki/Desktop/mini-projects/api-contracts",
+  "regeneration_stable": true,
+  "files": [
+    {
+      "path": "docs/effective-permission-contract.md",
+      "sha256": "6e276524bffdaf3e77e201b0840cbaa30218a1cadca505625e4aad846eb935e8",
+      "new": true
+    },
+    {
+      "path": "pb/user/v1/user.payload.pb.go",
+      "sha256": "4622ee7848b2a16e0046098ae9d7f092d9bf237538ac6858dcd9232eac45613a",
+      "new": false
+    },
+    {
+      "path": "pb/user/v1/user.service.pb.go",
+      "sha256": "e569dc8f5ab56c0880c9299eacf70153c9b9baa9f3f702f5d483329c9a43a524",
+      "new": false
+    },
+    {
+      "path": "pb/user/v1/user.service_grpc.pb.go",
+      "sha256": "03a81e67c96af15b057a3bb9175ac5427a4b83657c55d48bb630977017c21530",
+      "new": false
+    },
+    {
+      "path": "proto/user/v1/user.payload.proto",
+      "sha256": "3bd545023ccb3e4255a6044c1919cec633da69a97b2d87fac4a2a00be2f5ffae",
+      "new": false
+    },
+    {
+      "path": "proto/user/v1/user.service.proto",
+      "sha256": "bc299e36db3517b3589231ce4622b1b0b42327144b8d034e4b89763896c9eb0f",
+      "new": false
+    },
+    {
+      "path": "tests/protobuf/fixtures/effective_permissions.go",
+      "sha256": "9e13cbe1fa385e4968a037122ab54b7ae3e8a86d14831ba05c5e858141b6f3b5",
+      "new": true
+    },
+    {
+      "path": "tests/protobuf/fixtures/effective_permissions_baseline.json",
+      "sha256": "cf6efdb0a3e67b3a25671e974121b10bd616ac8dd8fd82629b6359d4a776108a",
+      "new": true
+    },
+    {
+      "path": "tests/protobuf/runner_test.go",
+      "sha256": "4e9fd9d63c43f2fd397003b8e687121a28c8e5d54b1abeb7252418836edbe3bb",
+      "new": false
+    },
+    {
+      "path": "tests/protobuf/test_scenarios/application_access.go",
+      "sha256": "74701baa4e2db185d74c4b520df80c48cdab0e4df0d5fffb3cd5da318d45fcf2",
+      "new": false
+    },
+    {
+      "path": "tests/protobuf/test_scenarios/assignment.go",
+      "sha256": "0f8f5a1f26723c7b13c0e52e696ac52bbb8dd144aa0683d5b17b8afcee309f19",
+      "new": false
+    },
+    {
+      "path": "tests/protobuf/test_scenarios/effective_permissions.go",
+      "sha256": "b3ad3303f19d73b310e4e26cae9ac3170f861a18966770b0cb4758d0e54407f3",
+      "new": true
+    },
+    {
+      "path": "tests/protobuf/test_scenarios/user_management.go",
+      "sha256": "541e069a134dd1dd2b5956a7a8a9f07491f9fad7290440e66b20e8763628a875",
+      "new": false
+    }
+  ]
+}

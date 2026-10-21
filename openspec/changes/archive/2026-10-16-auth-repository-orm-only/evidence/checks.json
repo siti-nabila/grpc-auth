@@ -1,0 +1,285 @@
+[
+  {
+    "check": "orm-test",
+    "started_at": "2026-10-15T12:05:00.329653+00:00",
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./..."
+    ],
+    "mode": "off",
+    "exit_code": 0,
+    "passed_tests": 205,
+    "failed_tests": []
+  },
+  {
+    "check": "orm-race",
+    "started_at": "2026-10-15T12:05:00.329661+00:00",
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "-race",
+      "./..."
+    ],
+    "mode": "off",
+    "exit_code": 0,
+    "passed_tests": 205,
+    "failed_tests": []
+  },
+  {
+    "check": "orm-vet",
+    "started_at": "2026-10-15T12:05:00.333454+00:00",
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "mode": "off",
+    "exit_code": 0,
+    "passed_tests": 0,
+    "failed_tests": []
+  },
+  {
+    "check": "orm-build",
+    "started_at": "2026-10-15T12:04:04.058270+00:00",
+    "command": [
+      "go",
+      "build",
+      "./..."
+    ],
+    "mode": "off",
+    "exit_code": 0,
+    "passed_tests": 0,
+    "failed_tests": []
+  },
+  {
+    "check": "grpc-test",
+    "started_at": "2026-10-15T13:30:27.610721+00:00",
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./..."
+    ],
+    "mode": "/private/tmp/grpc-auth-orm-only/go.work",
+    "exit_code": 0,
+    "passed_tests": 3265,
+    "failed_tests": []
+  },
+  {
+    "check": "grpc-race",
+    "started_at": "2026-10-15T13:30:27.610722+00:00",
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "-race",
+      "./..."
+    ],
+    "mode": "/private/tmp/grpc-auth-orm-only/go.work",
+    "exit_code": 0,
+    "passed_tests": 3265,
+    "failed_tests": []
+  },
+  {
+    "check": "grpc-vet",
+    "started_at": "2026-10-15T13:30:27.613459+00:00",
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "mode": "/private/tmp/grpc-auth-orm-only/go.work",
+    "exit_code": 0,
+    "passed_tests": 0,
+    "failed_tests": []
+  },
+  {
+    "check": "grpc-make-build",
+    "started_at": "2026-10-15T13:30:27.621709+00:00",
+    "command": [
+      "make",
+      "build",
+      "BIN_DIR=/private/tmp/grpc-auth-orm-only/build"
+    ],
+    "mode": "/private/tmp/grpc-auth-orm-only/go.work",
+    "exit_code": 0,
+    "passed_tests": 0,
+    "failed_tests": []
+  },
+  {
+    "check": "postgres-test",
+    "started_at": "2026-10-15T13:34:35.559683+00:00",
+    "command": [
+      "go",
+      "run",
+      "/private/tmp/grpc-auth-orm-only/run-postgres.go",
+      "-json",
+      "./tests/integration/postgres/..."
+    ],
+    "mode": "/private/tmp/grpc-auth-orm-only/go.work",
+    "exit_code": 0,
+    "passed_tests": 536,
+    "failed_tests": []
+  },
+  {
+    "check": "postgres-race",
+    "started_at": "2026-10-15T13:35:13.427799+00:00",
+    "command": [
+      "go",
+      "run",
+      "/private/tmp/grpc-auth-orm-only/run-postgres.go",
+      "-json",
+      "-race",
+      "./tests/integration/postgres/..."
+    ],
+    "mode": "/private/tmp/grpc-auth-orm-only/go.work",
+    "exit_code": 0,
+    "passed_tests": 536,
+    "failed_tests": []
+  },
+  {
+    "check": "grpc-standalone-targeted",
+    "started_at": "2026-10-15T13:29:44.017381+00:00",
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./tests/repositories/...",
+      "./tests/features/role/...",
+      "./tests/integration/auth_reads/..."
+    ],
+    "mode": "off",
+    "exit_code": 0,
+    "passed_tests": 904,
+    "failed_tests": []
+  },
+  {
+    "check": "grpc-standalone-test",
+    "started_at": "2026-10-15T13:30:14.600556+00:00",
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./..."
+    ],
+    "mode": "off",
+    "exit_code": 0,
+    "passed_tests": 3265,
+    "failed_tests": []
+  },
+  {
+    "check": "grpc-standalone-race",
+    "started_at": "2026-10-15T13:30:14.600565+00:00",
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "-race",
+      "./..."
+    ],
+    "mode": "off",
+    "exit_code": 0,
+    "passed_tests": 3265,
+    "failed_tests": []
+  },
+  {
+    "check": "grpc-standalone-vet",
+    "started_at": "2026-10-15T13:30:14.600555+00:00",
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "mode": "off",
+    "exit_code": 0,
+    "passed_tests": 0,
+    "failed_tests": []
+  },
+  {
+    "check": "grpc-standalone-build",
+    "started_at": "2026-10-15T13:30:14.600560+00:00",
+    "command": [
+      "make",
+      "build",
+      "BIN_DIR=/private/tmp/grpc-auth-orm-only/standalone-build"
+    ],
+    "mode": "off",
+    "exit_code": 0,
+    "passed_tests": 0,
+    "failed_tests": []
+  },
+  {
+    "check": "postgres-standalone-test",
+    "started_at": "2026-10-15T13:30:16.829885+00:00",
+    "command": [
+      "go",
+      "run",
+      "/private/tmp/grpc-auth-orm-only/run-postgres.go",
+      "-json",
+      "./tests/integration/postgres/..."
+    ],
+    "mode": "off",
+    "exit_code": 0,
+    "passed_tests": 536,
+    "failed_tests": []
+  },
+  {
+    "check": "postgres-standalone-race",
+    "started_at": "2026-10-15T13:31:30.427716+00:00",
+    "command": [
+      "go",
+      "run",
+      "/private/tmp/grpc-auth-orm-only/run-postgres.go",
+      "-json",
+      "-race",
+      "./tests/integration/postgres/..."
+    ],
+    "mode": "off",
+    "exit_code": 0,
+    "passed_tests": 536,
+    "failed_tests": []
+  },
+  {
+    "check": "grpc-release-tag-test",
+    "started_at": "2026-10-15T13:46:24.116243+00:00",
+    "command": [
+      "go",
+      "test",
+      "-json",
+      "./..."
+    ],
+    "mode": "off",
+    "exit_code": 0,
+    "passed_tests": 3265,
+    "failed_tests": []
+  },
+  {
+    "check": "grpc-release-tag-vet",
+    "started_at": "2026-10-15T13:46:24.116243+00:00",
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "mode": "off",
+    "exit_code": 0,
+    "passed_tests": 0,
+    "failed_tests": []
+  },
+  {
+    "check": "grpc-release-tag-build",
+    "started_at": "2026-10-15T13:46:24.116248+00:00",
+    "command": [
+      "make",
+      "build",
+      "BIN_DIR=/private/tmp/grpc-auth-orm-only/release-tag-bin"
+    ],
+    "mode": "off",
+    "exit_code": 0,
+    "passed_tests": 0,
+    "failed_tests": []
+  }
+]

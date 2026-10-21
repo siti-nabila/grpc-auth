@@ -1,0 +1,135 @@
+{
+  "scope": "Static comparison of historical read-only capture and owned test fixture; no application DB connection or migration",
+  "historical_report_sha256": "baebd19cda87fcd28912554cbadcfb531c9dbddbfaf4b129e8a1f5f172f28cf5",
+  "fixture_sha256": "cad4e509ec1a2472e3450380a20b9df5cb9ce07678cf9ce1d6bc3895c13a2d30",
+  "matrix": [
+    {
+      "table": "auth",
+      "required": [
+        "id",
+        "email",
+        "password",
+        "status",
+        "version",
+        "auth_version",
+        "created_at",
+        "must_change_password"
+      ],
+      "historical_columns": {
+        "id": {
+          "type": "int4",
+          "max_length": null
+        },
+        "email": {
+          "type": "varchar",
+          "max_length": 100
+        },
+        "password": {
+          "type": "varchar",
+          "max_length": 150
+        },
+        "status": {
+          "type": "varchar",
+          "max_length": 16
+        },
+        "version": {
+          "type": "int8",
+          "max_length": null
+        },
+        "auth_version": {
+          "type": "int8",
+          "max_length": null
+        },
+        "created_at": {
+          "type": "timestamp",
+          "max_length": null
+        },
+        "must_change_password": {
+          "type": "bool",
+          "max_length": null
+        }
+      },
+      "historical_not_captured": []
+    },
+    {
+      "table": "profile",
+      "required": [
+        "id",
+        "user_id",
+        "name",
+        "address",
+        "phone"
+      ],
+      "historical_columns": {
+        "id": {
+          "type": "int4",
+          "max_length": null
+        },
+        "user_id": {
+          "type": "int4",
+          "max_length": null
+        },
+        "name": {
+          "type": "varchar",
+          "max_length": 100
+        },
+        "address": {
+          "type": "varchar",
+          "max_length": 250
+        },
+        "phone": {
+          "type": "varchar",
+          "max_length": 20
+        }
+      },
+      "historical_not_captured": []
+    },
+    {
+      "table": "user_profile_search",
+      "required": [
+        "profile_id",
+        "fts_keyword",
+        "fts_lexeme_text"
+      ],
+      "historical_columns": {},
+      "historical_not_captured": [
+        "profile_id",
+        "fts_keyword",
+        "fts_lexeme_text"
+      ]
+    },
+    {
+      "table": "admin_guard",
+      "required": [
+        "id"
+      ],
+      "historical_columns": {},
+      "historical_not_captured": [
+        "id"
+      ]
+    },
+    {
+      "table": "sessions",
+      "required": [
+        "auth_version"
+      ],
+      "historical_columns": {},
+      "historical_not_captured": [
+        "auth_version"
+      ]
+    }
+  ],
+  "gaps": [
+    "Historical preflight did not inspect admin_guard; SQL migration artifact defines singleton id=1 but current fixture omits it. Add only owned fixture before status integration tests; deployment rechecks actual table/row.",
+    "Historical session generation absent at capture; prepared lifecycle migration and current fixture supply nullable sessions.auth_version; no migration executed.",
+    "Owned fixture intentionally omits production profile search trigger/index. Search update visibility needs controlled fixture synchronization matching inspected production trigger semantics; no assumption of application trigger installation."
+  ],
+  "invariants": [
+    "Normalized email unique_key_email and auth_email_normalized_ck present in fixture and historical capture.",
+    "Auth/profile INTEGER identity and profile.user_id uniqueness checked statically.",
+    "Legacy auth.created_at timestamp without timezone retained; no conversion/backfill inferred.",
+    "Last-admin current eligible count must be read under global guard, never historical count."
+  ],
+  "application_database_verified_now": false,
+  "migration_executed": false
+}
