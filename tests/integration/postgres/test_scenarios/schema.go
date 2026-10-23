@@ -88,8 +88,9 @@ func fixtureIsolation(t *testing.T) {
       (SELECT count(*) FROM information_schema.columns WHERE table_schema=$1 AND table_name IN ('auth','profile','role','user_role','audit_logs','outbox_events','idempotency_records')),
       (SELECT count(*) FROM pg_constraint con JOIN pg_class c ON c.oid=con.conrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname=$1 AND c.relname IN ('auth','profile','role','user_role','audit_logs','outbox_events','idempotency_records') AND con.convalidated),
       (SELECT count(*) FROM pg_indexes WHERE schemaname=$1 AND tablename IN ('auth','profile','role','user_role','audit_logs','outbox_events','idempotency_records'))`
-	if err := a.QueryRowContext(ctx, metadataQuery, fixture.Name).Scan(&columns, &constraints, &indexes); err != nil || columns != 70 || constraints != 35 || indexes != 22 {
-		t.Fatalf("fixture metadata counts = %d/%d/%d, want 70/35/22", columns, constraints, indexes)
+	// The existing fixture includes nullable profile.country_code.
+	if err := a.QueryRowContext(ctx, metadataQuery, fixture.Name).Scan(&columns, &constraints, &indexes); err != nil || columns != 71 || constraints != 35 || indexes != 22 {
+		t.Fatalf("fixture metadata counts = %d/%d/%d, want 71/35/22", columns, constraints, indexes)
 	}
 	var roles, rows int
 	if err := a.QueryRowContext(ctx, "SELECT count(*) FROM role WHERE role_code=1 AND code='iam.member'").Scan(&roles); err != nil || roles != 1 {

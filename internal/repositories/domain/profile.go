@@ -29,26 +29,29 @@ type (
 	}
 
 	Profile struct {
-		Id      uint64 `sql:"column:id;primaryKey" json:"id"`
-		UserId  uint64 `sql:"column:user_id" json:"user_id"`
-		Name    string `sql:"column:name" json:"name"`
-		Address string `sql:"column:address" json:"address"`
-		Phone   string `sql:"column:phone" json:"phone"`
+		Id          uint64         `sql:"column:id;primaryKey" json:"id"`
+		UserId      uint64         `sql:"column:user_id" json:"user_id"`
+		Name        string         `sql:"column:name" json:"name"`
+		Address     string         `sql:"column:address" json:"address"`
+		Phone       string         `sql:"column:phone" json:"phone"`
+		CountryCode sql.NullString `sql:"column:country_code" json:"country_code"`
 	}
 
 	ProfileRequest struct {
-		Id      uint64 `sql:"column:id;primaryKey" json:"id"`
-		UserId  uint64 `sql:"column:user_id" json:"user_id"`
-		Name    string `sql:"column:name" json:"name"`
-		Address string `sql:"column:address" json:"address"`
-		Phone   string `sql:"column:phone" json:"phone"`
+		Id          uint64         `sql:"column:id;primaryKey" json:"id"`
+		UserId      uint64         `sql:"column:user_id" json:"user_id"`
+		Name        string         `sql:"column:name" json:"name"`
+		Address     string         `sql:"column:address" json:"address"`
+		Phone       string         `sql:"column:phone" json:"phone"`
+		CountryCode sql.NullString `sql:"column:country_code" json:"country_code"`
 	}
 
 	UpdateProfileRequest struct {
-		Id      uint64 `sql:"column:id;primaryKey" json:"id"`
-		Name    string `sql:"column:name" json:"name"`
-		Address string `sql:"column:address" json:"address"`
-		Phone   string `sql:"column:phone" json:"phone"`
+		Id          uint64         `sql:"column:id;primaryKey" json:"id"`
+		Name        string         `sql:"column:name" json:"name"`
+		Address     string         `sql:"column:address" json:"address"`
+		Phone       string         `sql:"column:phone" json:"phone"`
+		CountryCode sql.NullString `sql:"column:country_code" json:"country_code"`
 	}
 )
 
@@ -61,11 +64,12 @@ func (Profile) TableName() string {
 
 func (p Profile) ToProfileResponse() *profilev1.Profile {
 	return &profilev1.Profile{
-		Id:      p.Id,
-		UserId:  p.UserId,
-		Name:    p.Name,
-		Address: p.Address,
-		Phone:   p.Phone,
+		Id:          p.Id,
+		UserId:      p.UserId,
+		Name:        p.Name,
+		Address:     p.Address,
+		Phone:       p.Phone,
+		CountryCode: p.CountryCode.String,
 	}
 }
 

@@ -41,6 +41,7 @@ CREATE TABLE profile (
  "name" character varying(100),
  "address" character varying(250),
  "phone" character varying(20),
+ "country_code" character varying(4),
  CONSTRAINT "fk_user_id_id" FOREIGN KEY (user_id) REFERENCES auth(id) ON DELETE RESTRICT,
  CONSTRAINT "profile_pk" PRIMARY KEY (id),
  CONSTRAINT "profile_user_id_uq" UNIQUE (user_id)

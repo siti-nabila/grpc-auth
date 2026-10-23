@@ -96,6 +96,7 @@ type SafeCommandResult struct {
 	Name               *string               `json:"name,omitempty"`
 	Address            *string               `json:"address,omitempty"`
 	Phone              *string               `json:"phone,omitempty"`
+	CountryCode        *string               `json:"country_code,omitempty"`
 	LoginRequired      bool                  `json:"login_required,omitempty"`
 	Email              *string               `json:"email,omitempty"`
 	CreatedAt          *time.Time            `json:"created_at,omitempty"`
@@ -126,7 +127,7 @@ func (r SafeCommandResult) Validate() error {
 			return common.ErrBadRequest
 		}
 	}
-	return (SafeSnapshot{Version: r.Version, Status: r.Status, Name: r.Name, Address: r.Address, Phone: r.Phone, RoleIDs: r.ChangedRoleIDs, SessionID: r.SessionID}).Validate()
+	return (SafeSnapshot{Version: r.Version, Status: r.Status, Name: r.Name, Address: r.Address, Phone: r.Phone, CountryCode: r.CountryCode, RoleIDs: r.ChangedRoleIDs, SessionID: r.SessionID}).Validate()
 }
 
 // UserDetail returns the stored initial safe response, never mutable current data.
@@ -137,11 +138,15 @@ func (r SafeCommandResult) UserDetail() (UserDetail, error) {
 	if ValidateManagementTarget(r.UserID) != nil || r.Version < 1 || !ManagementUserStatus(types.UserStatus(r.Status)) || r.Email == nil || r.CreatedAt == nil || r.MustChangePassword == nil || r.Name == nil || r.Address == nil || r.Phone == nil {
 		return UserDetail{}, common.ErrInternalServerError
 	}
-	return UserDetail{ID: r.UserID, Email: *r.Email, Name: *r.Name, Address: *r.Address, Phone: *r.Phone, Status: types.UserStatus(r.Status), Version: r.Version, CreatedAt: *r.CreatedAt, MustChangePassword: *r.MustChangePassword, Roles: r.Roles, ApplicationAccess: r.ApplicationAccess}, nil
+	countryCode := ""
+	if r.CountryCode != nil {
+		countryCode = *r.CountryCode
+	}
+	return UserDetail{CountryCode: countryCode, ID: r.UserID, Email: *r.Email, Name: *r.Name, Address: *r.Address, Phone: *r.Phone, Status: types.UserStatus(r.Status), Version: r.Version, CreatedAt: *r.CreatedAt, MustChangePassword: *r.MustChangePassword, Roles: r.Roles, ApplicationAccess: r.ApplicationAccess}, nil
 }
 
 func UserDetailCommandResult(r UserDetail, changed bool) SafeCommandResult {
-	return SafeCommandResult{UserID: r.ID, Version: r.Version, Changed: changed, Status: string(r.Status), Email: &r.Email, Name: &r.Name, Address: &r.Address, Phone: &r.Phone, CreatedAt: &r.CreatedAt, MustChangePassword: &r.MustChangePassword, Roles: r.Roles, ApplicationAccess: r.ApplicationAccess}
+	return SafeCommandResult{UserID: r.ID, Version: r.Version, Changed: changed, Status: string(r.Status), Email: &r.Email, Name: &r.Name, Address: &r.Address, Phone: &r.Phone, CountryCode: &r.CountryCode, CreatedAt: &r.CreatedAt, MustChangePassword: &r.MustChangePassword, Roles: r.Roles, ApplicationAccess: r.ApplicationAccess}
 }
 
 func (r *SafeCommandResult) UnmarshalJSON(data []byte) error {

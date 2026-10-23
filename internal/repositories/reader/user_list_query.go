@@ -21,7 +21,7 @@ func userSortExpressions() map[string]string {
 }
 func userListProjection() []string {
 	e := userSortExpressions()
-	return []string{"a.id AS auth_id", "a.email", `COALESCE(p."name", '') AS name`, "COALESCE(p.address, '') AS address", "COALESCE(p.phone, '') AS phone", "a.status", "a.version", "a.created_at", `p."name" AS key_name`, "p.address AS key_address", "p.phone AS key_phone", e[domain.UserSortRoles] + " AS key_roles", e[domain.UserSortApplicationAccess] + " AS key_application_access"}
+	return []string{"a.id AS auth_id", "a.email", `COALESCE(p."name", '') AS name`, "COALESCE(p.address, '') AS address", "COALESCE(p.phone, '') AS phone", "COALESCE(p.country_code, '') AS country_code", "a.status", "a.version", "a.created_at", `p."name" AS key_name`, "p.address AS key_address", "p.phone AS key_phone", e[domain.UserSortRoles] + " AS key_roles", e[domain.UserSortApplicationAccess] + " AS key_application_access"}
 }
 func buildUserListQuery(db domain.QueryReader, f domain.UserListFilter) *orm.QueryBuilder {
 	roles := db.UseModel(domain.UserListRole{}).Select("ur.user_id", "MIN(r.role_name) AS first_name").Join("role r", "r.id = ur.role_id").Where("ur.status = 'ACTIVE' AND r.status = 'ACTIVE'").GroupBy("ur.user_id")

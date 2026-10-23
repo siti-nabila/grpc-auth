@@ -20,6 +20,7 @@ type UserDetail struct {
 	Name               string                `sql:"column:name"`
 	Address            string                `sql:"column:address"`
 	Phone              string                `sql:"column:phone"`
+	CountryCode        string                `sql:"column:country_code"`
 	Status             types.UserStatus      `sql:"column:status"`
 	Version            int64                 `sql:"column:version"`
 	CreatedAt          time.Time             `sql:"column:created_at"`
@@ -50,6 +51,7 @@ type ManagementStatusWriter interface {
 
 type CreateUserInput struct {
 	Name, Email, Password, Address, Phone string
+	CountryCode                           *string
 	Status                                *types.UserStatus
 	Key                                   string
 }
@@ -65,15 +67,18 @@ func (r CreateUserInput) Validate() error {
 	if err != nil || address.Address != r.Email || !userText(r.Email, 6, 50) || !userText(r.Password, 6, 50) || !userText(r.Name, 3, 100) || !userText(r.Address, 0, 250) || !userText(r.Phone, 0, 20) || r.Status == nil || (*r.Status != types.UserPending && *r.Status != types.UserActive) || ValidateManagementKey(r.Key, true) != nil {
 		return common.ErrBadRequest
 	}
+	if r.CountryCode != nil {
+		return ValidateCountryCode(*r.CountryCode)
+	}
 	return nil
 }
 
 type UpdateUserInput struct {
-	UserID               uint64
-	ExpectedVersion      int64
-	Name, Address, Phone *string
-	Fields               []string
-	Key                  string
+	UserID                            uint64
+	ExpectedVersion                   int64
+	Name, Address, Phone, CountryCode *string
+	Fields                            []string
+	Key                               string
 }
 
 func (r UpdateUserInput) Validate() error {
@@ -87,18 +92,21 @@ func (r UpdateUserInput) Validate() error {
 		}
 		selected[field] = true
 		switch field {
-		case "name", "address", "phone":
+		case "name", "address", "phone", "country_code":
 		default:
 			return common.ErrBadRequest
 		}
 	}
-	for field, value := range map[string]*string{"name": r.Name, "address": r.Address, "phone": r.Phone} {
+	for field, value := range map[string]*string{"name": r.Name, "address": r.Address, "phone": r.Phone, "country_code": r.CountryCode} {
 		if selected[field] != (value != nil) {
 			return common.ErrBadRequest
 		}
 	}
 	if r.Name != nil && !userText(*r.Name, 3, 100) || r.Address != nil && !userText(*r.Address, 0, 250) || r.Phone != nil && !userText(*r.Phone, 0, 20) {
 		return common.ErrBadRequest
+	}
+	if r.CountryCode != nil {
+		return ValidateCountryCode(*r.CountryCode)
 	}
 	return nil
 }

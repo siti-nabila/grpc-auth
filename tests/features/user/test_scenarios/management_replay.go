@@ -23,8 +23,8 @@ func ManagementReplay() []testutils.Scenario {
 }
 func managementSafeReplay(t *testing.T) {
 	scope := domain.IdempotencyScope{ActorID: 42, Method: "/user.v1.UserService/CreateUser", Target: "account/target@example.test", Key: "creation"}
-	name, address, phone := "Target user", "", "123"
-	payload := featurecommon.FingerprintPayload{Email: "target@example.test", Name: &name, Address: &address, Phone: &phone, Status: "ACTIVE", Presence: []string{"name", "address", "phone", "status"}}
+	name, address, phone, countryCode := "Target user", "", "123", "+62"
+	payload := featurecommon.FingerprintPayload{Email: "target@example.test", Name: &name, Address: &address, Phone: &phone, CountryCode: &countryCode, Status: "ACTIVE", Presence: []string{"name", "address", "phone", "status"}}
 	key := bytes.Repeat([]byte{1}, 32)
 	old, e := featurecommon.NewFingerprinter("v1", map[string][]byte{"v1": key})
 	if e != nil {
@@ -34,7 +34,7 @@ func managementSafeReplay(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	initial := domain.UserDetail{ID: 43, Email: payload.Email, Name: name, Address: address, Phone: phone, Status: types.UserActive, Version: 1, CreatedAt: fixtures.ServiceTime, MustChangePassword: true, Roles: []domain.UserListRole{{ID: 1, Code: "iam.member", Name: "Member", Status: types.AssignmentActive, RoleStatus: types.RoleActive}}, ApplicationAccess: []domain.UserListApplication{{ID: 1, Code: "iam", Name: "IAM", Status: types.ApplicationAccessActive, ApplicationStatus: types.ApplicationActive}}}
+	initial := domain.UserDetail{ID: 43, Email: payload.Email, Name: name, Address: address, Phone: phone, CountryCode: countryCode, Status: types.UserActive, Version: 1, CreatedAt: fixtures.ServiceTime, MustChangePassword: true, Roles: []domain.UserListRole{{ID: 1, Code: "iam.member", Name: "Member", Status: types.AssignmentActive, RoleStatus: types.RoleActive}}, ApplicationAccess: []domain.UserListApplication{{ID: 1, Code: "iam", Name: "IAM", Status: types.ApplicationAccessActive, ApplicationStatus: types.ApplicationActive}}}
 	saved := domain.UserDetailCommandResult(initial, true)
 	data, e := json.Marshal(saved)
 	if e != nil {
@@ -55,6 +55,26 @@ func managementSafeReplay(t *testing.T) {
 	}
 	if _, e = rotated.ReplayPassword(record, scope, payload, []byte("different-password"), fixtures.ServiceTime); !errors.Is(e, usererrors.ErrIdempotencyConflict) {
 		t.Fatal("password conflict", e)
+	}
+	changedCode := payload
+	otherCode := "+1"
+	changedCode.CountryCode = &otherCode
+	if _, e = rotated.ReplayPassword(record, scope, changedCode, []byte("synthetic-password"), fixtures.ServiceTime); !errors.Is(e, usererrors.ErrIdempotencyConflict) {
+		t.Fatal("country code fingerprint conflict lost", e)
+	}
+	historical := saved
+	historical.CountryCode = nil
+	oldData, e := json.Marshal(historical)
+	if e != nil {
+		t.Fatal(e)
+	}
+	var decoded domain.SafeCommandResult
+	if e = json.Unmarshal(oldData, &decoded); e != nil {
+		t.Fatal(e)
+	}
+	oldDetail, e := decoded.UserDetail()
+	if e != nil || oldDetail.CountryCode != "" {
+		t.Fatal("historical replay without calling code rejected", e)
 	}
 	changed := payload
 	changed.Address = nil

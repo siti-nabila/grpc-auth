@@ -52,9 +52,9 @@ func managementHandlers(t *testing.T) {
 				if kind == "overflow version" {
 					version = math.MaxUint64
 				}
-				name, address, phone, status := "Target user", "", "123", "ACTIVE"
-				create := &userv1.CreateUserRequest{Name: name, Email: "target@example.test", Password: "synthetic-password", Status: &status, Address: address, Phone: phone}
-				update := &userv1.UpdateUserRequest{UserId: 43, ExpectedUserVersion: &version, Name: &name, Address: &address, FieldMask: &fieldmaskpb.FieldMask{Paths: []string{"name", "address"}}}
+				name, address, phone, status, countryCode := "Target user", "", "123", "ACTIVE", "+62"
+				create := &userv1.CreateUserRequest{Name: name, Email: "target@example.test", Password: "synthetic-password", Status: &status, Address: address, Phone: phone, CountryCode: &countryCode}
+				update := &userv1.UpdateUserRequest{UserId: 43, ExpectedUserVersion: &version, Name: &name, Address: &address, CountryCode: &countryCode, FieldMask: &fieldmaskpb.FieldMask{Paths: []string{"name", "address", "country_code"}}}
 				change := &userv1.ChangeUserStatusRequest{UserId: 43, ExpectedUserVersion: &version, Status: &status, Reason: "Reviewed"}
 				if kind == "nil request" {
 					create = nil
@@ -68,7 +68,7 @@ func managementHandlers(t *testing.T) {
 				if kind == "missing mask" {
 					update.FieldMask = nil
 				}
-				detail := domain.UserDetail{ID: 43, Email: "target@example.test", Name: name, Address: address, Phone: phone, Status: types.UserActive, Version: 8, CreatedAt: fixtures.ServiceTime, MustChangePassword: true}
+				detail := domain.UserDetail{ID: 43, Email: "target@example.test", Name: name, Address: address, Phone: phone, CountryCode: countryCode, Status: types.UserActive, Version: 8, CreatedAt: fixtures.ServiceTime, MustChangePassword: true}
 				result := domain.UserDetailCommandResult(detail, true)
 				cause := errors.New("controlled feature error")
 				calls := 0
@@ -93,13 +93,13 @@ func managementHandlers(t *testing.T) {
 				}
 				mock := mocks.UserManagement{
 					Create: func(got context.Context, r domain.CreateUserInput) (*domain.SafeCommandResult, error) {
-						if r.Name != name || r.Email != create.Email || r.Password != create.Password || r.Status == nil || *r.Status != types.UserActive || r.Key != key {
+						if r.Name != name || r.Email != create.Email || r.Password != create.Password || r.Status == nil || *r.Status != types.UserActive || r.Key != key || r.CountryCode == nil || *r.CountryCode != countryCode {
 							t.Fatal("create mapping")
 						}
 						return respond(got)
 					},
 					Update: func(got context.Context, r domain.UpdateUserInput) (*domain.SafeCommandResult, error) {
-						if r.UserID != 43 || r.ExpectedVersion != 7 || r.Address == nil || *r.Address != "" || r.Phone != nil || !reflect.DeepEqual(r.Fields, []string{"name", "address"}) || r.Key != key {
+						if r.UserID != 43 || r.ExpectedVersion != 7 || r.Address == nil || *r.Address != "" || r.Phone != nil || r.CountryCode == nil || *r.CountryCode != countryCode || !reflect.DeepEqual(r.Fields, []string{"name", "address", "country_code"}) || r.Key != key {
 							t.Fatal("update presence/target mapping")
 						}
 						return respond(got)
@@ -132,11 +132,11 @@ func managementHandlers(t *testing.T) {
 					switch r := response.(type) {
 					case *userv1.CreateUserResponse:
 						b, _ := protojson.Marshal(r)
-						if r.User.Password != "" || strings.Contains(string(b), `"password":`) {
+						if r.User.CountryCode != countryCode || r.User.Password != "" || strings.Contains(string(b), `"password":`) {
 							t.Fatal("unsafe creation response")
 						}
 					case *userv1.UpdateUserResponse:
-						if !r.Changed || r.User.Version != 8 || r.User.Password != "" {
+						if !r.Changed || r.User.CountryCode != countryCode || r.User.Version != 8 || r.User.Password != "" {
 							t.Fatal("unsafe update response")
 						}
 					case *userv1.ChangeUserStatusResponse:

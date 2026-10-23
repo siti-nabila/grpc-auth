@@ -24,6 +24,7 @@ type FingerprintPayload struct {
 	Description     *string  `json:"description,omitempty"`
 	Address         *string  `json:"address,omitempty"`
 	Phone           *string  `json:"phone,omitempty"`
+	CountryCode     *string  `json:"country_code,omitempty"`
 	Status          string   `json:"status,omitempty"`
 	Reason          string   `json:"reason,omitempty"`
 	ApplicationID   uint64   `json:"application_id,omitempty"`

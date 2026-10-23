@@ -2,6 +2,7 @@ package test_scenarios
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"reflect"
 	"testing"
@@ -24,7 +25,7 @@ func Session() []testutils.Scenario {
 }
 
 func sessionUpdate(t *testing.T) {
-	for _, name := range []string{"success", "no-op", "partial", "partial clear", "empty mask", "begin", "busy", "lock", "state", "revoked", "suspended", "restricted", "version changed", "owner", "read", "update", "version", "audit", "event-id", "outbox", "commit", "panic", "cancel"} {
+	for _, name := range []string{"success", "no-op", "country code", "country clear", "country no-op", "legacy country", "legacy null", "partial", "partial clear", "empty mask", "begin", "busy", "lock", "state", "revoked", "suspended", "restricted", "version changed", "owner", "read", "update", "version", "audit", "event-id", "outbox", "commit", "panic", "cancel"} {
 		t.Run(name, func(t *testing.T) {
 			base, cancel := context.WithCancel(context.Background())
 			defer cancel()
@@ -51,7 +52,10 @@ func sessionUpdate(t *testing.T) {
 				}
 				return nil
 			}
-			current := domain.Profile{Id: 7, UserId: 42, Name: "Old", Address: "address", Phone: "123"}
+			current := domain.Profile{Id: 7, UserId: 42, Name: "Old", Address: "address", Phone: "123", CountryCode: sql.NullString{String: "+62", Valid: true}}
+			if name == "legacy null" {
+				current.CountryCode = sql.NullString{}
+			}
 			var audits []domain.AuditRequest
 			var events []domain.EventEnvelope
 			deps := profile.SessionDependencies{Transactions: provider, Now: func() time.Time { return fixtures.ServiceTime }, EventID: func() (string, error) {
@@ -95,12 +99,24 @@ func sessionUpdate(t *testing.T) {
 						return value, err
 					}},
 					Writer: mocks.Writer{Write: func(req *domain.UpdateProfileRequest) error {
-						expectedName := "New"
-						if name == "partial clear" {
-							expectedName = current.Name
+						expected := current
+						switch name {
+						case "country code":
+							expected.CountryCode = sql.NullString{String: "+1", Valid: true}
+						case "country clear":
+							expected.CountryCode = sql.NullString{}
+						case "partial":
+							expected.Name = "New"
+						case "partial clear":
+							expected.Address, expected.Phone = "", ""
+						default:
+							expected.Name, expected.Address, expected.Phone = "New", "", ""
+							if name == "legacy country" {
+								expected.CountryCode = sql.NullString{String: "+1", Valid: true}
+							}
 						}
-						if req.Id != 7 || req.Name != expectedName || name != "partial" && (req.Address != "" || req.Phone != "") || name == "partial" && (req.Address != current.Address || req.Phone != current.Phone) {
-							t.Fatal("unsafe or wrong replacement", req)
+						if req.Id != expected.Id || req.Name != expected.Name || req.Address != expected.Address || req.Phone != expected.Phone || req.CountryCode != expected.CountryCode {
+							t.Fatal("unsafe or wrong replacement", req, expected)
 						}
 						err := step("update")
 						if name == "panic" {
@@ -140,6 +156,20 @@ func sessionUpdate(t *testing.T) {
 			if name == "empty mask" {
 				req = domain.ProfileUpdate{MaskPresent: true}
 			}
+			if name == "country code" || name == "country clear" || name == "country no-op" {
+				value := "+1"
+				if name == "country clear" {
+					value = ""
+				}
+				if name == "country no-op" {
+					value = "+62"
+				}
+				req = domain.ProfileUpdate{CountryCode: &value, MaskPresent: true, Mask: []string{"country_code"}}
+			}
+			if name == "legacy country" {
+				value := "+1"
+				req.CountryCode = &value
+			}
 			res, err := service.UpdateProfile(ctx, req)
 			full := []string{"begin", "lock:auth:user:42", "lock:auth:session:" + fixtures.SessionID, "bind", "state", "read", "update", "version", "audit", "event-id", "outbox", "commit"}
 			want := full
@@ -150,18 +180,28 @@ func sessionUpdate(t *testing.T) {
 					want = append(want, "rollback")
 				}
 			}
-			if name == "no-op" || name == "empty mask" {
+			if name == "no-op" || name == "country no-op" || name == "empty mask" {
 				want = append(append([]string(nil), full[:6]...), "audit", "commit")
 			}
 			if !reflect.DeepEqual(tx.Calls, want) {
 				t.Fatalf("calls %v want %v", tx.Calls, want)
 			}
-			if name == "success" || name == "partial" || name == "partial clear" || name == "no-op" || name == "empty mask" {
-				if err != nil || res == nil || res.Profile.UserId != 42 || res.Changed != (name != "no-op" && name != "empty mask") || res.Version != map[bool]int64{true: 5, false: 4}[res.Changed] {
+			if name == "country code" || name == "country clear" || name == "country no-op" || name == "legacy country" || name == "legacy null" || name == "success" || name == "partial" || name == "partial clear" || name == "no-op" || name == "empty mask" {
+				if err != nil || res == nil || res.Profile.UserId != 42 || res.Changed != (name != "no-op" && name != "country no-op" && name != "empty mask") || res.Version != map[bool]int64{true: 5, false: 4}[res.Changed] {
 					t.Fatal("committed result", res, err)
 				}
 				if len(audits) != 1 || len(events) != map[bool]int{true: 1, false: 0}[res.Changed] {
 					t.Fatal("audit/event counts")
+				}
+				code := current.CountryCode.String
+				if name == "country code" || name == "legacy country" {
+					code = "+1"
+				}
+				if name == "country clear" {
+					code = ""
+				}
+				if res.Profile.CountryCode.String != code || audits[0].Before.CountryCode == nil || *audits[0].Before.CountryCode != current.CountryCode.String || audits[0].After.CountryCode == nil || *audits[0].After.CountryCode != code {
+					t.Fatal("country code result/audit lost")
 				}
 				record, err := audits[0].Record()
 				if err != nil || record.ActorUserID == nil || *record.ActorUserID != 42 || record.ActorService != nil {
@@ -200,7 +240,12 @@ func sessionUpdate(t *testing.T) {
 }
 
 func profileFields(t *testing.T) {
-	for _, req := range []domain.ProfileUpdate{{Name: ""}, {Name: "ok"}, {Name: "Valid", MaskPresent: true, Mask: []string{"email"}}, {Name: "Valid", MaskPresent: true, Mask: []string{"user_id"}}, {Phone: string([]byte{255}), MaskPresent: true, Mask: []string{"phone"}}} {
+	invalid := []domain.ProfileUpdate{{Name: ""}, {Name: "ok"}, {Name: "Valid", MaskPresent: true, Mask: []string{"email"}}, {Name: "Valid", MaskPresent: true, Mask: []string{"user_id"}}, {Phone: string([]byte{255}), MaskPresent: true, Mask: []string{"phone"}}, {MaskPresent: true, Mask: []string{"country_code"}}}
+	for _, value := range []string{"62", "+0", "+1234", "+６２", " +62", "+62 "} {
+		code := value
+		invalid = append(invalid, domain.ProfileUpdate{CountryCode: &code, MaskPresent: true, Mask: []string{"country_code"}})
+	}
+	for _, req := range invalid {
 		ctx := fixtures.PrincipalContext(t, fixtures.CallerContext(t, context.Background(), profilev1.ProfileService_UpdateProfile_FullMethodName))
 		tx := &shared.Transaction{Context: ctx}
 		provider := &shared.TransactionProvider{Tx: tx}

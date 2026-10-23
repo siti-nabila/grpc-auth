@@ -15,6 +15,7 @@ import (
 	"github.com/siti-nabila/grpc-auth/tests/features/catalog/mocks"
 	"github.com/siti-nabila/grpc-auth/tests/shared/fixtures"
 	"github.com/siti-nabila/grpc-auth/tests/shared/testutils"
+	"github.com/siti-nabila/orm/orm"
 )
 
 func Reads() []testutils.Scenario {
@@ -113,7 +114,7 @@ func catalogReads(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				q := domain.CatalogQuery{}
+				q := domain.CatalogQuery{Search: &orm.SearchQuery{Fields: []string{"keyword"}, Keyword: "reviewer", Mode: orm.SearchModeFullTextTrigram}}
 				if name == "query invalid" {
 					q.Fields = []string{"password"}
 				}

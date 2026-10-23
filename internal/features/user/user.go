@@ -47,6 +47,8 @@ func projectUser(row domain.UserSearchRow, fields []string) domain.UserSearchRow
 			out.Address = row.Address
 		case domain.UserSortPhone:
 			out.Phone = row.Phone
+		case "country_code":
+			out.CountryCode = row.CountryCode
 		case domain.UserSortStatus:
 			out.Status = row.Status
 		case domain.UserSortVersion:
@@ -102,7 +104,7 @@ func normalizeUserOptions(opts *orm.QueryOptions) error {
 		opts.Limit = userListMaxLimit
 	}
 	for _, field := range opts.Select {
-		if domain.UserSortKind(field) == "" && field != domain.UserListCursorField {
+		if domain.UserSortKind(field) == "" && field != domain.UserListCursorField && field != "country_code" {
 			return common.ErrBadRequest
 		}
 	}

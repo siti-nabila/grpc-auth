@@ -2,6 +2,7 @@ package test_scenarios
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"reflect"
 	"testing"
@@ -71,7 +72,7 @@ func sessionProfileHandler(t *testing.T) {
 	if _, err := handler.NewSessionProfileHandler(nil); err == nil {
 		t.Fatal("nil service accepted")
 	}
-	for _, kind := range []string{"legacy", "partial", "empty mask", "nil", "error", "malformed"} {
+	for _, kind := range []string{"legacy", "partial", "country code", "country clear", "empty mask", "nil", "error", "malformed"} {
 		t.Run(kind, func(t *testing.T) {
 			ctx := context.Background()
 			calls := 0
@@ -83,7 +84,15 @@ func sessionProfileHandler(t *testing.T) {
 			if kind == "empty mask" {
 				input.FieldMask = &fieldmaskpb.FieldMask{}
 			}
-			want := domain.ProfileUpdate{Name: "New", MaskPresent: input.FieldMask != nil, Mask: append([]string(nil), input.GetFieldMask().GetPaths()...)}
+			if kind == "country code" || kind == "country clear" {
+				value := "+62"
+				if kind == "country clear" {
+					value = ""
+				}
+				input.CountryCode = &value
+				input.FieldMask = &fieldmaskpb.FieldMask{Paths: []string{"country_code"}}
+			}
+			want := domain.ProfileUpdate{Name: "New", CountryCode: input.CountryCode, MaskPresent: input.FieldMask != nil, Mask: append([]string(nil), input.GetFieldMask().GetPaths()...)}
 			h, err := handler.NewSessionProfileHandler(mocks.SessionProfile{Call: func(got context.Context, req domain.ProfileUpdate) (*profile.UpdateResult, error) {
 				calls++
 				if got != ctx || !reflect.DeepEqual(req, want) {
@@ -95,7 +104,7 @@ func sessionProfileHandler(t *testing.T) {
 				if kind == "malformed" {
 					return nil, nil
 				}
-				return &profile.UpdateResult{Profile: domain.Profile{Id: 7, UserId: 42, Name: "Committed"}, Version: 5, Changed: true}, nil
+				return &profile.UpdateResult{Profile: domain.Profile{Id: 7, UserId: 42, Name: "Committed", CountryCode: sql.NullString{String: "+62", Valid: true}}, Version: 5, Changed: true}, nil
 			}})
 			if err != nil {
 				t.Fatal(err)
@@ -108,7 +117,7 @@ func sessionProfileHandler(t *testing.T) {
 				if res != nil || kind == "nil" && !errors.Is(err, common.ErrBadRequest) || kind == "error" && !errors.Is(err, cause) || kind == "malformed" && !errors.Is(err, common.ErrInternalServerError) {
 					t.Fatal("failure lost", err)
 				}
-			} else if err != nil || res.Profile.Id != 7 || res.Profile.UserId != 42 || res.Profile.Name != "Committed" || res.Version != 5 || !res.Changed {
+			} else if err != nil || res.Profile.Id != 7 || res.Profile.UserId != 42 || res.Profile.Name != "Committed" || res.Profile.CountryCode != "+62" || res.Version != 5 || !res.Changed {
 				t.Fatal("committed response lost", res, err)
 			}
 			if calls != map[bool]int{true: 0, false: 1}[kind == "nil"] {

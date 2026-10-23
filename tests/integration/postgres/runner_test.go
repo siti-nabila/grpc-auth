@@ -124,6 +124,8 @@ func TestPostgresEffectivePermissions(t *testing.T) {
 	testutils.Run(t, test_scenarios.EffectivePermissions())
 }
 
+func TestPostgresMeAccessSnapshot(t *testing.T) { testutils.Run(t, test_scenarios.MeAccess()) }
+
 func TestPostgresAccessEvaluation(t *testing.T) { testutils.Run(t, test_scenarios.AccessEvaluation()) }
 
 func TestPostgresAuditLogReads(t *testing.T) { testutils.Run(t, test_scenarios.AuditLogReads()) }

@@ -164,6 +164,16 @@ func (c Catalog) normalizeSearch(q *CatalogQuery) error {
 	if q.Search != nil {
 		s := *q.Search
 		s.Fields = slices.Clone(s.Fields)
+		if slices.Contains(s.Fields, CatalogKeywordField) {
+			if err := c.normalizeKeywordSearch(&s); err != nil {
+				return err
+			}
+			q.Search = &s
+			if s.Keyword == "" {
+				q.Search = nil
+			}
+			return nil
+		}
 		s.Keyword = strings.TrimSpace(s.Keyword)
 		if !userText(s.Keyword, 0, 200) {
 			return common.ErrBadRequest

@@ -29,7 +29,7 @@ PENDING belum dapat Login. ACTIVE menghasilkan Login restricted dengan allowlist
 Me/ChangePassword/Logout saja; ChangePassword mencabut credential semua device
 dan membutuhkan Login baru dengan password baru.
 
-UpdateUser hanya menerima `name`, `address`, `phone`. Mask dan presence harus
+UpdateUser hanya menerima `name`, `address`, `phone`, `country_code`. Mask dan presence harus
 cocok; field omitted tidak berubah, selected-empty dapat mengosongkan address/
 phone. Name kosong dan mask email/password/status/owner/roles ditolak. Perubahan
 efektif menambah user version satu, menjaga auth_version/password/session.
@@ -92,3 +92,5 @@ Backend evidence: [auth-user-management](../openspec/changes/archive/2026-10-11-
 Deployment/schema/admin/key/caller/consumer readiness tetap mandatory dan OPEN
 pada [Phase6 DEP-01](grpc-auth-mvp-spec.md#101-phase-6-readiness-deployment).
 Role/application management increment B–E belum diimplementasikan.
+
+`country_code` adalah kode telepon opsional seperti `+62`, terpisah dari phone. Nilai kosong disimpan sebagai SQL NULL; data lama NULL dikembalikan sebagai string kosong. Omitted pada update tidak berubah. Nilai nonempty memakai `+` dan 1–3 digit ASCII dengan digit pertama nonzero. Perubahan masuk audit, fingerprint, dan safe replay result. Tidak ada default negara atau normalisasi phone otomatis. Lihat [contract country code](../../api-contracts/docs/country-code-contract.md).

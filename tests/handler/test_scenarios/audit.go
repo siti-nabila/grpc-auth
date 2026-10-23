@@ -67,7 +67,7 @@ func auditHandler(t *testing.T) {
 				if name != "default" && (q.ActorService != "svc" || q.ActorUserID == nil || *q.ActorUserID != 7) {
 					t.Fatal(q)
 				}
-				return orm.PageData[domain.AuditLogItem]{Items: []domain.AuditLogItem{{ID: math.MaxInt64, ActorService: proto.String("service"), Action: "NO_OP", TargetType: "user", TargetID: "7", After: &domain.SafeSnapshot{Name: proto.String(""), RoleIDs: []uint64{2}, PermissionCodes: []string{"iam.audit.read"}, NoOp: true}, OccurredAt: fixtures.ServiceTime}}, Page: 1, Limit: 20, Total: 1, TotalPages: 1}, want
+				return orm.PageData[domain.AuditLogItem]{Items: []domain.AuditLogItem{{ID: math.MaxInt64, ActorService: proto.String("service"), Action: "NO_OP", TargetType: "user", TargetID: "7", After: &domain.SafeSnapshot{CountryCode: proto.String("+62"), Name: proto.String(""), RoleIDs: []uint64{2}, PermissionCodes: []string{"iam.audit.read"}, NoOp: true}, OccurredAt: fixtures.ServiceTime}}, Page: 1, Limit: 20, Total: 1, TotalPages: 1}, want
 			}))
 			if err != nil {
 				t.Fatal(err)
@@ -80,7 +80,7 @@ func auditHandler(t *testing.T) {
 				if res != nil {
 					t.Fatal("partial response")
 				}
-			} else if res.Items[0].Id != math.MaxInt64 || res.Items[0].ActorUserId != nil || res.Items[0].SafeBefore != nil || res.Items[0].SafeAfter == nil || res.Items[0].SafeAfter.Name == nil || !res.Items[0].SafeAfter.NoOp || !res.Items[0].OccurredAt.AsTime().Equal(fixtures.ServiceTime) {
+			} else if res.Items[0].Id != math.MaxInt64 || res.Items[0].ActorUserId != nil || res.Items[0].SafeBefore != nil || res.Items[0].SafeAfter == nil || res.Items[0].SafeAfter.Name == nil || res.Items[0].SafeAfter.GetCountryCode() != "+62" || !res.Items[0].SafeAfter.NoOp || !res.Items[0].OccurredAt.AsTime().Equal(fixtures.ServiceTime) {
 				t.Fatal(res)
 			}
 			expected := 0

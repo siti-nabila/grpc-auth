@@ -98,7 +98,7 @@ func userDetailSnapshot(t *testing.T) {
 					if kind == "absent profile" {
 						name = ""
 					}
-					detail := mocks.SQLStep{Op: "query", SQL: "a.deleted_at IS NULL", Args: []driver.Value{int64(80)}, Columns: []string{"id", "email", "name", "address", "phone", "status", "version", "created_at", "must_change_password"}, Rows: [][]driver.Value{{int64(80), "target@example.test", name, "", "", status, int64(7), fixtures.ServiceTime, true}}}
+					detail := mocks.SQLStep{Op: "query", SQL: "a.deleted_at IS NULL", Args: []driver.Value{int64(80)}, Columns: []string{"id", "email", "name", "address", "phone", "country_code", "status", "version", "created_at", "must_change_password"}, Rows: [][]driver.Value{{int64(80), "target@example.test", name, "", "", "+62", status, int64(7), fixtures.ServiceTime, true}}}
 					if kind == "missing target" || kind == "deleted target" {
 						detail.Rows = nil
 						want = auth.ErrNotFound
@@ -156,7 +156,7 @@ func userDetailSnapshot(t *testing.T) {
 				}
 				verifyReadErrorLocale(t, ctx, err)
 			} else {
-				if err != nil || res.GetUser().GetId() != 80 || res.User.Email != "target@example.test" || res.User.Version != 7 || !res.User.MustChangePassword || len(res.User.Roles) != 1 || len(res.User.ApplicationAccess) != 1 {
+				if err != nil || res.GetUser().GetId() != 80 || res.User.Email != "target@example.test" || res.User.CountryCode != "+62" || res.User.Version != 7 || !res.User.MustChangePassword || len(res.User.Roles) != 1 || len(res.User.ApplicationAccess) != 1 {
 					t.Fatal("unsafe or incorrect target detail", res, err)
 				}
 				b, err := protojson.Marshal(res)

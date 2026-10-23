@@ -24,7 +24,7 @@ func (h *SessionProfileHandler) UpdateProfile(ctx context.Context, input *profil
 	if input == nil {
 		return nil, common.ErrBadRequest
 	}
-	req := domain.ProfileUpdate{Name: input.Name, Address: input.Address, Phone: input.Phone, MaskPresent: input.FieldMask != nil, Mask: append([]string(nil), input.GetFieldMask().GetPaths()...)}
+	req := domain.ProfileUpdate{Name: input.Name, Address: input.Address, Phone: input.Phone, CountryCode: input.CountryCode, MaskPresent: input.FieldMask != nil, Mask: append([]string(nil), input.GetFieldMask().GetPaths()...)}
 	result, err := h.service.UpdateProfile(ctx, req)
 	if err != nil {
 		return nil, err

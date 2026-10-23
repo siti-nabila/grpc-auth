@@ -78,6 +78,9 @@ func catalogBase(handle domain.QueryReader, c domain.Catalog, q domain.CatalogQu
 	if len(q.Statuses) > 0 {
 		b = b.WhereIn(expressions["status"], q.Statuses)
 	}
+	if q.UsesKeywordSearch() {
+		return catalogKeywordSearch(b, c, q.Search)
+	}
 	if q.Search != nil {
 		keyword := strings.NewReplacer(`\`, `\\`, "%", `\%`, "_", `\_`).Replace(q.Search.Keyword) + "%"
 		if q.Search.Mode == orm.SearchModeContains {

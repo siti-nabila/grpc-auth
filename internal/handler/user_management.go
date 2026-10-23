@@ -52,7 +52,7 @@ func (h *UserManagementHandler) CreateUser(ctx context.Context, r *userv1.Create
 	if err != nil {
 		return nil, err
 	}
-	input := domain.CreateUserInput{Name: r.Name, Email: r.Email, Password: r.Password, Address: r.Address, Phone: r.Phone, Key: key}
+	input := domain.CreateUserInput{Name: r.Name, Email: r.Email, Password: r.Password, Address: r.Address, Phone: r.Phone, CountryCode: r.CountryCode, Key: key}
 	if r.Status != nil {
 		status := types.UserStatus(*r.Status)
 		input.Status = &status
@@ -83,7 +83,7 @@ func (h *UserManagementHandler) UpdateUser(ctx context.Context, r *userv1.Update
 	if err != nil {
 		return nil, err
 	}
-	input := domain.UpdateUserInput{UserID: r.UserId, ExpectedVersion: version, Name: r.Name, Address: r.Address, Phone: r.Phone, Fields: append([]string(nil), r.FieldMask.Paths...), Key: key}
+	input := domain.UpdateUserInput{UserID: r.UserId, ExpectedVersion: version, Name: r.Name, Address: r.Address, Phone: r.Phone, CountryCode: r.CountryCode, Fields: append([]string(nil), r.FieldMask.Paths...), Key: key}
 	result, err := h.service.UpdateUser(ctx, input)
 	if err != nil {
 		return nil, err

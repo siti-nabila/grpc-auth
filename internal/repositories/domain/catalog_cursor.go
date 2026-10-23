@@ -34,7 +34,8 @@ func (c Catalog) QueryHash(q CatalogQuery) string {
 		Statuses     []string
 		Search       *orm.SearchQuery
 		TargetUserID uint64 `json:"target_user_id,omitempty"`
-	}{c, q.Sort, q.ApplicationCode, q.Statuses, q.Search, q.TargetUserID})
+		Revision     string `json:"search_revision,omitempty"`
+	}{c, q.Sort, q.ApplicationCode, q.Statuses, q.Search, q.TargetUserID, q.searchRevision()})
 	sum := sha256.Sum256(b)
 	return hex.EncodeToString(sum[:])
 }
@@ -44,7 +45,7 @@ func (c Catalog) ParseCursor(q CatalogQuery) ([]CatalogValue, error) {
 		return nil, nil
 	}
 	if n, err := strconv.ParseInt(q.LastID, 10, 64); err == nil {
-		if n < 1 || n > math.MaxInt32 || len(q.Sort) != 1 || q.Sort[0].Field != c.IdentityField() || strconv.FormatInt(n, 10) != q.LastID {
+		if q.UsesKeywordSearch() || n < 1 || n > math.MaxInt32 || len(q.Sort) != 1 || q.Sort[0].Field != c.IdentityField() || strconv.FormatInt(n, 10) != q.LastID {
 			return nil, common.ErrBadRequest
 		}
 		value := q.LastID
@@ -57,7 +58,7 @@ func (c Catalog) ParseCursor(q CatalogQuery) ([]CatalogValue, error) {
 	var cursor CatalogCursor
 	d := json.NewDecoder(bytes.NewReader(b))
 	d.DisallowUnknownFields()
-	if d.Decode(&cursor) != nil || d.Decode(new(any)) != io.EOF || cursor.Version != 1 || cursor.Method != c || cursor.Query != c.QueryHash(q) || len(cursor.Values) != len(q.Sort) {
+	if d.Decode(&cursor) != nil || d.Decode(new(any)) != io.EOF || cursor.Version != q.cursorVersion() || cursor.Method != c || cursor.Query != c.QueryHash(q) || len(cursor.Values) != len(q.Sort) {
 		return nil, common.ErrBadRequest
 	}
 	canonical, _ := json.Marshal(cursor)
@@ -106,7 +107,7 @@ func (c Catalog) ParseCursor(q CatalogQuery) ([]CatalogValue, error) {
 }
 
 func (c Catalog) NextCursor(q CatalogQuery, values []CatalogValue) string {
-	b, _ := json.Marshal(CatalogCursor{Version: 1, Method: c, Query: c.QueryHash(q), Values: values})
+	b, _ := json.Marshal(CatalogCursor{Version: q.cursorVersion(), Method: c, Query: c.QueryHash(q), Values: values})
 	return base64.RawURLEncoding.EncodeToString(b)
 }
 

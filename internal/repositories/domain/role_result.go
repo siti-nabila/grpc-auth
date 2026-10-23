@@ -32,7 +32,7 @@ func (r SafeCommandResult) validateRoleResult() error {
 		return nil
 	}
 	role := r.Role
-	if role.Validate() != nil || r.RoleID != role.ID || r.Version != role.Version || r.Status != string(role.Status) || r.UserID != 0 || r.SessionID != "" || r.Email != nil || r.Name != nil || r.Address != nil || r.Phone != nil || r.MustChangePassword != nil || len(r.Roles) > 0 || len(r.ApplicationAccess) > 0 || r.CreatedAt != nil || r.LoginRequired || len(r.ChangedRoleIDs) > 0 || r.ApplicationID != 0 {
+	if role.Validate() != nil || r.RoleID != role.ID || r.Version != role.Version || r.Status != string(role.Status) || r.UserID != 0 || r.SessionID != "" || r.Email != nil || r.Name != nil || r.Address != nil || r.Phone != nil || r.CountryCode != nil || r.MustChangePassword != nil || len(r.Roles) > 0 || len(r.ApplicationAccess) > 0 || r.CreatedAt != nil || r.LoginRequired || len(r.ChangedRoleIDs) > 0 || r.ApplicationID != 0 {
 		return common.ErrBadRequest
 	}
 	ids, codes := map[uint64]bool{}, map[string]bool{}

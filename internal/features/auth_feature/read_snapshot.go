@@ -12,6 +12,7 @@ import (
 	"github.com/siti-nabila/grpc-auth/internal/serviceauth"
 	"github.com/siti-nabila/grpc-auth/internal/sessions"
 	"github.com/siti-nabila/grpc-auth/pkg/jwt"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // ReadUserDataSnapshot rechecks the principal and reads Me in one primary
@@ -28,7 +29,8 @@ func ReadUserDataSnapshot(ctx context.Context, claims jwt.VerifiedClaims, provid
 	if err = ctx.Err(); err != nil {
 		return res, err
 	}
-	if _, err = serviceauth.CallerFromContext(ctx); err != nil {
+	caller, err := serviceauth.CallerFromContext(ctx)
+	if err != nil {
 		return res, err
 	}
 	if provider == nil {
@@ -61,17 +63,13 @@ func ReadUserDataSnapshot(ctx context.Context, claims jwt.VerifiedClaims, provid
 		return res, featurecommon.DependencyError(err)
 	}
 	res = &userv1.UserData{Id: identity.ID, Email: identity.Email, Fullname: profile.Name}
-	res.Address, res.Phone = profile.Address, profile.Phone
+	res.Address, res.Phone = profile.Address, profile.CountryCode.String+profile.Phone
+	res.CountryCode = profile.CountryCode.String
+	res.CreatedAt = timestamppb.New(identity.CreatedAt)
 	res.Status, res.Version, res.MustChangePassword = string(identity.Status), uint64(identity.Version), principal.Restricted()
 	if !principal.Restricted() {
-		roles, readErr := self.ActiveRoles(ctx, principal.UserID())
-		err = readErr
-		if err != nil {
+		if err = readMeAccess(ctx, tx, principal.UserID(), caller, res); err != nil {
 			return res, featurecommon.DependencyError(err)
-		}
-		for _, role := range roles {
-			res.RoleCodes = append(res.RoleCodes, int32(role.Code))
-			res.RoleNames = append(res.RoleNames, role.Name)
 		}
 	}
 	if err = owner.Commit(); err != nil {

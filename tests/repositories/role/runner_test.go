@@ -9,3 +9,5 @@ import (
 func TestRolePersistence(t *testing.T) { testutils.Run(t, test_scenarios.Persistence()) }
 
 func TestCatalogSQL(t *testing.T) { testutils.Run(t, test_scenarios.CatalogSQL()) }
+
+func TestKeywordSQL(t *testing.T) { testutils.Run(t, test_scenarios.KeywordSQL()) }
