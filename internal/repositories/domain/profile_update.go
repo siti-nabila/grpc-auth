@@ -4,6 +4,7 @@ package domain
 // always taken from the authenticated principal, never supplied by this input.
 type ProfileUpdate struct {
 	Name, Address, Phone string
+	CountryCode          *string
 	Mask                 []string
 	MaskPresent          bool
 }

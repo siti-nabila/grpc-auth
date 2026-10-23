@@ -28,7 +28,7 @@ func (h *SessionReadHandler) GetUser(ctx context.Context, input *userv1.GetUserR
 
 // SafeUserResponse never copies a credential-bearing database or proto model.
 func SafeUserResponse(r domain.UserDetail) *userv1.User {
-	u := &userv1.User{Id: r.ID, Email: r.Email, Name: r.Name, Address: r.Address, PhoneNo: r.Phone, Status: string(r.Status), Version: uint64(r.Version), MustChangePassword: r.MustChangePassword}
+	u := &userv1.User{Id: r.ID, Email: r.Email, Name: r.Name, Address: r.Address, PhoneNo: r.Phone, CountryCode: r.CountryCode, Status: string(r.Status), Version: uint64(r.Version), MustChangePassword: r.MustChangePassword}
 	if !r.CreatedAt.IsZero() {
 		u.CreatedAt = timestamppb.New(r.CreatedAt)
 	}

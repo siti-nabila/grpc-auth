@@ -79,13 +79,16 @@ func verify(t *testing.T, mock *mocks.SQL) {
 }
 
 func meReads(t *testing.T) {
-	for _, kind := range []string{"normal", "restricted", "missing session", "profile failure", "commit failure"} {
+	for _, kind := range []string{"normal", "null country", "restricted", "missing session", "profile failure", "commit failure"} {
 		t.Run(kind, func(t *testing.T) {
 			ctx := callerContext(t, "/user.v1.UserService/Me")
 			cause := errors.New("controlled read failure")
 			state := sessionStep(kind == "restricted")
-			identity := mocks.SQLStep{Op: "query", SQL: "SELECT id, email, status, version, must_change_password FROM auth", Args: []driver.Value{int64(42)}, Columns: []string{"id", "email", "status", "version", "must_change_password"}, Rows: [][]driver.Value{{int64(42), "member@example.test", "ACTIVE", int64(4), kind == "restricted"}}}
-			profile := mocks.SQLStep{Op: "query", SQL: "FROM profile", Args: []driver.Value{int64(42)}, Columns: []string{"id", "user_id", "name", "address", "phone"}, Rows: [][]driver.Value{{int64(7), int64(42), "Member", "Address", "123"}}}
+			identity := mocks.SQLStep{Op: "query", SQL: "SELECT id, email, status, version, must_change_password, created_at FROM auth", Args: []driver.Value{int64(42)}, Columns: []string{"id", "email", "status", "version", "must_change_password", "created_at"}, Rows: [][]driver.Value{{int64(42), "member@example.test", "ACTIVE", int64(4), kind == "restricted", fixtures.ServiceTime.Add(-time.Hour)}}}
+			profile := mocks.SQLStep{Op: "query", SQL: "FROM profile", Args: []driver.Value{int64(42)}, Columns: []string{"id", "user_id", "name", "address", "phone", "country_code"}, Rows: [][]driver.Value{{int64(7), int64(42), "Member", "Address", "123", "+62"}}}
+			if kind == "null country" {
+				profile.Rows[0][5] = nil
+			}
 			roles := mocks.SQLStep{Op: "query", SQL: "ORDER BY r.id ASC", Args: []driver.Value{int64(42), "ACTIVE", "ACTIVE"}, Columns: []string{"id", "role_name", "role_code", "role_description"}, Rows: [][]driver.Value{{int64(1), "Member", int64(1), nil}}}
 			steps := []mocks.SQLStep{{Op: "begin"}, state}
 			var want error
@@ -100,6 +103,7 @@ func meReads(t *testing.T) {
 				steps = append(steps, identity, profile)
 				if want == nil && kind != "restricted" {
 					steps = append(steps, roles)
+					steps = append(steps, meExtraSteps()...)
 				}
 			}
 			if want != nil {
@@ -138,6 +142,13 @@ func meReads(t *testing.T) {
 				if err != nil || res.Id != 42 || res.Email != "member@example.test" || res.Fullname != "Member" || res.Version != 4 || res.Status != "ACTIVE" {
 					t.Fatal("Me response", res.String(), err)
 				}
+				wantCode := "+62"
+				if kind == "null country" {
+					wantCode = ""
+				}
+				if res.CountryCode != wantCode {
+					t.Fatal("Me calling code lost", res.CountryCode)
+				}
 				if kind == "restricted" {
 					if !res.MustChangePassword || len(res.RoleCodes) != 0 || len(res.Roles) != 0 || len(res.ApplicationAccess) != 0 {
 						t.Fatal("restricted privileges exposed")
@@ -152,7 +163,7 @@ func meReads(t *testing.T) {
 }
 
 func listReads(t *testing.T) {
-	for _, kind := range []string{"allowed", "empty", "denied", "restricted", "missing session", "permission failure", "invalid field", "count failure", "data failure", "role failure", "application failure", "commit failure"} {
+	for _, kind := range []string{"allowed", "country projection", "empty", "denied", "restricted", "missing session", "permission failure", "invalid field", "count failure", "data failure", "role failure", "application failure", "commit failure"} {
 		t.Run(kind, func(t *testing.T) {
 			ctx := callerContext(t, "/user.v1.UserService/ListUsers")
 			cause := errors.New("controlled page failure")
@@ -177,6 +188,9 @@ func listReads(t *testing.T) {
 				}
 			}
 			req := &userv1.ListUsersRequest{Query: &paginatorv1.PageQuery{Page: 1, Limit: 10}}
+			if kind == "country projection" {
+				req.Query.Fields = []string{"country_code"}
+			}
 			if kind == "invalid field" {
 				req.Query.Fields = []string{"password"}
 				want = common.ErrBadRequest
@@ -193,7 +207,7 @@ func listReads(t *testing.T) {
 				steps = append(steps, count)
 			}
 			if want == nil {
-				data := mocks.SQLStep{Op: "query", SQL: "ORDER BY a.id ASC", Columns: []string{"auth_id", "email", "name", "address", "phone"}, Rows: [][]driver.Value{{int64(80), "result@example.test", "Result", "", ""}}}
+				data := mocks.SQLStep{Op: "query", SQL: "ORDER BY a.id ASC", Columns: []string{"auth_id", "email", "name", "address", "phone", "country_code"}, Rows: [][]driver.Value{{int64(80), "result@example.test", "Result", "", "", "+62"}}}
 				if kind == "empty" {
 					data.Rows = nil
 				}
@@ -252,6 +266,12 @@ func listReads(t *testing.T) {
 				}
 				verifyReadErrorLocale(t, ctx, err)
 			} else {
+				if (kind == "allowed" || kind == "country projection") && (len(res.GetItems()) != 1 || res.Items[0].CountryCode != "+62") {
+					t.Fatal("list calling code lost", res)
+				}
+				if kind == "country projection" && (res.Items[0].Name != "" || res.Items[0].Email != "") {
+					t.Fatal("projection leaked unselected fields", res)
+				}
 				if err != nil || res.Page != 1 || res.Limit != 10 || kind == "empty" && len(res.Items) != 0 || kind == "allowed" && (len(res.Items) != 1 || res.Items[0].Id != 80 || res.NextCursor != "80") {
 					t.Fatal("authorized page", res, err)
 				}

@@ -45,6 +45,7 @@ type (
 		Name              string                `sql:"column:name" json:"name"`
 		Address           string                `sql:"column:address" json:"address"`
 		Phone             string                `sql:"column:phone" json:"phone"`
+		CountryCode       string                `sql:"column:country_code" json:"country_code"`
 		Status            types.UserStatus      `sql:"column:status" json:"status"`
 		Version           int64                 `sql:"column:version" json:"version"`
 		CreatedAt         time.Time             `sql:"column:created_at" json:"created_at"`

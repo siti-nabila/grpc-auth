@@ -102,7 +102,7 @@ func (s *sessionProfileService) persistUpdate(ctx context.Context, repos Session
 }
 
 func profileSnapshot(p domain.Profile, version int64) *domain.SafeSnapshot {
-	return &domain.SafeSnapshot{Version: version, Name: &p.Name, Address: &p.Address, Phone: &p.Phone}
+	return &domain.SafeSnapshot{Version: version, Name: &p.Name, Address: &p.Address, Phone: &p.Phone, CountryCode: &p.CountryCode.String}
 }
 
 func (s *sessionProfileService) lockedProfile(ctx context.Context, repos SessionRepositories, principal sessions.Principal) (sessions.Principal, domain.Profile, error) {
@@ -132,7 +132,7 @@ func persistProfileFields(repos SessionRepositories, principal sessions.Principa
 		return common.ErrInternalServerError
 	}
 	result.Version++
-	if err := repos.Writer.Update(&domain.UpdateProfileRequest{Id: before.Id, Name: result.Profile.Name, Address: result.Profile.Address, Phone: result.Profile.Phone}); err != nil {
+	if err := repos.Writer.Update(&domain.UpdateProfileRequest{Id: before.Id, Name: result.Profile.Name, Address: result.Profile.Address, Phone: result.Profile.Phone, CountryCode: result.Profile.CountryCode}); err != nil {
 		return featurecommon.DependencyError(err)
 	}
 	if err := repos.Version.SetVersion(principal.UserID(), result.Version); err != nil {

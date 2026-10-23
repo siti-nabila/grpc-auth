@@ -79,5 +79,5 @@ func auditSnapshotResponse(s *domain.SafeSnapshot) *auditv1.AuditSnapshot {
 	if s == nil {
 		return nil
 	}
-	return &auditv1.AuditSnapshot{Version: s.Version, Status: s.Status, Name: s.Name, Description: s.Description, Address: s.Address, Phone: s.Phone, RoleIds: append([]uint64(nil), s.RoleIDs...), PermissionCodes: append([]string(nil), s.PermissionCodes...), ApplicationId: s.ApplicationID, SessionId: s.SessionID, ReasonCode: s.ReasonCode, NoOp: s.NoOp}
+	return &auditv1.AuditSnapshot{Version: s.Version, Status: s.Status, Name: s.Name, Description: s.Description, Address: s.Address, Phone: s.Phone, CountryCode: s.CountryCode, RoleIds: append([]uint64(nil), s.RoleIDs...), PermissionCodes: append([]string(nil), s.PermissionCodes...), ApplicationId: s.ApplicationID, SessionId: s.SessionID, ReasonCode: s.ReasonCode, NoOp: s.NoOp}
 }

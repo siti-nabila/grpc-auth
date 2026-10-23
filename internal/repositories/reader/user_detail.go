@@ -27,7 +27,7 @@ func (r *userDetailReader) Detail(ctx context.Context, id uint64) (detail domain
 	}
 	err = r.handle.UseModel(domain.UserDetail{}).WithContext(ctx).
 		LeftJoin("profile p", "p.user_id = a.id").
-		Select("a.id", "a.email", `COALESCE(p."name", '') AS name`, "COALESCE(p.address, '') AS address", "COALESCE(p.phone, '') AS phone", "a.status", "a.version", "a.created_at", "a.must_change_password").
+		Select("a.id", "a.email", `COALESCE(p."name", '') AS name`, "COALESCE(p.address, '') AS address", "COALESCE(p.phone, '') AS phone", "COALESCE(p.country_code, '') AS country_code", "a.status", "a.version", "a.created_at", "a.must_change_password").
 		Where("a.id = ? AND a.deleted_at IS NULL", id).Limit(1).Scan(&detail)
 	if err != nil {
 		return detail, helpers.HandleDBError(err)

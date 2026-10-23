@@ -10,3 +10,5 @@ import (
 func TestUserReader(t *testing.T) {
 	testutils.Run(t, test_scenarios.All())
 }
+
+func TestSelfAccessReader(t *testing.T) { testutils.Run(t, test_scenarios.SelfAccess()) }

@@ -51,6 +51,25 @@ func managementProfileInputs(t *testing.T) {
 	if err := clear.Validate(); err != nil {
 		t.Fatal("clear was rejected", err)
 	}
+	for _, code := range []string{"+1", "+62", "+123", ""} {
+		r := domain.UpdateUserInput{UserID: 42, ExpectedVersion: 1, CountryCode: &code, Fields: []string{"country_code"}}
+		if err := r.Validate(); err != nil {
+			t.Fatal("valid calling code rejected", code, err)
+		}
+	}
+	for _, code := range []string{"62", "+0", "+1234", "+６２", " +62", "a\x00b"} {
+		r := domain.UpdateUserInput{UserID: 42, ExpectedVersion: 1, CountryCode: &code, Fields: []string{"country_code"}}
+		if r.Validate() == nil {
+			t.Fatal("invalid calling code accepted", code)
+		}
+	}
+	valueCode := "+62"
+	if (domain.UpdateUserInput{UserID: 42, ExpectedVersion: 1, CountryCode: &valueCode, Name: &value, Fields: []string{"name"}}).Validate() == nil {
+		t.Fatal("unselected calling code accepted")
+	}
+	if (domain.UpdateUserInput{UserID: 42, ExpectedVersion: 1, Fields: []string{"country_code"}}).Validate() == nil {
+		t.Fatal("missing selected calling code accepted")
+	}
 	tooLong := strings.Repeat("x", 251)
 	clear.Address = &tooLong
 	if clear.Validate() == nil {
@@ -83,6 +102,7 @@ func managementCreationInputs(t *testing.T) {
 		"display email":     func(r *domain.CreateUserInput) { r.Email = "Ana <ana@example.test>" },
 		"long name":         func(r *domain.CreateUserInput) { r.Name = strings.Repeat("n", 101) },
 		"nul phone":         func(r *domain.CreateUserInput) { r.Phone = "a\x00b" },
+		"bad calling code":  func(r *domain.CreateUserInput) { code := "62"; r.CountryCode = &code },
 	} {
 		t.Run(name, func(t *testing.T) {
 			r := valid

@@ -48,6 +48,7 @@ func buildsParameterizedFilters(t *testing.T) {
 	}
 	for _, fragment := range []string{
 		"SELECT a.id AS auth_id",
+		"COALESCE(p.country_code, '') AS country_code",
 		"FROM auth a LEFT JOIN profile p",
 		"EXISTS (SELECT ur.user_id FROM user_role ur",
 		"JOIN role r ON r.id = ur.role_id",

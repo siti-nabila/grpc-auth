@@ -6,8 +6,9 @@ import (
 	"testing"
 )
 
-func TestReadSnapshots(t *testing.T)  { testutils.Run(t, test_scenarios.All()) }
-func TestServiceIngress(t *testing.T) { testutils.Run(t, test_scenarios.ServiceIngress()) }
+func TestReadSnapshots(t *testing.T)    { testutils.Run(t, test_scenarios.All()) }
+func TestMeAccessSnapshot(t *testing.T) { testutils.Run(t, test_scenarios.MeAccess()) }
+func TestServiceIngress(t *testing.T)   { testutils.Run(t, test_scenarios.ServiceIngress()) }
 
 func TestLoginProducer(t *testing.T) { testutils.Run(t, test_scenarios.Producer()) }
 

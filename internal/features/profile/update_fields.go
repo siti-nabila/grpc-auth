@@ -10,7 +10,7 @@ import (
 )
 
 func selectedFields(req domain.ProfileUpdate) (map[string]bool, error) {
-	fields := map[string]bool{"name": !req.MaskPresent, "address": !req.MaskPresent, "phone": !req.MaskPresent}
+	fields := map[string]bool{"name": !req.MaskPresent, "address": !req.MaskPresent, "phone": !req.MaskPresent, "country_code": !req.MaskPresent && req.CountryCode != nil}
 	for _, field := range req.Mask {
 		if _, ok := fields[field]; !ok {
 			return nil, common.ErrBadRequest
@@ -34,6 +34,13 @@ func selectedFields(req domain.ProfileUpdate) (map[string]bool, error) {
 			errs.Add(field.name, auth.ErrMaxLength(field.max))
 		}
 	}
+	if fields["country_code"] {
+		if req.CountryCode == nil {
+			errs.Add("country_code", common.ErrBadRequest)
+		} else if err := domain.ValidateCountryCode(*req.CountryCode); err != nil {
+			errs.Add("country_code", err)
+		}
+	}
 	if !errs.Empty() {
 		return nil, errs
 	}
@@ -49,6 +56,9 @@ func replaceFields(current domain.Profile, req domain.ProfileUpdate, fields map[
 	}
 	if fields["phone"] {
 		current.Phone = req.Phone
+	}
+	if fields["country_code"] {
+		current.CountryCode = domain.NullableCountryCode(req.CountryCode)
 	}
 	return current
 }

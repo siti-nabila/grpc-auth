@@ -15,6 +15,7 @@ import (
 	"github.com/siti-nabila/grpc-auth/tests/features/catalog/mocks"
 	"github.com/siti-nabila/grpc-auth/tests/shared/fixtures"
 	"github.com/siti-nabila/grpc-auth/tests/shared/testutils"
+	"github.com/siti-nabila/orm/orm"
 )
 
 func Reads() []testutils.Scenario {
@@ -91,7 +92,7 @@ func roleReads(t *testing.T) {
 				}
 				count := 0
 				if method == rolev1.RoleService_ListRoles_FullMethodName {
-					page, e := service.ListRoles(ctx, domain.CatalogQuery{})
+					page, e := service.ListRoles(ctx, domain.CatalogQuery{Search: &orm.SearchQuery{Fields: []string{"keyword"}, Keyword: "reviewer", Mode: orm.SearchModeFullTextTrigram}})
 					err = e
 					count = len(page.Items)
 				} else {

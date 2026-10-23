@@ -154,9 +154,10 @@ func producerFlow(t *testing.T) {
 				mock.Context = requestCtx
 				mock.Steps = append(mock.Steps, stateStep)
 				if method == userv1.UserService_Me_FullMethodName {
-					mock.Steps = append(mock.Steps, mocks.SQLStep{Op: "begin"}, stateStep, mocks.SQLStep{Op: "query", SQL: "SELECT id, email, status, version, must_change_password FROM auth", Args: []driver.Value{int64(42)}, Columns: []string{"id", "email", "status", "version", "must_change_password"}, Rows: [][]driver.Value{{int64(42), "member@example.com", "ACTIVE", int64(4), restricted}}}, mocks.SQLStep{Op: "query", SQL: "FROM profile", Args: []driver.Value{int64(42)}, Columns: []string{"id", "user_id", "name", "address", "phone"}, Rows: [][]driver.Value{{int64(7), int64(42), "Member", "Address", "123"}}})
+					mock.Steps = append(mock.Steps, mocks.SQLStep{Op: "begin"}, stateStep, mocks.SQLStep{Op: "query", SQL: "SELECT id, email, status, version, must_change_password, created_at FROM auth", Args: []driver.Value{int64(42)}, Columns: []string{"id", "email", "status", "version", "must_change_password", "created_at"}, Rows: [][]driver.Value{{int64(42), "member@example.com", "ACTIVE", int64(4), restricted, fixtures.ServiceTime.Add(-time.Hour)}}}, mocks.SQLStep{Op: "query", SQL: "FROM profile", Args: []driver.Value{int64(42)}, Columns: []string{"id", "user_id", "name", "address", "phone"}, Rows: [][]driver.Value{{int64(7), int64(42), "Member", "Address", "123"}}})
 					if !restricted {
 						mock.Steps = append(mock.Steps, mocks.SQLStep{Op: "query", SQL: "ORDER BY r.id ASC", Args: []driver.Value{int64(42), "ACTIVE", "ACTIVE"}, Columns: []string{"id", "role_name", "role_code", "role_description"}, Rows: [][]driver.Value{{int64(1), "Member", int64(1), nil}}})
+						mock.Steps = append(mock.Steps, meExtraSteps()...)
 					}
 					mock.Steps = append(mock.Steps, mocks.SQLStep{Op: "commit"})
 				} else if !restricted {

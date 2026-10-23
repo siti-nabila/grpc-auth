@@ -169,12 +169,13 @@ func ListUsersResponseFromPage(page orm.PageData[domain.UserSearchRow]) *userv1.
 
 func userListItem(row domain.UserSearchRow) *userv1.UserListItem {
 	item := &userv1.UserListItem{
-		Email:   row.Email,
-		Name:    row.Name,
-		Address: row.Address,
-		Phone:   row.Phone,
-		Id:      int32(row.AuthID),
-		Status:  string(row.Status), Version: uint64(row.Version),
+		Email:       row.Email,
+		Name:        row.Name,
+		Address:     row.Address,
+		Phone:       row.Phone,
+		CountryCode: row.CountryCode,
+		Id:          int32(row.AuthID),
+		Status:      string(row.Status), Version: uint64(row.Version),
 	}
 	if !row.CreatedAt.IsZero() {
 		item.CreatedAt = timestamppb.New(row.CreatedAt)

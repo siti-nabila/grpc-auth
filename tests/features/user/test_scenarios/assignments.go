@@ -255,7 +255,7 @@ func assignmentCase(t *testing.T, command, kind string, restart bool) {
 				roleCalls++
 				return rows, step(fmt.Sprintf("roles%d", roleCalls))
 			}, List: func(got context.Context, q domain.CatalogQuery) (orm.PageData[domain.UserRoleAssignmentItem], error) {
-				if got != ctx || q.TargetUserID != 43 || q.Page != 1 || q.Limit != 20 {
+				if got != ctx || q.TargetUserID != 43 || q.Page != 1 || q.Limit != 20 || !q.UsesKeywordSearch() {
 					t.Fatal("list scope")
 				}
 				page := orm.PageData[domain.UserRoleAssignmentItem]{Items: rows, Total: 3, Page: 1, Limit: 20, TotalPages: 1}
@@ -341,7 +341,7 @@ func assignmentCase(t *testing.T, command, kind string, restart bool) {
 	}
 	var result *domain.SafeCommandResult
 	if command == "list" {
-		out, err := svc.ListUserRoles(ctx, domain.CatalogQuery{TargetUserID: 43})
+		out, err := svc.ListUserRoles(ctx, domain.CatalogQuery{TargetUserID: 43, Search: &orm.SearchQuery{Fields: []string{"keyword"}, Keyword: "reviewer", Mode: orm.SearchModeFullTextTrigram}})
 		e = err
 		if e == nil {
 			if out.UserID != 43 || out.Version != before.Version || kind == "empty" && (out.Page.Total != 0 || len(out.Page.Items) != 0) {

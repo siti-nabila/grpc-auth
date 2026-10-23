@@ -37,9 +37,10 @@ func (w *managementAccountWriter) Create(r *domain.PendingRegistration) error {
 }
 
 type managementProfilePatch struct {
-	Name    string `sql:"column:name"`
-	Address string `sql:"column:address"`
-	Phone   string `sql:"column:phone"`
+	Name        string         `sql:"column:name"`
+	Address     string         `sql:"column:address"`
+	Phone       string         `sql:"column:phone"`
+	CountryCode sql.NullString `sql:"column:country_code"`
 }
 
 func (managementProfilePatch) TableName() string { return "profile" }
@@ -51,7 +52,7 @@ func (w *managementProfileWriter) UpdateProfile(ctx context.Context, id uint64, 
 	if w.tx == nil {
 		return false, common.ErrDependencyUnavailable
 	}
-	patch := managementProfilePatch{r.Name, r.Address, r.Phone}
+	patch := managementProfilePatch{r.Name, r.Address, r.Phone, domain.NullableCountryCode(&r.CountryCode)}
 	res, err := w.tx.UseModel(&patch).WithContext(ctx).Where("user_id = ?", id).Updates()
 	return managementAffected(res, err)
 }

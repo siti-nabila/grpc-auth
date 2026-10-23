@@ -42,7 +42,7 @@ func managementMatrix(t *testing.T) {
 			cases = append(cases, "duplicate", "PENDING")
 		case "update":
 			stages = append(stages, "ids1", "ids2", "detail", "profile-version", "profile-write")
-			cases = append(cases, "stale version", "no-op", "zero version write", "zero profile write", "optional key")
+			cases = append(cases, "stale version", "no-op", "country only", "country clear", "country no-op", "zero version write", "zero profile write", "optional key")
 		case "status":
 			stages = append(stages, "ids1", "ids2", "target", "admin-count", "status-write", "sessions", "refresh")
 			cases = append(cases, "stale version", "no-op", "last admin", "count failure", "zero status write", "activate", "illegal transition", "self")
@@ -115,8 +115,20 @@ func managementCommandCase(t *testing.T, command, kind string) {
 	if kind == "no-op" {
 		name = "Target user"
 	}
-	create := domain.CreateUserInput{Name: "Target user", Email: " TARGET@EXAMPLE.TEST ", Password: "synthetic-password", Status: &status, Key: "test-key"}
+	countryCode := "+62"
+	create := domain.CreateUserInput{CountryCode: &countryCode, Name: "Target user", Email: " TARGET@EXAMPLE.TEST ", Password: "synthetic-password", Status: &status, Key: "test-key"}
 	update := domain.UpdateUserInput{UserID: 43, ExpectedVersion: 7, Name: &name, Fields: []string{"name"}, Key: "test-key"}
+	if strings.HasPrefix(kind, "country ") {
+		name = "Target user"
+		code := "+1"
+		if kind == "country clear" {
+			code = ""
+		}
+		if kind == "country no-op" {
+			code = "+62"
+		}
+		update.Name, update.CountryCode, update.Fields = nil, &code, []string{"country_code"}
+	}
 	status = types.UserSuspended
 	if command == "create" {
 		status = types.UserActive
@@ -137,7 +149,7 @@ func managementCommandCase(t *testing.T, command, kind string) {
 	if kind == "optional key" {
 		update.Key = ""
 	}
-	detail := domain.UserDetail{ID: 43, Email: "target@example.test", Name: "Target user", Status: types.UserActive, Version: 7, CreatedAt: fixtures.ServiceTime, MustChangePassword: true}
+	detail := domain.UserDetail{ID: 43, Email: "target@example.test", Name: "Target user", CountryCode: countryCode, Status: types.UserActive, Version: 7, CreatedAt: fixtures.ServiceTime, MustChangePassword: true}
 	if command == "create" {
 		detail.Version = 1
 		detail.Status = status
@@ -155,12 +167,12 @@ func managementCommandCase(t *testing.T, command, kind string) {
 		t.Fatal(err)
 	}
 	scope := domain.IdempotencyScope{ActorID: 42, Method: method, Target: "user/43", Key: "test-key"}
-	payload := featurecommon.FingerprintPayload{ExpectedVersion: 7, Name: &name, Presence: []string{"expected_user_version", "name"}}
+	payload := featurecommon.FingerprintPayload{ExpectedVersion: 7, Name: update.Name, CountryCode: update.CountryCode, Presence: append([]string{"expected_user_version"}, update.Fields...)}
 	if command == "create" {
 		scope.Target = "account/target@example.test"
 		email := "target@example.test"
 		address, phone := "", ""
-		payload = featurecommon.FingerprintPayload{Email: email, Name: &create.Name, Address: &address, Phone: &phone, Status: string(status), Presence: []string{"status", "name", "address", "phone"}}
+		payload = featurecommon.FingerprintPayload{Email: email, Name: &create.Name, Address: &address, Phone: &phone, CountryCode: create.CountryCode, Status: string(status), Presence: []string{"status", "name", "address", "phone"}}
 	}
 	if command == "status" {
 		if kind == "self" {
@@ -284,7 +296,7 @@ func managementCommandCase(t *testing.T, command, kind string) {
 				return step("create")
 			}},
 			Profile: authmocks.ProfileWriter{Write: func(r *domain.ProfileRequest) error {
-				if r.UserId != 43 || r.Name != create.Name {
+				if r.UserId != 43 || r.Name != create.Name || r.CountryCode.String != countryCode || !r.CountryCode.Valid {
 					t.Fatal("profile scope")
 				}
 				return step("profile-create")
@@ -313,7 +325,7 @@ func managementCommandCase(t *testing.T, command, kind string) {
 				}
 				return kind != "zero version write", step("profile-version")
 			}, Write: func(got context.Context, id uint64, r domain.UserDetail) (bool, error) {
-				if got != ctx || id != 43 || r.Name != name {
+				if got != ctx || id != 43 || r.Name != name || update.CountryCode != nil && r.CountryCode != *update.CountryCode || update.CountryCode == nil && r.CountryCode != countryCode {
 					t.Fatal("profile mutation scope")
 				}
 				return kind != "zero profile write", step("profile-write")
@@ -341,7 +353,7 @@ func managementCommandCase(t *testing.T, command, kind string) {
 				if e != nil || a.ActorUserID == nil || *a.ActorUserID != 42 || r.TargetID != "43" {
 					t.Fatal("audit identity", e)
 				}
-				if kind == "no-op" && (r.Action != types.AuditNoOp || !r.After.NoOp) {
+				if (kind == "no-op" || kind == "country no-op") && (r.Action != types.AuditNoOp || !r.After.NoOp) {
 					t.Fatal("no-op audit")
 				}
 				return step("audit")
@@ -416,7 +428,7 @@ func managementCommandCase(t *testing.T, command, kind string) {
 		}
 		return
 	}
-	if err != nil || result == nil || result.UserID != 43 || result.Changed != (kind != "no-op") {
+	if err != nil || result == nil || result.UserID != 43 || result.Changed != (kind != "no-op" && kind != "country no-op") {
 		t.Fatal("result", result, err, tx.Calls)
 	}
 	if tx.Calls[len(tx.Calls)-1] != "commit" {
@@ -427,7 +439,7 @@ func managementCommandCase(t *testing.T, command, kind string) {
 			t.Fatal("replay performed business effects", tx.Calls)
 		}
 	}
-	if kind == "no-op" && (slices.Contains(tx.Calls, "outbox") || slices.Contains(tx.Calls, "status-write") || slices.Contains(tx.Calls, "profile-write")) {
+	if (kind == "no-op" || kind == "country no-op") && (slices.Contains(tx.Calls, "outbox") || slices.Contains(tx.Calls, "status-write") || slices.Contains(tx.Calls, "profile-write")) {
 		t.Fatal("no-op mutated state", tx.Calls)
 	}
 	if kind == "optional key" && (slices.Contains(tx.Calls, "lookup") || slices.Contains(tx.Calls, "save")) {

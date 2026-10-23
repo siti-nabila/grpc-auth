@@ -12,3 +12,5 @@ func TestRoleInputs(t *testing.T) { testutils.Run(t, test_scenarios.Inputs()) }
 func TestRoleResults(t *testing.T) { testutils.Run(t, test_scenarios.Results()) }
 
 func TestCatalogQuery(t *testing.T) { testutils.Run(t, test_scenarios.Catalogs()) }
+
+func TestKeywordCatalogs(t *testing.T) { testutils.Run(t, test_scenarios.KeywordCatalogs()) }

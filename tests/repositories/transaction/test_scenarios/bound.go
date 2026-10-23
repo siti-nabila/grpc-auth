@@ -29,7 +29,7 @@ func writeFailures(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
 			cause := errors.New("write failed")
-			step := mocks.SQLStep{Op: "exec", SQL: "UPDATE profile", Args: []driver.Value{"", "", "", int64(1)}, Error: cause}
+			step := mocks.SQLStep{Op: "exec", SQL: "UPDATE profile", Args: []driver.Value{"", "", "", nil, int64(1)}, Error: cause}
 			if name == "auth duplicate" {
 				step = mocks.SQLStep{Op: "query", SQL: "INSERT INTO auth", Args: []driver.Value{"x@example.test", "encoded"}, Error: &pq.Error{Code: "23505"}}
 			}
@@ -74,10 +74,10 @@ func bound(t *testing.T) {
 		{Op: "begin"},
 		{Op: "query", SQL: "FROM auth", Args: []driver.Value{"user@example.test"}, Columns: []string{"id", "email", "password"}, Rows: [][]driver.Value{{int64(42), "user@example.test", "encoded"}}},
 		{Op: "query", SQL: "FROM role", Args: []driver.Value{int64(1)}, Columns: []string{"id", "role_code", "role_name"}, Rows: [][]driver.Value{{int64(7), int64(1), "member"}}},
-		{Op: "query", SQL: "FROM profile", Args: []driver.Value{int64(42)}, Columns: []string{"id", "user_id", "name", "address", "phone"}, Rows: [][]driver.Value{{int64(8), int64(42), "old", "old", "old"}}},
-		{Op: "exec", SQL: "UPDATE profile SET name = $1, address = $2, phone = $3 WHERE id = $4", Args: []driver.Value{"new", "", "", int64(8)}},
+		{Op: "query", SQL: "FROM profile", Args: []driver.Value{int64(42)}, Columns: []string{"id", "user_id", "name", "address", "phone", "country_code"}, Rows: [][]driver.Value{{int64(8), int64(42), "old", "old", "old", nil}}},
+		{Op: "exec", SQL: "UPDATE profile SET name = $1, address = $2, phone = $3, country_code = $4 WHERE id = $5", Args: []driver.Value{"new", "", "", "+62", int64(8)}},
 		{Op: "query", SQL: "INSERT INTO auth", Args: []driver.Value{"new@example.test", "encoded"}, Columns: []string{"id"}, Rows: [][]driver.Value{{int64(43)}}},
-		{Op: "query", SQL: "INSERT INTO profile", Args: []driver.Value{int64(43), "", "", ""}, Columns: []string{"id"}, Rows: [][]driver.Value{{int64(9)}}},
+		{Op: "query", SQL: "INSERT INTO profile", Args: []driver.Value{int64(43), "", "", "", nil}, Columns: []string{"id"}, Rows: [][]driver.Value{{int64(9)}}},
 		{Op: "query", SQL: "INSERT INTO user_role", Args: []driver.Value{int64(43), int64(7)}, Columns: []string{"id"}, Rows: [][]driver.Value{{int64(10)}}},
 		{Op: "commit"},
 		{Op: "begin"}, {Op: "rollback"},
@@ -103,10 +103,10 @@ func bound(t *testing.T) {
 		t.Fatalf("role %+v err %v", r, err)
 	}
 	p, err := ownProfile.Reader.GetByUserId(42)
-	if err != nil || p.Id != 8 || p.UserId != 42 {
+	if err != nil || p.Id != 8 || p.UserId != 42 || p.CountryCode.Valid {
 		t.Fatalf("profile %+v err %v", p, err)
 	}
-	if err = ownProfile.Writer.Update(&domain.UpdateProfileRequest{Id: p.Id, Name: "new"}); err != nil {
+	if err = ownProfile.Writer.Update(&domain.UpdateProfileRequest{Id: p.Id, Name: "new", CountryCode: sql.NullString{String: "+62", Valid: true}}); err != nil {
 		t.Fatal(err)
 	}
 	request := &domain.AuthRequest{Email: "new@example.test", Password: "encoded"}

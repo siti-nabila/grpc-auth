@@ -21,7 +21,7 @@ func (s *managementService) UpdateUser(ctx context.Context, input domain.UpdateU
 	if err := input.Validate(); err != nil {
 		return nil, err
 	}
-	payload := featurecommon.FingerprintPayload{Name: input.Name, Address: input.Address, Phone: input.Phone, ExpectedVersion: input.ExpectedVersion, Presence: append([]string{"expected_user_version"}, input.Fields...)}
+	payload := featurecommon.FingerprintPayload{Name: input.Name, Address: input.Address, Phone: input.Phone, CountryCode: input.CountryCode, ExpectedVersion: input.ExpectedVersion, Presence: append([]string{"expected_user_version"}, input.Fields...)}
 	c := managementCommand{method: userv1.UserService_UpdateUser_FullMethodName, permission: types.PermissionIAMUserUpdate, target: input.UserID, key: input.Key, payload: payload}
 	return s.runManagement(ctx, c, func(ctx context.Context, r ManagementRepositories, p sessions.Principal, _ uint64, now time.Time) (domain.SafeCommandResult, error) {
 		return s.updateUser(ctx, r, p, input, now)
@@ -40,7 +40,7 @@ func (s *managementService) updateUser(ctx context.Context, r ManagementReposito
 		return domain.SafeCommandResult{}, usererrors.ErrVersionConflict
 	}
 	after := updatedUserProfile(before, input)
-	changed := after.Name != before.Name || after.Address != before.Address || after.Phone != before.Phone
+	changed := after.Name != before.Name || after.Address != before.Address || after.Phone != before.Phone || after.CountryCode != before.CountryCode
 	action := types.AuditNoOp
 	if changed {
 		if err = persistManagedProfile(ctx, r, after, input, now); err != nil {
@@ -68,7 +68,7 @@ func (s *managementService) updateUser(ctx context.Context, r ManagementReposito
 }
 
 func managementProfileSnapshot(r domain.UserDetail) *domain.SafeSnapshot {
-	return &domain.SafeSnapshot{Version: r.Version, Name: &r.Name, Address: &r.Address, Phone: &r.Phone}
+	return &domain.SafeSnapshot{Version: r.Version, Name: &r.Name, Address: &r.Address, Phone: &r.Phone, CountryCode: &r.CountryCode}
 }
 
 func updatedUserProfile(before domain.UserDetail, input domain.UpdateUserInput) domain.UserDetail {
@@ -81,6 +81,9 @@ func updatedUserProfile(before domain.UserDetail, input domain.UpdateUserInput) 
 	}
 	if input.Phone != nil {
 		after.Phone = *input.Phone
+	}
+	if input.CountryCode != nil {
+		after.CountryCode = *input.CountryCode
 	}
 	return after
 }

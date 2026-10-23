@@ -20,7 +20,7 @@ func (s *managementService) CreateUser(ctx context.Context, input domain.CreateU
 	if err := input.Validate(); err != nil {
 		return nil, err
 	}
-	payload := featurecommon.FingerprintPayload{Email: input.Email, Name: &input.Name, Address: &input.Address, Phone: &input.Phone, Status: string(*input.Status), Presence: []string{"status", "name", "address", "phone"}}
+	payload := featurecommon.FingerprintPayload{Email: input.Email, Name: &input.Name, Address: &input.Address, Phone: &input.Phone, CountryCode: input.CountryCode, Status: string(*input.Status), Presence: []string{"status", "name", "address", "phone"}}
 	c := managementCommand{method: userv1.UserService_CreateUser_FullMethodName, permission: types.PermissionIAMUserCreate, account: input.Email, key: input.Key, payload: payload, password: []byte(input.Password)}
 	return s.runManagement(ctx, c, func(ctx context.Context, r ManagementRepositories, p sessions.Principal, member uint64, now time.Time) (domain.SafeCommandResult, error) {
 		return s.createUser(ctx, r, p, member, input, now)
@@ -51,7 +51,7 @@ func (s *managementService) createUser(ctx context.Context, r ManagementReposito
 	if domain.ValidateManagementTarget(account.ID) != nil {
 		return domain.SafeCommandResult{}, common.ErrInternalServerError
 	}
-	if err = r.Profile.Create(&domain.ProfileRequest{UserId: account.ID, Name: input.Name, Address: input.Address, Phone: input.Phone}); err != nil {
+	if err = r.Profile.Create(&domain.ProfileRequest{UserId: account.ID, Name: input.Name, Address: input.Address, Phone: input.Phone, CountryCode: domain.NullableCountryCode(input.CountryCode)}); err != nil {
 		return domain.SafeCommandResult{}, featurecommon.DependencyError(err)
 	}
 	if err = r.Member.Assign(account.ID, member); err != nil {

@@ -22,7 +22,7 @@ func (r *userIdentityReader) Identity(ctx context.Context, userID uint64) (res d
 	if r.handle == nil {
 		return res, common.ErrDependencyUnavailable
 	}
-	err = r.handle.UseModel(domain.UserIdentity{}).WithContext(ctx).Select("id", "email", "status", "version", "must_change_password").Where("id = ?", userID).Limit(1).Scan(&res)
+	err = r.handle.UseModel(domain.UserIdentity{}).WithContext(ctx).Select("id", "email", "status", "version", "must_change_password", "created_at").Where("id = ?", userID).Limit(1).Scan(&res)
 	return res, helpers.HandleDBError(err)
 }
 
